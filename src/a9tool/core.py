@@ -4,7 +4,9 @@ Every writing function here follows the same shape — snapshot, persist, write,
 read back, confirm nothing else moved, then SAVE(0) — because that is the shape
 that was proven on hardware before this tool existed.
 """
+import json
 from dataclasses import dataclass
+from datetime import datetime, timezone
 from pathlib import Path
 
 from . import fnmap, journal, usbdev
@@ -44,8 +46,9 @@ def override_status(state: CameraState) -> str:
     return STATUS_MIXED
 
 
-def _perform(camera, session, pid: int, target: bytes, state: CameraState, say) -> journal.Session:
-    """Write one property, confirm nothing else moved, then SAVE(0).
+def _perform_many(camera, session, targets: dict[int, bytes], state: CameraState,
+                  say) -> journal.Session:
+    """Write the given properties, confirm nothing else moved, then SAVE(0).
 
     Shared by every write path. On any failure the session is left in
     FAILED_REVIEW_REQUIRED with the error recorded, never silently retried.
@@ -58,13 +61,19 @@ def _perform(camera, session, pid: int, target: bytes, state: CameraState, say) 
             if live[prop] != bytes([state.slots[number]]):
                 raise ValueError('机身参数在读取之后发生变化，已停止，没有写入')
 
-        others = {p: value for p, value in live.items() if p != pid}
+        pending = {pid: target for pid, target in targets.items() if live.get(pid) != target}
+        others = {p: value for p, value in live.items() if p not in targets}
+        if not pending:
+            session.journal['state'] = 'ALREADY_AT_TARGET_NO_SAVE'
+            return journal.save(session)
+
         say('正在写入…')
         session.journal['state'] = 'WRITE_PENDING'
         journal.save(session)
-        camera.writeBackup(pid, target)
-        if bytes(camera.readBackup(pid)) != target:
-            raise ValueError('写入后立即回读不一致')
+        for pid, target in pending.items():
+            camera.writeBackup(pid, target)
+            if bytes(camera.readBackup(pid)) != target:
+                raise ValueError(f'写入后立即回读不一致（{pid:#010x}）')
         session.journal['state'] = 'WRITE_VERIFIED'
         journal.save(session)
 
@@ -77,8 +86,9 @@ def _perform(camera, session, pid: int, target: bytes, state: CameraState, say) 
         journal.save(session)
         camera.saveBackup(0)
 
-        if bytes(camera.readBackup(pid)) != target:
-            raise ValueError('保存后回读与写入值不一致')
+        for pid, target in pending.items():
+            if bytes(camera.readBackup(pid)) != target:
+                raise ValueError(f'保存后回读与写入值不一致（{pid:#010x}）')
         for other, expected in others.items():
             if bytes(camera.readBackup(other)) != expected:
                 raise ValueError(f'保存后一个不相关的参数发生了变化（{other:#010x}）')
@@ -90,6 +100,10 @@ def _perform(camera, session, pid: int, target: bytes, state: CameraState, say) 
         session.journal['error'] = str(error)
         journal.save(session)
         raise
+
+
+def _perform(camera, session, pid: int, target: bytes, state: CameraState, say) -> journal.Session:
+    return _perform_many(camera, session, {pid: target}, state, say)
 
 
 def enable_override(camera, state: CameraState, root: Path, progress=None) -> journal.Session:
@@ -158,3 +172,81 @@ def write_slot(camera, state: CameraState, slot: int, value: int, root: Path,
     )
     session = journal.create(root, 'write_slot', payload, state.snapshot)
     return _perform(camera, session, pid, bytes([value]), state, say)
+
+
+# --------------------------------------------------------------------------
+# restore
+# --------------------------------------------------------------------------
+
+def _restore_target(session: journal.Session, state: CameraState):
+    """(property id, the value to write back, the value that must be there now)."""
+    payload = session.payload
+    if session.action == 'write_slot':
+        slot = payload['slot']
+        pid = fnmap.FN_SLOTS[slot]
+        return pid, bytes.fromhex(payload['original']), bytes([state.slots[slot]]), bytes.fromhex(payload['target'])
+    if session.action == 'enable_override':
+        return fnmap.OVERRIDE, bytes.fromhex(payload['original']), state.override, bytes.fromhex(payload['target'])
+    raise ValueError('这条记录没有可以恢复的内容')
+
+
+def restore_session(camera, session: journal.Session, root: Path, progress=None) -> journal.Session:
+    """Put back exactly what one earlier write changed."""
+    say = progress or (lambda _message: None)
+    journal.load(session.directory / 'journal.json')  # re-verifies the snapshot hash
+    state = read_state(camera)
+    pid, original, current, written = _restore_target(session, state)
+    if current not in (original, written):
+        raise ValueError('恢复冲突：这个槽位的当前值既不是记录的原值、也不是写入的值。'
+                         '可能你在相机上手动改过它，恢复已停止。')
+
+    payload = dict(original=current.hex(), target=original.hex(),
+                   property=hex(pid), restored_from=session.directory.name)
+    restored = journal.create(root, 'restore', payload, state.snapshot)
+    return _perform(camera, restored, pid, original, state, say)
+
+
+def save_baseline(state: CameraState, root=None) -> Path:
+    """Record the pre-first-write state once. Never overwritten afterwards."""
+    base = Path(root) if root is not None else journal.baseline_root()
+    record_path = base / 'baseline.json'
+    if record_path.exists():
+        return record_path
+    base.mkdir(parents=True, exist_ok=True)
+    (base / 'Backup-baseline.bin').write_bytes(state.snapshot)
+    record = dict(
+        schema='a9tool-baseline-v1',
+        created=datetime.now(timezone.utc).isoformat(timespec='seconds'),
+        snapshot_sha256=journal.digest(state.snapshot),
+        override=state.override.hex(),
+        slots={str(number): value for number, value in state.slots.items()},
+    )
+    record_path.write_text(json.dumps(record, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+    return record_path
+
+
+def restore_baseline(camera, root: Path, progress=None, baseline_dir=None) -> journal.Session:
+    """Put the whole camera back to the state recorded before this tool was first used."""
+    say = progress or (lambda _message: None)
+    base = Path(baseline_dir) if baseline_dir is not None else journal.baseline_root()
+    record_path = base / 'baseline.json'
+    if not record_path.exists():
+        raise ValueError('还没有原厂基线记录，无法恢复全部原厂')
+    record = json.loads(record_path.read_text(encoding='utf-8'))
+    snapshot = base / 'Backup-baseline.bin'
+    if not snapshot.exists() or journal.digest(snapshot.read_bytes()) != record.get('snapshot_sha256'):
+        raise ValueError('原厂基线文件缺失或已损坏，恢复已停止')
+
+    state = read_state(camera)
+    targets = {}
+    override = bytes.fromhex(record['override'])
+    if state.override != override:
+        targets[fnmap.OVERRIDE] = override
+    for number, prop in fnmap.FN_SLOTS.items():
+        wanted = record['slots'][str(number)]
+        if state.slots[number] != wanted:
+            targets[prop] = bytes([wanted])
+
+    payload = dict(restored_from='baseline', properties=[hex(pid) for pid in targets])
+    session = journal.create(root, 'restore_baseline', payload, state.snapshot)
+    return _perform_many(camera, session, targets, state, say)
