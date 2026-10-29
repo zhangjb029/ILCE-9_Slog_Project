@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>在 Sony A9 上开启 Picture Profile 和 SLog 显示辅助</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+<nav><a href="../index.html">English</a> · <strong>简体中文</strong></nav>
+
+<main>
+
+<h1>在 Sony A9 上开启 Picture Profile 和 SLog 显示辅助</h1>
+<p class="sub">适用机型：ILCE-9（第一代 A9），固件 6.00。整个过程大约 30 分钟，不需要装 Python，也不需要敲命令。</p>
+
+<div class="banner">
+<h2>开始之前请先读完这段</h2>
+<ul>
+  <li>这个工具会修改相机里的<b>功能参数</b>，不是固件。改坏了可以用它自带的备份恢复。</li>
+  <li>它<b>只支持 ILCE-9 固件 6.00</b>。其他机型、其他固件版本，程序会直接拒绝，不会写入任何东西。</li>
+  <li>一共提供 77 个功能。其中 <b>Picture Profile 和 SLog 显示辅助这两项在真机上验证过能用</b>，其余 74 项从来没有人在真机上试过，包括可能出现相机卡死、必须拔电池的情况。</li>
+  <li>已经知道「像素转换多重拍摄」会在拍第一张之后卡死，界面上把它标成了红色，但仍然可以点。</li>
+  <li>风险自负。这不是索尼官方工具，出了问题索尼不会保修。</li>
+</ul>
+</div>
+
+<h2>1. 开始之前</h2>
+
+<p>先确认三件事：</p>
+<ol>
+  <li>相机是 <b>ILCE-9</b>（机身背面写着 ILCE-9，不是 ILCE-9M2）。</li>
+  <li>固件版本是 <b>6.00</b>。在相机上查看：MENU → 设置 → 版本。</li>
+  <li>有一根能传数据的 USB 线，和一个能用的 Windows 10/11 电脑。</li>
+</ol>
+
+<div class="warn">
+<strong>版本不是 6.00 怎么办？</strong>
+先不要用这个工具。不同固件版本里，参数存放的位置不一样，硬写进去可能损坏相机配置。程序会自己拦住，但请你也先确认一下。
+</div>
+
+<p>你需要用到的两个网站，建议提前打开：</p>
+<ul>
+  <li>本工具的下载页（GitHub Releases，链接在本页底部）</li>
+  <li><a href="https://zadig.akeo.ie/">Zadig</a> — 用来给相机装 USB 驱动的小工具，免费</li>
+</ul>
+
+<h2>2. 下载与解压</h2>
+
+<p>在 Releases 页面下载 <code>ILCE-9_Slog_Project.exe</code>，放到一个你找得到的地方，比如桌面。</p>
+
+<p>这个程序<b>没有安装过程</b>，也没有卸载程序——它就是一个 exe 文件，双击就能用。第一次运行时，它会在自己所在的文件夹里建一个 <code>sessions</code> 文件夹，用来放每次修改前的备份。<b>请不要删掉这个文件夹</b>，恢复就靠它。</p>
+
+<div class="note">
+<strong>为什么它要建文件夹？</strong>
+因为每次改动相机之前，程序都会先把相机当时的完整参数存一份到这个文件夹里。万一改坏了，或者你反悔了，用它就能回到改之前。
+</div>
+
+<h2>3. Windows 拦住了这个程序</h2>
+
+<p>第一次双击时，Windows 很可能弹出一个蓝色窗口，写着「Windows 已保护你的电脑」。</p>
+
+<figure class="shot">
+  <img src="../assets/img/smartscreen.png" alt="Windows SmartScreen 拦截窗口">
+  <figcaption>截图：Windows 的拦截窗口</figcaption>
+</figure>
+
+<p>点左边的 <b>「更多信息」</b>，然后点下面出现的 <b>「仍要运行」</b>。</p>
+
+<p>原因很简单：这个程序没有买微软的数字签名证书（一年要几百美元，个人项目买不起）。Windows 见到没有签名的 exe 就一律拦下来，不代表它有问题。</p>
+
+<h2>4. 杀毒软件报毒</h2>
+
+<p>有些杀毒软件会把这个程序报成病毒。原因也一样：它需要直接读写 USB 设备，这个行为和某些恶意软件很像。</p>
+
+<p>如果你不放心，可以看 GitHub 上的源代码——所有代码都公开，任何人都能检查它到底做了什么。<b>不要</b>从别的地方下载这个 exe。</p>
+
+<h2>5. 给相机装驱动（第一次）</h2>
+
+<p>这是整个流程里最容易卡住的一步，慢慢来。</p>
+
+<h3>5.1 让相机进入大容量存储模式</h3>
+<ol>
+  <li>相机关机。</li>
+  <li>用 USB 线把相机连到电脑。</li>
+  <li>相机开机。</li>
+  <li>如果相机屏幕上问「USB 连接」，选 <b>「大容量存储」</b>（Mass Storage）。</li>
+  <li>这时电脑上会出现相机的存储卡。如果没有出现，换一根线或换一个 USB 口。</li>
+</ol>
+
+<h3>5.2 用 Zadig 换驱动</h3>
+<ol>
+  <li>打开 Zadig（不需要安装，双击就行）。</li>
+  <li>点菜单 <b>Options → List All Devices</b>。</li>
+  <li>在中间的下拉列表里找到你的相机。它可能显示成 <code>Sony Digital Still Camera</code> 或者类似的名称。</li>
+  <li>确认右边显示的目标驱动是 <b>libusb-win32</b>。如果不是，点右边的箭头换成它。</li>
+  <li>点 <b>Install Driver</b> 或 <b>Replace Driver</b>，等它跑完。</li>
+</ol>
+
+<figure class="shot">
+  <img src="../assets/img/zadig-1.png" alt="Zadig 中选择相机设备">
+  <figcaption>截图：在 Zadig 里选中你的相机</figcaption>
+</figure>
+
+<div class="warn">
+<strong>不要选错设备</strong>
+列表里可能还有一个叫 <code>USB Input Device</code> 之类、VID 是 <code>054C</code>、PID 是 <code>0994</code> 的设备。那个是相机的 USB 输入接口，<b>不是</b>这次要改的。改错了不影响相机，但电脑的输入设备会出问题。
+</div>
+
+<h3>5.3 装完之后，存储卡会消失</h3>
+
+<p>装完驱动后，你会发现 Windows 资源管理器里看不到相机的存储卡了，还可能弹出一个「需要格式化」的提示。</p>
+
+<div class="note">
+<strong>这是正常的，不是相机坏了。</strong>
+新驱动把相机从「U 盘」变成了「一个程序可以直接对话的设备」，代价就是 Windows 不再把它当成 U 盘显示。<b>不要点格式化。</b> 用完工具之后按第 11 节把驱动换回去，存储卡就回来了。
+</div>
+
+<h2>6. 连接并检查</h2>
+
+<p>保持相机的「大容量存储」模式，双击打开 <code>ILCE-9_Slog_Project.exe</code>。</p>
+
+<p>点 <b>「① 连接并检查」</b> 里的按钮。程序会做这几件事：读相机型号、读固件版本、确认是 6.00、把当前的全部参数备份一份、然后尝试把相机切换到服务模式。</p>
+
+<p>中间可能需要几十秒，日志区会一行行往下滚。正常情况下你会看到：</p>
+
+<ul>
+  <li><code>已确认 ILCE-9 / 6.00，正在切换服务模式</code></li>
+  <li><code>服务模式已认证，正在读取机身参数</code></li>
+  <li>然后「② 检测结果」里出现机型、固件、序列号指纹</li>
+</ul>
+
+<h2>7. 给相机装驱动（第二次）</h2>
+
+<p>如果第 6 步的最后卡住了，日志里出现 <b>「Service device not found」</b> 或者一段提到 Zadig 的提示，说明相机已经切到服务模式，但 Windows 还没给这个新出现的设备装驱动。</p>
+
+<p>这是正常现象——<b>服务模式是一个不同的 USB 设备，需要单独再装一次驱动</b>。</p>
+
+<ol>
+  <li>相机不要拔线，保持现在的状态。</li>
+  <li>再打开一次 Zadig，<b>Options → List All Devices</b>。</li>
+  <li>这次会多出一个新的 Sony 设备，名字后面通常带 <code>(Interface 1)</code> 或者类似的标记。</li>
+  <li>同样给它装 <b>libusb-win32</b>。</li>
+  <li>回到本程序的窗口，点 <b>「重试」</b>。</li>
+</ol>
+
+<figure class="shot">
+  <img src="../assets/img/zadig-2.png" alt="Zadig 中选择服务模式设备">
+  <figcaption>截图：第二次安装时出现的新设备</figcaption>
+</figure>
+
+<div class="warn">
+<strong>重试按钮一小时后会失效</strong>
+如果隔了太久才回来点重试，程序会提示你把相机拔掉重插、回到大容量存储模式重新开始。这一步不会写入任何东西，重来是安全的。
+</div>
+
+<h2>8. 开启 PP 放行，然后重启</h2>
+
+<p>连接成功之后，「② 检测结果」里会显示 PP 放行的状态。</p>
+
+<p>如果是 <b>「✗ 未开启」</b>，点旁边的 <b>「开启 PP 放行」</b>。程序会改五个字节，然后自动保存。</p>
+
+<div class="note">
+<strong>为什么要重启相机？</strong>
+改完参数只是写进了相机的存储，相机要重新开机才会重新读取这些参数。程序会提示你关机重启，请照做。<b>重启之前不要再做别的操作。</b>
+</div>
+
+<p>重启完之后，再打开本程序，重新走一遍第 6 步连接（第二次不需要再装驱动了）。</p>
+
+<h2>9. 把功能写进 Fn 槽位</h2>
+
+<p>「③ 选择功能」里默认显示两张卡片：</p>
+
+<ul>
+  <li><b>Picture Profile</b>（图片配置文件）</li>
+  <li><b>SLog 显示辅助</b></li>
+</ul>
+
+<p>每张卡片下面有一个槽位下拉框，选你想放进哪个 Fn 位置（Fn1 到 Fn12）。选好之后点「写入」。</p>
+
+<figure class="shot">
+  <img src="../assets/img/window-connected.png" alt="程序主窗口">
+  <figcaption>截图：连接成功后的主窗口</figcaption>
+</figure>
+
+<p>如果要用的功能不在这两张卡片里，点下面的 <b>「▸ 全部功能（77 项，多数未验证）」</b> 展开完整列表，选一行，在弹出的框里选槽位，点「写入所选功能」。</p>
+
+<p>写入成功后，<b>整个窗口的写入按钮都会变灰</b>。这是故意的：一次运行只做一次修改，每次修改都有自己的备份。要再改另一个槽位，关掉窗口重新打开。</p>
+
+<h2>10. 在相机上确认</h2>
+
+<p>写入完成后，程序会提示你关机重启。重启之后，在相机上按 <b>Fn</b> 键，看看对应的槽位有没有变成你写入的那个功能。</p>
+
+<figure class="shot">
+  <img src="../assets/img/camera-fn.png" alt="相机 Fn 菜单">
+  <figcaption>截图：相机上的 Fn 菜单</figcaption>
+</figure>
+
+<div class="warn">
+<strong>「菜单里出现了」不等于「功能能用」</strong>
+这一步很重要。所有 12 个 Fn 槽位都能写进去，相机也会把它显示出来——但显示出来只说明入口存在，不代表功能真的能用。
+<ul>
+  <li>Picture Profile 和 SLog 显示辅助：真机验证过能用，重启后依然有效。</li>
+  <li>其余 74 项：从来没有人试过。可能出现灰显、点了没反应、甚至让相机卡死。</li>
+</ul>
+如果试了没反应，用第 11 节的方法恢复回去就好。
+</div>
+
+<h2>11. 改回去</h2>
+
+<h3>11.1 撤销某一次修改</h3>
+
+<p>打开程序，连上相机，在「④ 恢复」的列表里会看到你之前做过的每一次修改，每条都标了时间和内容。</p>
+
+<ol>
+  <li>点选你要撤销的那一条。</li>
+  <li>点 <b>「从备份恢复到原状」</b>。</li>
+  <li>确认之后，程序会把那一次改过的值写回去，并自动保存。</li>
+  <li>关机重启相机。</li>
+</ol>
+
+<div class="note">
+<strong>连着改过好几次的话</strong>
+每条记录的「原值」是指<i>那一次修改之前</i>的值。如果你先改了 Fn7、后来又改了 Fn12，那么撤销 Fn12 只会回到「Fn7 已经改过」的状态，不是出厂状态。列表的备注栏会提醒你这一点。
+</div>
+
+<h3>11.2 全部恢复到第一次使用之前</h3>
+
+<p>「④ 恢复」里的 <b>「恢复全部原厂」</b> 会把本工具改过的所有位置一次性写回第一次使用之前的值。</p>
+
+<div class="warn">
+<strong>这个按钮会覆盖你手动改的东西</strong>
+它会连你在相机上手动改过的设置一起覆盖掉。确认之前想清楚。
+</div>
+
+<h3>11.3 让 Windows 重新把相机当 U 盘</h3>
+
+<p>如果你不再需要用这个工具，可以按下面的步骤把驱动还原：</p>
+
+<ol>
+  <li>关掉本程序。</li>
+  <li>右键「开始」→ <b>设备管理器</b>。</li>
+  <li>找到「libusb-win32 devices」或者其他的 Sony 相机条目。</li>
+  <li>右键 → <b>卸载设备</b>，勾选 <b>「删除此设备的驱动程序软件」</b>。</li>
+  <li>拔掉 USB 线，重新插上。</li>
+  <li>Windows 会自动装回原来的驱动，存储卡又能看到了。</li>
+</ol>
+
+<div class="note">
+<strong>只针对相机</strong>
+卸载的时候看清楚，只卸相机那一条，不要动别的 USB 设备。
+</div>
+
+<footer>
+<p>本工具与索尼公司无关，未获索尼认可或支持。Sony、ILCE-9、Picture Profile、S-Log 是索尼集团公司的商标。</p>
+<p>源代码与许可证：<a href="https://github.com/">GitHub 仓库</a> · 遇到问题请附上程序窗口下方的完整日志。</p>
+</footer>
+
+</main>
+</body>
+</html>
