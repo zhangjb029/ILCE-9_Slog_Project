@@ -58,7 +58,7 @@ a = Analysis(
         'pmca.usb.driver.generic', 'pmca.usb.driver.generic.libusb',
         'pmca.backup',
     ],
-    hookspath=[],
+    hookspath=[os.path.join(SPECPATH, 'hooks')],
     runtime_hooks=[],
     excludes=['pytest', 'tkinter.test', 'test'],
     noarchive=False,

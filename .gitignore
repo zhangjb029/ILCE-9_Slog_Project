@@ -10,3 +10,5 @@ baseline/
 .superpowers/
 .remember/
 dist-debug/
+.venv-ci/
+dist-ci/
