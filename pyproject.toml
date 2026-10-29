@@ -1,0 +1,16 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "a9tool"
+version = "1.0.0"
+description = "Enable hidden Fn-menu functions on the Sony ILCE-9 (firmware 6.00)"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+
+[tool.setuptools]
+package-dir = { "" = "src" }
+
+[tool.setuptools.packages.find]
+where = ["src"]
