@@ -1,0 +1,824 @@
+{
+  "01": {
+    "symbol": "DriveMode",
+    "english": "Drive Mode",
+    "chinese": "驱动模式",
+    "chinese_confirmed": true,
+    "candidates": [
+      "驱动模式"
+    ],
+    "english_confirmed": true
+  },
+  "02": {
+    "symbol": "FlashMode",
+    "english": "Flash Mode",
+    "chinese": "闪光模式",
+    "chinese_confirmed": true,
+    "candidates": [
+      "闪光模式"
+    ],
+    "english_confirmed": true
+  },
+  "03": {
+    "symbol": "ISOSensitivity",
+    "english": "ISO",
+    "chinese": "ISO",
+    "chinese_confirmed": true,
+    "candidates": [
+      "ISO"
+    ],
+    "english_confirmed": true
+  },
+  "04": {
+    "symbol": "MeteringMode",
+    "english": "Metering Mode",
+    "chinese": "测光模式",
+    "chinese_confirmed": true,
+    "candidates": [
+      "测光模式"
+    ],
+    "english_confirmed": true
+  },
+  "05": {
+    "symbol": "FocusMode",
+    "english": "Focus Mode",
+    "chinese": "对焦模式",
+    "chinese_confirmed": true,
+    "candidates": [
+      "对焦模式"
+    ],
+    "english_confirmed": true
+  },
+  "06": {
+    "symbol": "PhaseDetectionAF",
+    "english": "Phase Detect. Area",
+    "chinese": "相位检测AF区域",
+    "chinese_confirmed": true,
+    "candidates": [
+      "相位检测AF区域",
+      "相位检测区域"
+    ],
+    "english_confirmed": true
+  },
+  "07": {
+    "symbol": "WhiteBalance",
+    "english": "White Balance",
+    "chinese": "白平衡模式",
+    "chinese_confirmed": true,
+    "candidates": [
+      "白平衡模式",
+      "白平衡"
+    ],
+    "english_confirmed": true
+  },
+  "08": {
+    "symbol": "DRO_Auto_HDR",
+    "english": "DRO/Auto HDR",
+    "chinese": "DRO/自动HDR",
+    "chinese_confirmed": true,
+    "candidates": [
+      "DRO/自动HDR",
+      "DRO/自动 HDR"
+    ],
+    "english_confirmed": true
+  },
+  "09": {
+    "symbol": "CreativeStyle",
+    "english": "Creative Style",
+    "chinese": "创意风格",
+    "chinese_confirmed": true,
+    "candidates": [
+      "创意风格"
+    ],
+    "english_confirmed": true
+  },
+  "0a": {
+    "symbol": "FlashComp",
+    "english": "Flash Comp.",
+    "chinese": "闪光补偿",
+    "chinese_confirmed": true,
+    "candidates": [
+      "闪光补偿"
+    ],
+    "english_confirmed": true
+  },
+  "0b": {
+    "symbol": "PictureEffect",
+    "english": "Picture Effect",
+    "chinese": "照片效果",
+    "chinese_confirmed": true,
+    "candidates": [
+      "照片效果",
+      "图片效果",
+      "影像效果"
+    ],
+    "english_confirmed": true
+  },
+  "0c": {
+    "symbol": "ExposureCompensation",
+    "english": "Exposure Comp.",
+    "chinese": "曝光补偿",
+    "chinese_confirmed": true,
+    "candidates": [
+      "曝光补偿"
+    ],
+    "english_confirmed": true
+  },
+  "0d": {
+    "symbol": "FaceDetection",
+    "english": "Face Detection",
+    "chinese": "人脸检测",
+    "chinese_confirmed": true,
+    "candidates": [
+      "人脸检测",
+      "脸部检测"
+    ],
+    "english_confirmed": true
+  },
+  "0e": {
+    "symbol": "PortraitIFraming",
+    "english": "Portrait Framing",
+    "chinese": "肖像构图",
+    "chinese_confirmed": true,
+    "candidates": [
+      "肖像构图",
+      "肖像取景",
+      "人像构图"
+    ],
+    "english_confirmed": false
+  },
+  "0f": {
+    "symbol": "ObjectTracking",
+    "english": "Tracking",
+    "chinese": "跟踪",
+    "chinese_confirmed": true,
+    "candidates": [
+      "实时追踪",
+      "对象跟踪",
+      "跟踪"
+    ],
+    "english_confirmed": true
+  },
+  "10": {
+    "symbol": "SoftSkin",
+    "english": "Soft Skin Effect",
+    "chinese": "美肤效果",
+    "chinese_confirmed": true,
+    "candidates": [
+      "美肤效果",
+      "柔肤效果"
+    ],
+    "english_confirmed": true
+  },
+  "11": {
+    "symbol": "ShootingMode",
+    "english": "Shooting Mode",
+    "chinese": "拍摄模式",
+    "chinese_confirmed": true,
+    "candidates": [
+      "拍摄模式"
+    ],
+    "english_confirmed": true
+  },
+  "12": {
+    "symbol": "MemoryRecallFn",
+    "english": "Recall",
+    "chinese": "调出存储",
+    "chinese_confirmed": true,
+    "candidates": [
+      "调出存储",
+      "调出"
+    ],
+    "english_confirmed": true
+  },
+  "13": {
+    "symbol": "StillImageSize",
+    "english": "Image Size",
+    "chinese": "影像尺寸",
+    "chinese_confirmed": true,
+    "candidates": [
+      "影像尺寸"
+    ],
+    "english_confirmed": true
+  },
+  "14": {
+    "symbol": "MemoryCardRecordingMedia",
+    "english": "Recording Media",
+    "chinese": "记录媒体",
+    "chinese_confirmed": true,
+    "candidates": [
+      "记录媒体",
+      "存储卡记录媒体"
+    ],
+    "english_confirmed": false
+  },
+  "15": {
+    "symbol": "StlImageQuality",
+    "english": "Image Quality",
+    "chinese": "影像质量",
+    "chinese_confirmed": true,
+    "candidates": [
+      "影像质量"
+    ],
+    "english_confirmed": false
+  },
+  "16": {
+    "symbol": "StlImageAspectRatio",
+    "english": "Aspect Ratio",
+    "chinese": "纵横比",
+    "chinese_confirmed": true,
+    "candidates": [
+      "纵横比"
+    ],
+    "english_confirmed": true
+  },
+  "17": {
+    "symbol": "StillSteadyShot",
+    "english": "SteadyShot",
+    "chinese": "防抖",
+    "chinese_confirmed": true,
+    "candidates": [
+      "防抖",
+      "影像稳定"
+    ],
+    "english_confirmed": true
+  },
+  "18": {
+    "symbol": "Gain",
+    "english": "Gain",
+    "chinese": "增益",
+    "chinese_confirmed": true,
+    "candidates": [
+      "增益"
+    ],
+    "english_confirmed": true
+  },
+  "19": {
+    "symbol": "AutoBackLight",
+    "english": "Auto Backlight",
+    "chinese": "自动背光校正",
+    "chinese_confirmed": true,
+    "candidates": [
+      "自动背光校正",
+      "自动逆光校正"
+    ],
+    "english_confirmed": false
+  },
+  "20": {
+    "symbol": "CustomGridLine",
+    "english": "Grid Line",
+    "chinese": "网格线",
+    "chinese_confirmed": true,
+    "candidates": [
+      "网格线"
+    ],
+    "english_confirmed": true
+  },
+  "21": {
+    "symbol": "CustomPeakingLevel",
+    "english": "Peaking Level",
+    "chinese": "峰值水平",
+    "chinese_confirmed": true,
+    "candidates": [
+      "峰值水平",
+      "峰值等级"
+    ],
+    "english_confirmed": true
+  },
+  "22": {
+    "symbol": "CustomPeakingColor",
+    "english": "Peaking Color",
+    "chinese": "峰值色彩",
+    "chinese_confirmed": true,
+    "candidates": [
+      "峰值色彩",
+      "峰值颜色"
+    ],
+    "english_confirmed": true
+  },
+  "24": {
+    "symbol": "PhaseDetectionAF",
+    "english": "Phase Detect. Area",
+    "chinese": "相位检测AF区域",
+    "chinese_confirmed": true,
+    "candidates": [
+      "相位检测AF区域",
+      "相位检测区域"
+    ],
+    "english_confirmed": true
+  },
+  "25": {
+    "symbol": "NDFilter",
+    "english": "ND Filter",
+    "chinese": "ND过滤器",
+    "chinese_confirmed": true,
+    "candidates": [
+      "ND过滤器",
+      "ND滤镜"
+    ],
+    "english_confirmed": true
+  },
+  "29": {
+    "symbol": "MarkerDisplay",
+    "english": "Marker Display",
+    "chinese": "标记显示",
+    "chinese_confirmed": true,
+    "candidates": [
+      "标记显示"
+    ],
+    "english_confirmed": true
+  },
+  "2a": {
+    "symbol": "Cinematone",
+    "english": "CineTone",
+    "chinese": "电影色调",
+    "chinese_confirmed": true,
+    "candidates": [
+      "电影色调",
+      "影片色调"
+    ],
+    "english_confirmed": false
+  },
+  "2b": {
+    "symbol": "MovieSteadyShot",
+    "english": "SteadyShot",
+    "chinese": "防抖",
+    "chinese_confirmed": true,
+    "candidates": [
+      "防抖",
+      "影像稳定"
+    ],
+    "english_confirmed": true
+  },
+  "2c": {
+    "symbol": "SteadyShot",
+    "english": "SteadyShot",
+    "chinese": "防抖",
+    "chinese_confirmed": true,
+    "candidates": [
+      "防抖",
+      "影像稳定"
+    ],
+    "english_confirmed": true
+  },
+  "2d": {
+    "symbol": "MovieAudioRecordingLevel",
+    "english": "Audio Rec Level",
+    "chinese": "录音音量",
+    "chinese_confirmed": true,
+    "candidates": [
+      "录音音量"
+    ],
+    "english_confirmed": true
+  },
+  "2e": {
+    "symbol": "MovieAudioRecordingLevelDisplay",
+    "english": "Audio Level Display",
+    "chinese": "录音音量显示",
+    "chinese_confirmed": false,
+    "candidates": [
+      "录音音量显示",
+      "音频电平显示"
+    ],
+    "english_confirmed": true
+  },
+  "2f": {
+    "symbol": "ZebraLevel",
+    "english": "Zebra Level",
+    "chinese": "斑马纹水平",
+    "chinese_confirmed": false,
+    "candidates": [
+      "斑马纹水平",
+      "斑马纹等级"
+    ],
+    "english_confirmed": true
+  },
+  "30": {
+    "symbol": "AutoDualRec",
+    "english": "Auto Dual Rec",
+    "chinese": "自动双路录制",
+    "chinese_confirmed": false,
+    "candidates": [
+      "自动双路录制",
+      "自动双重录制"
+    ],
+    "english_confirmed": true
+  },
+  "31": {
+    "symbol": "ISO_Auto_Min_Shutter_Speed",
+    "english": "ISO AUTO Min. SS",
+    "chinese": "ISO AUTO最小速度",
+    "chinese_confirmed": true,
+    "candidates": [
+      "ISO AUTO最小速度",
+      "ISO AUTO 最小快门速度"
+    ],
+    "english_confirmed": true
+  },
+  "32": {
+    "symbol": "SelfTimerOnBracket",
+    "english": "Self-timer",
+    "chinese": "自拍定时",
+    "chinese_confirmed": true,
+    "candidates": [
+      "自拍定时",
+      "自拍"
+    ],
+    "english_confirmed": true
+  },
+  "33": {
+    "symbol": "FrameRateZako",
+    "english": "Frame Rate",
+    "chinese": "帧速率",
+    "chinese_confirmed": true,
+    "candidates": [
+      "帧速率",
+      "帧率"
+    ],
+    "english_confirmed": true
+  },
+  "34": {
+    "symbol": "SilentShutter",
+    "english": "Silent Shooting",
+    "chinese": "静音拍摄",
+    "chinese_confirmed": true,
+    "candidates": [
+      "静音拍摄"
+    ],
+    "english_confirmed": true
+  },
+  "35": {
+    "symbol": "LPFilter",
+    "english": "LP Filter",
+    "chinese": "低通滤镜",
+    "chinese_confirmed": true,
+    "candidates": [
+      "低通滤镜",
+      "LP滤镜"
+    ],
+    "english_confirmed": false
+  },
+  "36": {
+    "symbol": "SLogDispAssist",
+    "english": "S-Log Display Assist",
+    "chinese": "S-Log显示辅助",
+    "chinese_confirmed": false,
+    "candidates": [
+      "S-Log显示辅助",
+      "S-Log 显示辅助"
+    ],
+    "english_confirmed": false
+  },
+  "37": {
+    "symbol": "CustomFinderFrameRate",
+    "english": "Finder Frame Rate",
+    "chinese": "取景器帧速率",
+    "chinese_confirmed": true,
+    "candidates": [
+      "取景器帧速率"
+    ],
+    "english_confirmed": true
+  },
+  "38": {
+    "symbol": "SQFrameRateZako",
+    "english": "S&Q Frame Rate",
+    "chinese": "慢和快动作",
+    "chinese_confirmed": true,
+    "candidates": [
+      "慢和快动作",
+      "慢和快动作帧速率"
+    ],
+    "english_confirmed": false
+  },
+  "39": {
+    "symbol": "CustomLiveViewDisplay",
+    "english": "Live View Display",
+    "chinese": "实时取景显示",
+    "chinese_confirmed": true,
+    "candidates": [
+      "实时取景显示"
+    ],
+    "english_confirmed": true
+  },
+  "3a": {
+    "symbol": "PictureProfile",
+    "english": "Picture Profile",
+    "chinese": "图片配置文件",
+    "chinese_confirmed": true,
+    "candidates": [
+      "图片配置文件"
+    ],
+    "english_confirmed": true
+  },
+  "3b": {
+    "symbol": "LockOnAfwCenter",
+    "english": "Center Lock-on AF",
+    "chinese": "中央锁定AF",
+    "chinese_confirmed": true,
+    "candidates": [
+      "中央锁定AF",
+      "中央锁定自动对焦"
+    ],
+    "english_confirmed": true
+  },
+  "3c": {
+    "symbol": "SteadyShotCustomInformation",
+    "english": "SteadyShot Custom Info",
+    "chinese": "防抖自定义信息",
+    "chinese_confirmed": false,
+    "candidates": [
+      "防抖自定义信息",
+      "自定义防抖信息"
+    ],
+    "english_confirmed": false
+  },
+  "3d": {
+    "symbol": "SteadyShotCustomFocalLength",
+    "english": "SteadyShot Custom Focal Length",
+    "chinese": "防抖自定义焦距",
+    "chinese_confirmed": false,
+    "candidates": [
+      "防抖自定义焦距",
+      "自定义焦距"
+    ],
+    "english_confirmed": false
+  },
+  "4a": {
+    "symbol": "SetupAPSCSuper35",
+    "english": "APS-C S35 Shooting",
+    "chinese": "APS-C S35拍摄",
+    "chinese_confirmed": false,
+    "candidates": [
+      "APS-C S35拍摄",
+      "APS-C/S35拍摄"
+    ],
+    "english_confirmed": false
+  },
+  "4b": {
+    "symbol": "PriorAWB",
+    "english": "Priority AWB",
+    "chinese": "AWB优先",
+    "chinese_confirmed": true,
+    "candidates": [
+      "AWB优先",
+      "自动白平衡优先"
+    ],
+    "english_confirmed": false
+  },
+  "4c": {
+    "symbol": "AntiFlickerShoot",
+    "english": "Anti-flicker Shoot",
+    "chinese": "防闪烁拍摄",
+    "chinese_confirmed": true,
+    "candidates": [
+      "防闪烁拍摄",
+      "防闪烁"
+    ],
+    "english_confirmed": true
+  },
+  "4d": {
+    "symbol": "MovieAngleSetting",
+    "english": "Movie Angle Setting",
+    "chinese": "角度设置",
+    "chinese_confirmed": true,
+    "candidates": [
+      "角度设置",
+      "视频角度设置"
+    ],
+    "english_confirmed": false
+  },
+  "4f": {
+    "symbol": "ShutterSpeed",
+    "english": "Shutter Speed",
+    "chinese": "快门速度",
+    "chinese_confirmed": true,
+    "candidates": [
+      "快门速度"
+    ],
+    "english_confirmed": true
+  },
+  "50": {
+    "symbol": "SetupAudioSignals",
+    "english": "Audio Signals",
+    "chinese": "音频信号",
+    "chinese_confirmed": true,
+    "candidates": [
+      "音频信号"
+    ],
+    "english_confirmed": false
+  },
+  "51": {
+    "symbol": "CustomStillShutterType",
+    "english": "Shutter Type",
+    "chinese": "快门类型",
+    "chinese_confirmed": true,
+    "candidates": [
+      "快门类型"
+    ],
+    "english_confirmed": true
+  },
+  "52": {
+    "symbol": "NearModeInPF",
+    "english": "Near Mode in PF",
+    "chinese": "近摄模式",
+    "chinese_confirmed": false,
+    "candidates": [
+      "近摄模式",
+      "对焦放大时近摄"
+    ],
+    "english_confirmed": false
+  },
+  "53": {
+    "symbol": "WirelessFlash",
+    "english": "Wireless Flash",
+    "chinese": "无线闪光",
+    "chinese_confirmed": true,
+    "candidates": [
+      "无线闪光"
+    ],
+    "english_confirmed": true
+  },
+  "54": {
+    "symbol": "StlImageRecordFormat",
+    "english": "File Format",
+    "chinese": "影像文件格式",
+    "chinese_confirmed": true,
+    "candidates": [
+      "影像文件格式",
+      "文件格式"
+    ],
+    "english_confirmed": true
+  },
+  "55": {
+    "symbol": "StlImageJPEGQuality",
+    "english": "JPEG Quality",
+    "chinese": "JPEG影像质量",
+    "chinese_confirmed": true,
+    "candidates": [
+      "JPEG影像质量",
+      "JPEG质量"
+    ],
+    "english_confirmed": true
+  },
+  "56": {
+    "symbol": "CustomPeakingDisplay",
+    "english": "Peaking Display",
+    "chinese": "峰值显示",
+    "chinese_confirmed": true,
+    "candidates": [
+      "峰值显示"
+    ],
+    "english_confirmed": true
+  },
+  "57": {
+    "symbol": "ZebraDisplay",
+    "english": "Zebra Display",
+    "chinese": "斑马线显示",
+    "chinese_confirmed": true,
+    "candidates": [
+      "斑马纹显示",
+      "斑马线显示"
+    ],
+    "english_confirmed": true
+  },
+  "58": {
+    "symbol": "FaceAF",
+    "english": "Face AF",
+    "chinese": "人脸AF",
+    "chinese_confirmed": false,
+    "candidates": [
+      "人脸AF",
+      "脸部AF"
+    ],
+    "english_confirmed": false
+  },
+  "59": {
+    "symbol": "SmileShutter",
+    "english": "Smile Shutter",
+    "chinese": "笑脸快门",
+    "chinese_confirmed": true,
+    "candidates": [
+      "笑脸快门"
+    ],
+    "english_confirmed": true
+  },
+  "60": {
+    "symbol": "TouchOperation",
+    "english": "Touch Operation",
+    "chinese": "触摸操作",
+    "chinese_confirmed": true,
+    "candidates": [
+      "触摸操作"
+    ],
+    "english_confirmed": true
+  },
+  "61": {
+    "symbol": "FaceDetectionInMulti",
+    "english": "Face Detection in Multi",
+    "chinese": "多区域人脸检测",
+    "chinese_confirmed": false,
+    "candidates": [
+      "多区域人脸检测",
+      "人脸检测(多区域)"
+    ],
+    "english_confirmed": false
+  },
+  "62": {
+    "symbol": "APSCSizeCrop",
+    "english": "APS-C Size/Crop",
+    "chinese": "APS-C尺寸/裁切",
+    "chinese_confirmed": false,
+    "candidates": [
+      "APS-C尺寸/裁切",
+      "APS-C尺寸"
+    ],
+    "english_confirmed": false
+  },
+  "63": {
+    "symbol": "APSCSizeCropForManual",
+    "english": "APS-C Size/Crop (Manual)",
+    "chinese": "APS-C尺寸/裁切",
+    "chinese_confirmed": false,
+    "candidates": [
+      "APS-C尺寸/裁切",
+      "APS-C尺寸/裁切(手动)"
+    ],
+    "english_confirmed": false
+  },
+  "64": {
+    "symbol": "TrinityShot",
+    "english": "Pixel Shift Multi Shooting",
+    "chinese": "像素转换多重拍摄",
+    "chinese_confirmed": true,
+    "candidates": [
+      "像素转换多重拍摄"
+    ],
+    "english_confirmed": true
+  },
+  "68": {
+    "symbol": "ZebraLevel",
+    "english": "Zebra Level",
+    "chinese": "斑马纹水平",
+    "chinese_confirmed": false,
+    "candidates": [
+      "斑马纹水平",
+      "斑马纹等级"
+    ],
+    "english_confirmed": true
+  },
+  "69": {
+    "symbol": "RightLeftEyeSelect",
+    "english": "Right/Left Eye Select",
+    "chinese": "右眼/左眼选择",
+    "chinese_confirmed": true,
+    "candidates": [
+      "右眼/左眼选择",
+      "左/右眼选择"
+    ],
+    "english_confirmed": true
+  },
+  "6a": {
+    "symbol": "IntervalShooting",
+    "english": "Interval Shooting",
+    "chinese": "间隔拍摄",
+    "chinese_confirmed": true,
+    "candidates": [
+      "间隔拍摄"
+    ],
+    "english_confirmed": true
+  },
+  "6b": {
+    "symbol": "AfTrackingSpeed",
+    "english": "AF Track Sens.",
+    "chinese": "AF跟踪灵敏度",
+    "chinese_confirmed": true,
+    "candidates": [
+      "AF跟踪灵敏度",
+      "AF追踪灵敏度"
+    ],
+    "english_confirmed": false
+  },
+  "6c": {
+    "symbol": "LensApertureDrive",
+    "english": "Aperture Drive in AF",
+    "chinese": "光圈驱动",
+    "chinese_confirmed": true,
+    "candidates": [
+      "光圈驱动",
+      "AF中的光圈驱动",
+      "镜头光圈驱动"
+    ],
+    "english_confirmed": true
+  },
+  "6e": {
+    "symbol": "FaceEyeDetectTarget",
+    "english": "Face/Eye Detection Target",
+    "chinese": "人脸/眼部AF",
+    "chinese_confirmed": true,
+    "candidates": [
+      "人脸/眼部AF",
+      "人脸/眼部AF检测目标"
+    ],
+    "english_confirmed": false
+  }
+}

@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+dist/
+build/output/
+build/work/
+sessions/
+baseline/
+*.exe
+.pytest_cache/
+.superpowers/

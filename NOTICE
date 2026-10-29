@@ -1,0 +1,37 @@
+Third-party components bundled in src/vendor/
+==============================================
+
+pmca — Sony-PMCA-RE by ma1co
+  https://github.com/ma1co/Sony-PMCA-RE
+  License: MIT
+  Only the usb/, util/ and backup/ subpackages are included.
+
+pyusb
+  https://github.com/pyusb/pyusb
+  License: BSD (see src/vendor/usb/LICENSE if present, otherwise upstream)
+
+libusb-1.0 (libusb_package)
+  https://libusb.info/
+  License: LGPL-2.1 — bundled as a shared library (src/vendor/libusb_package/libusb-1.0.dll)
+  and loaded at runtime via ctypes, not statically linked. Source:
+  https://github.com/libusb/libusb
+
+importlib_resources
+  https://github.com/python/importlib_resources
+  License: Apache-2.0
+
+Firmware-derived strings
+========================
+
+src/data/a9_fn_functions.json contains function symbol names and saved-value
+bytes read from the public firmware of the ILCE-9 (version 6.00) for the sole
+purpose of addressing the camera's own function table.
+
+src/data/a9_fn_chinese_names.json contains 77 Chinese menu labels, 64 of which
+were matched against the camera's own Chinese UI resources. These strings are
+reproduced only so that the tool shows the same wording the user sees on the
+camera. No rights over them are claimed, and no firmware binary, key, or
+unpacked firmware artifact is distributed with this project.
+
+Sony, ILCE-9, Picture Profile and S-Log are trademarks of Sony Group
+Corporation. This project is not affiliated with or endorsed by Sony.
