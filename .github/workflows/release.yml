@@ -40,9 +40,18 @@ jobs:
       - name: Self-check the bundle
         shell: pwsh
         run: |
+          # The shipped binary is windowed, so it has no stdout: the self-check
+          # writes selfcheck.txt next to the exe instead. Start-Process -Wait is
+          # required because PowerShell does not wait for GUI subsystem programs.
+          $log = 'dist\selfcheck.txt'
+          Remove-Item $log -ErrorAction SilentlyContinue
           $env:A9TOOL_SELFCHECK = '1'
-          .\dist\ILCE-9_Slog_Project.exe
-          if ($LASTEXITCODE -ne 0) { throw "self-check failed with $LASTEXITCODE" }
+          $p = Start-Process -FilePath 'dist\ILCE-9_Slog_Project.exe' -Wait -PassThru
+          if (Test-Path $log) { Get-Content $log }
+          if ($p.ExitCode -ne 0) { throw "self-check exited $($p.ExitCode)" }
+          if (-not (Select-String -Path $log -Pattern 'SELFCHECK_OK' -Quiet)) {
+            throw "self-check did not report SELFCHECK_OK"
+          }
 
       - name: Checksum
         shell: pwsh

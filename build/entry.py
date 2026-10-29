@@ -11,6 +11,7 @@ mistake (missing libusb DLL, missing JSON) before a user hits it.
 """
 import os
 import sys
+from pathlib import Path
 
 
 def selfcheck() -> int:
@@ -49,6 +50,12 @@ def selfcheck() -> int:
 
 if __name__ == '__main__':
     if os.environ.get('A9TOOL_SELFCHECK') == '1':
+        # A windowed build has no stdout at all — sys.stdout is None and the
+        # first print() would raise. Redirect to a file next to the exe so the
+        # released windowed binary can still be self-checked.
+        if sys.stdout is None:
+            sys.stdout = open(Path(sys.executable).parent / 'selfcheck.txt', 'w',
+                              encoding='utf-8', buffering=1)
         sys.exit(selfcheck())
     from a9tool.gui import main
     sys.exit(main())
