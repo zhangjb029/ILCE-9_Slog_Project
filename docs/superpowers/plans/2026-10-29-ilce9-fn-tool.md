@@ -61,18 +61,20 @@
 - [ ] **Step 1: 建目录并初始化 git**
 
 ```powershell
-Set-Location -LiteralPath 'F:\固件\ILCE-9_Slog_Project'
+Set-Location -LiteralPath '<项目根>'
 git init
 New-Item -ItemType Directory -Force src/a9tool, src/data, src/vendor, build, tests, docs/assets/img
 ```
 
 - [ ] **Step 2: 复制 vendored 依赖与数据表**
 
+`<UPSTREAM>` 指本地存放分析材料的目录（不在本仓库内）。
+
 ```powershell
-Copy-Item -Recurse 'F:\固件\analysis\pmca_update_auth_source\a82f5baaa8e9c3d9f28f94699e860fb2e48cc8e0\pmca' src/vendor/pmca
-Copy-Item -Recurse 'F:\固件\analysis\a9_live_deps\usb' src/vendor/usb
-Copy-Item -Recurse 'F:\固件\analysis\a9_live_deps\libusb_package' src/vendor/libusb_package
-Copy-Item 'F:\固件\analysis\a9_fn_functions.json','F:\固件\analysis\a9_fn_chinese_names.json' src/data/
+Copy-Item -Recurse '<UPSTREAM>\pmca_update_auth_source\a82f5baaa8e9c3d9f28f94699e860fb2e48cc8e0\pmca' src/vendor/pmca
+Copy-Item -Recurse '<UPSTREAM>\a9_live_deps\usb' src/vendor/usb
+Copy-Item -Recurse '<UPSTREAM>\a9_live_deps\libusb_package' src/vendor/libusb_package
+Copy-Item '<UPSTREAM>\a9_fn_functions.json','<UPSTREAM>\a9_fn_chinese_names.json' src/data/
 ```
 
 `src/vendor/` 本身就是一个 `sys.path` 条目，所以 `import pmca` / `import usb` / `import libusb_package` 都从这里解析。
@@ -264,7 +266,7 @@ git commit -m "feat(journal): session directories with chained-original detectio
 
 **Files:**
 - Create: `src/a9tool/usbdev.py`, `src/a9tool/errors.py`, `tests/test_usbdev.py`, `tests/test_errors.py`
-- Reference (只读移植来源): `F:\固件\analysis\a9_pp_live.py:364-460`
+- Reference (只读移植来源): `<UPSTREAM>\a9_pp_live.py:364-460`
 
 **Interfaces:**
 - Consumes: `fnmap`, `journal`
