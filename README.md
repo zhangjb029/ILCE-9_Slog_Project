@@ -198,6 +198,21 @@ $env:A9TOOL_SELFCHECK=1; .\dist\ILCE-9_Slog_Project.exe
 
 A windowed exe has no console, so build with `A9TOOL_CONSOLE=1` to read the output. It checks the JSON tables, the sessions path, the bundled libusb backend, and that the main window constructs with all 77 rows.
 
+## Publishing a release
+
+**The exe is not in git.** `.gitignore` excludes it, so a Release built from the repository alone has no download. `build/entry.py` is what the workflow runs.
+
+Push a tag:
+
+```bash
+git tag v1.0.0
+git push origin v1.0.0
+```
+
+`.github/workflows/release.yml` then runs the tests, builds, self-checks the bundle, and attaches `ILCE-9_Slog_Project.exe` plus `SHA256SUMS.txt` to the Release. Re-running the workflow for the same tag replaces the attached files.
+
+To publish a build you made locally instead: GitHub → **Releases** → **Draft a new release** → upload `dist/ILCE-9_Slog_Project.exe`.
+
 ## Tests
 
 ```powershell

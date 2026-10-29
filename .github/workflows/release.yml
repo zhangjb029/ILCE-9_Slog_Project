@@ -1,0 +1,67 @@
+name: Release
+
+# Pushing a tag like v1.0.0 builds the exe and attaches it to that GitHub
+# Release. The exe is never committed (.gitignore excludes *.exe), so this
+# workflow — or a manual upload — is the only way it gets published.
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Existing tag to build and attach the exe to'
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.tag || github.ref }}
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install PyInstaller
+        run: pip install pyinstaller
+
+      - name: Tests
+        run: python -m unittest discover -s tests -t .
+
+      - name: Build
+        run: powershell -File build/build_exe.ps1
+
+      - name: Self-check the bundle
+        shell: pwsh
+        run: |
+          $env:A9TOOL_SELFCHECK = '1'
+          .\dist\ILCE-9_Slog_Project.exe
+          if ($LASTEXITCODE -ne 0) { throw "self-check failed with $LASTEXITCODE" }
+
+      - name: Checksum
+        shell: pwsh
+        run: |
+          $hash = (Get-FileHash .\dist\ILCE-9_Slog_Project.exe -Algorithm SHA256).Hash.ToLower()
+          "$hash  ILCE-9_Slog_Project.exe" | Out-File -Encoding ascii dist\SHA256SUMS.txt
+          Get-Content dist\SHA256SUMS.txt
+
+      - name: Publish release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ github.event.inputs.tag || github.ref_name }}
+        run: |
+          $files = 'dist\ILCE-9_Slog_Project.exe', 'dist\SHA256SUMS.txt'
+          gh release view $env:TAG --repo $env:GITHUB_REPOSITORY *> $null
+          if ($LASTEXITCODE -ne 0) {
+            gh release create $env:TAG --repo $env:GITHUB_REPOSITORY --title $env:TAG `
+              --generate-notes $files
+          } else {
+            gh release upload $env:TAG --repo $env:GITHUB_REPOSITORY --clobber $files
+          }
