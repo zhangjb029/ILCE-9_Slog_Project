@@ -196,6 +196,21 @@ $env:A9TOOL_SELFCHECK=1; .\dist\ILCE-9_Slog_Project.exe
 
 窗口版没有控制台，所以要用 `A9TOOL_CONSOLE=1` 构建才能看到输出。它会检查 JSON 表、`sessions` 路径、包内 libusb 后端，以及主窗口能否构造出全部 77 行。
 
+## 发布 Release
+
+**exe 不在 git 里。** `.gitignore` 把它排除了，所以直接拿仓库做出来的 Release 里没有可下载的文件。
+
+推一个 tag：
+
+```bash
+git tag v1.0.0
+git push origin v1.0.0
+```
+
+`.github/workflows/release.yml` 会跑测试、构建、自检打包产物，然后把 `ILCE-9_Slog_Project.exe` 和 `SHA256SUMS.txt` 挂到对应的 Release 上。同一个 tag 重跑会覆盖附件。
+
+如果你想发布本地构建出来的那个：GitHub → **Releases** → **Draft a new release** → 上传 `dist/ILCE-9_Slog_Project.exe`。
+
 ## 测试
 
 ```powershell
