@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Enable Picture Profile and S-Log Display Assist on the Sony A9</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<nav><strong>English</strong> · <a href="zh-CN/index.html">简体中文</a></nav>
+
+<main>
+
+<h1>Enable Picture Profile and S-Log Display Assist on the Sony A9</h1>
+<p class="sub">Applies to the original ILCE-9 running firmware 6.00. About 30 minutes, no Python, no command line.</p>
+
+<div class="banner">
+<h2>Read this first</h2>
+<ul>
+  <li>This tool changes <b>camera parameters</b>, not firmware. If something goes wrong you can restore from the backup it takes.</li>
+  <li>It works <b>only on the ILCE-9 with firmware 6.00</b>. Any other model or firmware is refused before anything is written.</li>
+  <li>It exposes 77 functions. <b>Only Picture Profile and S-Log Display Assist have been confirmed working on real hardware.</b> The other 75 have never been tested on a camera and may freeze or misbehave.</li>
+  <li>Pixel Shift Multi Shooting is known to hang after the first frame and require a battery pull. It is marked in red but still selectable.</li>
+  <li>Use at your own risk. This is not a Sony tool and Sony will not honour a warranty claim for damage it causes.</li>
+</ul>
+</div>
+
+<h2>1. Before you start</h2>
+
+<p>Check three things:</p>
+<ol>
+  <li>Your camera is an <b>ILCE-9</b> — not an ILCE-9M2. The model is printed on the body.</li>
+  <li>The firmware is <b>6.00</b>. On the camera: MENU → Setup → Version.</li>
+  <li>You have a USB data cable and a working Windows 10/11 PC.</li>
+</ol>
+
+<div class="warn">
+<strong>Not on 6.00?</strong>
+Do not use this tool. Parameters live at different addresses in different firmware versions, and writing to the wrong one can damage the camera configuration. The program refuses, but check anyway.
+</div>
+
+<p>Two pages worth opening now:</p>
+<ul>
+  <li>The download page for this tool — GitHub Releases, linked at the bottom of this page.</li>
+  <li><a href="https://zadig.akeo.ie/">Zadig</a> — a small free utility that installs the USB driver the camera needs.</li>
+</ul>
+
+<h2>2. Download</h2>
+
+<p>Download <code>ILCE-9_Slog_Project.exe</code> from Releases and put it somewhere you will find again — the Desktop is fine.</p>
+
+<p>There is <b>no installer and no uninstaller</b>. It is a single exe. On first run it creates a <code>sessions</code> folder next to itself, where it keeps the pre-change backup of every write. <b>Do not delete that folder</b> — restoring depends on it.</p>
+
+<div class="note">
+<strong>Why does it need a folder?</strong>
+Before changing anything, the program saves the camera's complete parameter set into that folder. If a change goes wrong, or you change your mind, that is what puts it back.
+</div>
+
+<h2>3. Windows blocks the program</h2>
+
+<p>The first time you double-click it, Windows will probably show a blue box saying "Windows protected your PC".</p>
+
+<figure class="shot">
+  <img src="assets/img/smartscreen.png" alt="The Windows SmartScreen dialog">
+  <figcaption>Screenshot: the SmartScreen dialog</figcaption>
+</figure>
+
+<p>Click <b>More info</b>, then <b>Run anyway</b>.</p>
+
+<p>The reason is simple: the executable is not code-signed (a signing certificate costs several hundred dollars a year, which a hobby project does not have). Windows blocks every unsigned executable it has not seen before. It does not mean the file is malicious.</p>
+
+<h2>4. Antivirus warnings</h2>
+
+<p>Some antivirus products flag this program. Same reason: it talks to a USB device directly, which is also what certain malware does.</p>
+
+<p>If that bothers you, the source is on GitHub — read it. <b>Do not</b> download this executable from anywhere else.</p>
+
+<h2>5. Install the driver (first time)</h2>
+
+<p>This is the step people get stuck on. Take it slowly.</p>
+
+<h3>5.1 Put the camera in Mass Storage mode</h3>
+<ol>
+  <li>Turn the camera off.</li>
+  <li>Connect it to the PC with the USB cable.</li>
+  <li>Turn it on.</li>
+  <li>If the camera asks how to connect, choose <b>Mass Storage</b>.</li>
+  <li>The memory card should appear in Windows. If it does not, try another cable or another USB port.</li>
+</ol>
+
+<h3>5.2 Replace the driver with Zadig</h3>
+<ol>
+  <li>Open Zadig (no installation needed).</li>
+  <li>Choose <b>Options → List All Devices</b>.</li>
+  <li>Pick your camera from the dropdown — it may show as <code>Sony Digital Still Camera</code> or similar.</li>
+  <li>Make sure the target driver on the right says <b>libusb-win32</b>; use the arrows to change it if not.</li>
+  <li>Click <b>Install Driver</b> or <b>Replace Driver</b> and wait for it to finish.</li>
+</ol>
+
+<figure class="shot">
+  <img src="assets/img/zadig-1.png" alt="Selecting the camera in Zadig">
+  <figcaption>Screenshot: selecting your camera in Zadig</figcaption>
+</figure>
+
+<div class="warn">
+<strong>Do not pick the wrong device</strong>
+There may also be an entry such as <code>USB Input Device</code> with VID <code>054C</code> and PID <code>0994</code>. That is the camera's USB input interface, <b>not</b> the device this tool talks to. Replacing its driver will not break the camera, but it will break that input device on your PC.
+</div>
+
+<h3>5.3 The memory card disappears — that is expected</h3>
+
+<p>After the driver swap, Windows Explorer no longer shows the camera's card, and you may get a "you need to format this disk" popup.</p>
+
+<div class="note">
+<strong>The camera is fine.</strong>
+The new driver turns the camera from "a USB stick" into "a device a program can talk to directly", and Windows stops showing it as a disk. <b>Do not format anything.</b> Section 11 has the steps to put the original driver back.
+</div>
+
+<h2>6. Connect and check</h2>
+
+<p>Keep the camera in Mass Storage mode and run <code>ILCE-9_Slog_Project.exe</code>.</p>
+
+<p>Click <b>Connect and check</b> in section ①. The program reads the model, reads the firmware version, confirms it is 6.00, saves a full backup of the current parameters, then switches the camera into service mode.</p>
+
+<p>This takes a few tens of seconds; the log fills in as it goes. A good run looks like:</p>
+
+<ul>
+  <li><code>已确认 ILCE-9 / 6.00，正在切换服务模式</code> — model confirmed, switching modes</li>
+  <li><code>服务模式已认证，正在读取机身参数</code> — service mode authenticated, reading parameters</li>
+  <li>Then section ② fills in with model, firmware, and a serial fingerprint</li>
+</ul>
+
+<p class="sub">The interface is in Chinese. The log lines above are what to look for.</p>
+
+<h2>7. Install the driver again (second device)</h2>
+
+<p>If step 6 stalls and the log shows <b>"Service device not found"</b>, the camera has already switched into service mode but Windows has no driver for the device that just appeared.</p>
+
+<p>That is normal: <b>service mode is a separate USB device and needs its own driver install</b>.</p>
+
+<ol>
+  <li>Leave the camera plugged in exactly as it is.</li>
+  <li>Open Zadig again, <b>Options → List All Devices</b>.</li>
+  <li>A new Sony device is now in the list, usually with <code>(Interface 1)</code> or similar in the name.</li>
+  <li>Install <b>libusb-win32</b> for it too.</li>
+  <li>Go back to the tool window and click <b>重试</b> (Retry).</li>
+</ol>
+
+<figure class="shot">
+  <img src="assets/img/zadig-2.png" alt="The new service-mode device in Zadig">
+  <figcaption>Screenshot: the new device that appears for service mode</figcaption>
+</figure>
+
+<div class="warn">
+<strong>The retry expires after one hour</strong>
+Come back too late and the program asks you to unplug the camera, return to Mass Storage mode and start over. Nothing has been written at this point, so restarting is safe.
+</div>
+
+<h2>8. Turn on the PP override, then restart</h2>
+
+<p>Once connected, section ② shows whether the PP override is on.</p>
+
+<p>If it says <b>未开启</b> (off), click <b>开启 PP 放行</b>. The program changes five bytes and saves.</p>
+
+<div class="note">
+<strong>Why restart?</strong>
+The parameters are written to storage; the camera only re-reads them on the next boot. The program will tell you to power-cycle — do that, and do not do anything else before restarting.
+</div>
+
+<p>After the restart, run the program again and repeat the connect step. You do not need to install drivers a second time.</p>
+
+<h2>9. Write a function into an Fn slot</h2>
+
+<p>Section ③ shows two cards by default:</p>
+
+<ul>
+  <li><b>Picture Profile</b></li>
+  <li><b>SLog Display Assist</b> (S-Log Display Assist)</li>
+</ul>
+
+<p>Each card has a slot dropdown (Fn1 to Fn12). Pick a slot and click the write button.</p>
+
+<figure class="shot">
+  <img src="assets/img/window-connected.png" alt="The main window after connecting">
+  <figcaption>Screenshot: the main window after a successful connection</figcaption>
+</figure>
+
+<p>For anything else, expand <b>全部功能（77 items, mostly untested）</b>, pick a row, choose a slot, and click the write button.</p>
+
+<p>After a successful write <b>every write button in the window greys out</b>. That is deliberate: one run of the program performs exactly one change, each with its own backup. To change another slot, close and reopen the program.</p>
+
+<h2>10. Check on the camera</h2>
+
+<p>Power-cycle the camera as prompted, then press <b>Fn</b> and look at the slot you wrote to.</p>
+
+<figure class="shot">
+  <img src="assets/img/camera-fn.png" alt="The Fn menu on the camera">
+  <figcaption>Screenshot: the Fn menu on the camera</figcaption>
+</figure>
+
+<div class="warn">
+<strong>"It appears in the menu" is not "it works"</strong>
+All twelve slots accept a write and the camera will display the entry — but an entry existing only means the entry exists.
+<ul>
+  <li>Picture Profile and S-Log Display Assist: confirmed working on hardware, and they survive a restart.</li>
+  <li>The other 75: nobody has tried them. They may grey out, do nothing, or freeze the camera.</li>
+</ul>
+If one does nothing useful, section 11 puts it back.
+</div>
+
+<h2>11. Undo</h2>
+
+<h3>11.1 Undo one change</h3>
+
+<ol>
+  <li>Open the program and connect.</li>
+  <li>Section ④ lists every change you have made, with a timestamp and what it did.</li>
+  <li>Select the row you want to undo.</li>
+  <li>Click <b>从备份恢复到原状</b> (restore from backup).</li>
+  <li>The program writes the old value back, saves, and asks you to power-cycle.</li>
+</ol>
+
+<div class="note">
+<strong>If you made several changes</strong>
+Each row's "original" value is the value <i>before that particular write</i>. Undoing the second change returns you to the state after the first one, not to the factory state. The list marks those rows so you can tell them apart.
+</div>
+
+<h3>11.2 Restore everything</h3>
+
+<p><b>恢复全部原厂</b> writes back every position this tool has touched, as it was before you first used it.</p>
+
+<div class="warn">
+<strong>This overrides manual changes too</strong>
+It will also overwrite settings you changed by hand on the camera. Make sure that is what you want.
+</div>
+
+<h3>11.3 Give the camera back to Windows</h3>
+
+<ol>
+  <li>Close the program.</li>
+  <li>Right-click Start → <b>Device Manager</b>.</li>
+  <li>Find the camera under "libusb-win32 devices" or similar.</li>
+  <li>Right-click → <b>Uninstall device</b>, and tick <b>Delete the driver software for this device</b>.</li>
+  <li>Unplug and replug the USB cable.</li>
+  <li>Windows reinstalls its own driver and the memory card shows up again.</li>
+</ol>
+
+<div class="note">
+<strong>Camera only</strong>
+Uninstall only the camera entry. Leave every other USB device alone.
+</div>
+
+<footer>
+<p>Not affiliated with, endorsed by, or supported by Sony. Sony, ILCE-9, Picture Profile and S-Log are trademarks of Sony Group Corporation.</p>
+<p>Source and licence: <a href="https://github.com/">GitHub repository</a> · When reporting a problem, include the full log from the bottom of the window.</p>
+</footer>
+
+</main>
+</body>
+</html>
