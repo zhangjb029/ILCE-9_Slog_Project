@@ -408,6 +408,7 @@ def connect(receipt: Path | None = None, progress=None) -> CameraHandle:
             expected_port = port(device)
             if not expected_port['ports']:
                 raise RuntimeError('USB port path unavailable; cannot bind the service device to this camera')
+            receipt = save_receipt(identity, expected_port)
             say('已确认 ILCE-9 / 6.00，正在切换服务模式')
             auth = sony.SonySenserAuthDevice(driver)
             auth.start()
