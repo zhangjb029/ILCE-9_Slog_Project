@@ -61,13 +61,25 @@ class Session:
         return self.journal.get('payload', {})
 
 
+def _dump(stream, record: dict) -> None:
+    json.dump(record, stream, ensure_ascii=False, indent=2)
+    stream.write('\n')
+    stream.flush()
+    os.fsync(stream.fileno())
+
+
 def _write_record(path: Path, record: dict, exclusive: bool) -> None:
-    mode = 'x' if exclusive else 'w'
-    with path.open(mode, encoding='utf-8') as stream:
-        json.dump(record, stream, ensure_ascii=False, indent=2)
-        stream.write('\n')
-        stream.flush()
-        os.fsync(stream.fileno())
+    if exclusive:
+        with path.open('x', encoding='utf-8') as stream:
+            _dump(stream, record)
+        return
+    # Rewrite through a temporary file: a power cut mid-write must not leave a
+    # truncated journal, because the user who needs to restore is exactly the
+    # user whose camera is already half-written.
+    temporary = path.with_suffix('.json.tmp')
+    with temporary.open('w', encoding='utf-8') as stream:
+        _dump(stream, record)
+    os.replace(temporary, path)
 
 
 def _write_snapshot(path: Path, snapshot: bytes) -> None:
@@ -125,8 +137,14 @@ def list_sessions(root: Path) -> list[Session]:
     found = []
     for entry in sorted(root.iterdir(), key=lambda p: p.name, reverse=True):
         record = entry / 'journal.json'
-        if entry.is_dir() and record.exists():
-            found.append(Session(entry, json.loads(record.read_text(encoding='utf-8'))))
+        if not (entry.is_dir() and record.exists()):
+            continue
+        try:
+            loaded = json.loads(record.read_text(encoding='utf-8'))
+        except (OSError, ValueError):
+            # One damaged session must not make the whole tool unopenable.
+            continue
+        found.append(Session(entry, loaded))
     return found
 
 

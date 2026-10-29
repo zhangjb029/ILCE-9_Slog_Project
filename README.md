@@ -46,7 +46,17 @@ pip install pyinstaller
 powershell -File build/build_exe.ps1
 ```
 
-Output: `dist/ILCE-9_Slog_Project.exe` (~20 MB, onefile, unsigned).
+Output: `dist/ILCE-9_Slog_Project.exe` (~15 MB, onefile, unsigned).
+
+Verify the bundle without a camera:
+
+```powershell
+$env:A9TOOL_SELFCHECK=1; .\dist\ILCE-9_Slog_Project.exe
+```
+
+A windowed exe has no console, so build with `$env:A9TOOL_CONSOLE=1` to read the output.
+It checks the JSON tables, the sessions path, the bundled libusb backend, and that the
+main window constructs with all 77 rows.
 
 ## Tests
 
@@ -54,7 +64,7 @@ Output: `dist/ILCE-9_Slog_Project.exe` (~20 MB, onefile, unsigned).
 python -m unittest discover -s tests -t .
 ```
 
-All tests are offline: a `FakeCamera` stands in for the real device, so no camera and no USB backend is needed. 70 tests, including Tk widget-state checks.
+All tests are offline: a `FakeCamera` stands in for the real device, so no camera and no USB backend is needed. 87 tests, including Tk widget-state checks and a subprocess check that the vendored stack imports with site-packages disabled.
 
 ## How it works
 

@@ -106,7 +106,8 @@ def _perform(camera, session, pid: int, target: bytes, state: CameraState, say) 
     return _perform_many(camera, session, {pid: target}, state, say)
 
 
-def enable_override(camera, state: CameraState, root: Path, progress=None) -> journal.Session:
+def enable_override(camera, state: CameraState, root: Path, progress=None,
+                    identity: dict | None = None) -> journal.Session:
     """Turn on the five PP feature-override bytes. No Fn slot is touched."""
     say = progress or (lambda _message: None)
     status = override_status(state)
@@ -119,7 +120,8 @@ def enable_override(camera, state: CameraState, root: Path, progress=None) -> jo
     target = bytes(target_bytes)
 
     payload = dict(original=state.override.hex(), target=target.hex(),
-                   changed_offsets=list(fnmap.OVERRIDE_OFFSETS), written_by=None)
+                   changed_offsets=list(fnmap.OVERRIDE_OFFSETS), written_by=None,
+                   camera=_identity_key(identity))
     session = journal.create(root, 'enable_override', payload, state.snapshot)
 
     if status == STATUS_ENABLED:
@@ -127,6 +129,13 @@ def enable_override(camera, state: CameraState, root: Path, progress=None) -> jo
         return journal.save(session)
 
     return _perform(camera, session, fnmap.OVERRIDE, target, state, say)
+
+
+def _identity_key(identity: dict | None) -> str | None:
+    """The serial fingerprint, so a session cannot be restored onto another body."""
+    if not identity:
+        return None
+    return identity.get('serial_sha256')
 
 
 PIXEL_SHIFT_CONFIRMATION = (
@@ -143,7 +152,7 @@ def _lookup(value: int) -> fnmap.FunctionItem:
 
 
 def write_slot(camera, state: CameraState, slot: int, value: int, root: Path,
-               progress=None) -> journal.Session:
+               progress=None, identity: dict | None = None) -> journal.Session:
     """Put one saved value into one Fn slot. Requires the override already on."""
     say = progress or (lambda _message: None)
     if slot not in fnmap.FN_SLOTS:
@@ -169,6 +178,7 @@ def write_slot(camera, state: CameraState, slot: int, value: int, root: Path,
         status=item.status,
         confirmation_text=PIXEL_SHIFT_CONFIRMATION if item.status == fnmap.STATUS_KNOWN_BAD else '',
         written_by=written_by,
+        camera=_identity_key(identity),
     )
     session = journal.create(root, 'write_slot', payload, state.snapshot)
     return _perform(camera, session, pid, bytes([value]), state, say)
@@ -190,10 +200,14 @@ def _restore_target(session: journal.Session, state: CameraState):
     raise ValueError('这条记录没有可以恢复的内容')
 
 
-def restore_session(camera, session: journal.Session, root: Path, progress=None) -> journal.Session:
+def restore_session(camera, session: journal.Session, root: Path, progress=None,
+                    identity: dict | None = None) -> journal.Session:
     """Put back exactly what one earlier write changed."""
     say = progress or (lambda _message: None)
     journal.load(session.directory / 'journal.json')  # re-verifies the snapshot hash
+    recorded = session.payload.get('camera')
+    if recorded and identity and recorded != _identity_key(identity):
+        raise ValueError('这条记录属于另一台相机，不能恢复到现在这台机身上')
     state = read_state(camera)
     pid, original, current, written = _restore_target(session, state)
     if current not in (original, written):

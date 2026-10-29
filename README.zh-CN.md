@@ -46,7 +46,16 @@ pip install pyinstaller
 powershell -File build/build_exe.ps1
 ```
 
-产物：`dist/ILCE-9_Slog_Project.exe`（约 20 MB，单文件，未签名）。
+产物：`dist/ILCE-9_Slog_Project.exe`（约 15 MB，单文件，未签名）。
+
+不接相机也能验证打包产物：
+
+```powershell
+$env:A9TOOL_SELFCHECK=1; .\dist\ILCE-9_Slog_Project.exe
+```
+
+窗口版没有控制台，要看输出请用 `$env:A9TOOL_CONSOLE=1` 重新构建。
+它会检查 JSON 表、sessions 路径、包内 libusb 后端，以及主窗口能否构造出全部 77 行。
 
 ## 测试
 
@@ -54,7 +63,7 @@ powershell -File build/build_exe.ps1
 python -m unittest discover -s tests -t .
 ```
 
-全部离线：用 `FakeCamera` 代替真机，不需要相机也不需要 USB 后端。共 70 项，含 Tk 控件状态检查。
+全部离线：用 `FakeCamera` 代替真机，不需要相机也不需要 USB 后端。共 87 项，含 Tk 控件状态检查，以及在禁用 site-packages 的子进程里验证 vendored 依赖可导入。
 
 ## 原理
 
