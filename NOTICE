@@ -20,6 +20,11 @@ importlib_resources
   https://github.com/python/importlib_resources
   License: Apache-2.0
 
+Cryptodome (shim only)
+  pmca imports Cryptodome.Hash.SHA256 and calls SHA256.new(data).digest().
+  src/vendor/Cryptodome/ is a three-file stand-in implemented with hashlib,
+  not the pycryptodomex distribution. pycryptodomex itself is not bundled.
+
 Firmware-derived strings
 ========================
 

@@ -37,6 +37,25 @@ class TestJournal(unittest.TestCase):
         self.assertTrue(journal.mark_chained(second))
         self.assertFalse(journal.mark_chained(first))
 
+    def test_save_leaves_no_temporary_file(self):
+        s = journal.create(self.root, 'a', {}, b'x')
+        journal.save(s)
+        self.assertEqual(sorted(p.name for p in s.directory.iterdir()),
+                         ['Backup-original.bin', 'journal.json'])
+
+    def test_list_sessions_skips_a_corrupt_journal(self):
+        good = journal.create(self.root, 'good', {}, b'x')
+        bad = journal.create(self.root, 'bad', {}, b'y')
+        (bad.directory / 'journal.json').write_text('{ truncated', encoding='utf-8')
+        self.assertEqual([s.directory.name for s in journal.list_sessions(self.root)],
+                         [good.directory.name])
+
+    def test_list_sessions_skips_a_directory_without_payload(self):
+        good = journal.create(self.root, 'good', {}, b'x')
+        (self.root / '20200101-000000000000-orphan').mkdir()
+        self.assertEqual([s.directory.name for s in journal.list_sessions(self.root)],
+                         [good.directory.name])
+
     def test_load_rejects_tampered_snapshot(self):
         s = journal.create(self.root, 'a', {}, b'original')
         (s.directory / 'Backup-original.bin').write_bytes(b'changed!')

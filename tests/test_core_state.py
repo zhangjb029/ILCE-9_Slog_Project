@@ -61,6 +61,16 @@ class TestParameterGuard(unittest.TestCase):
         guard = usbdev.ParameterGuard(FakeTransport())
         guard.sendSenserPacket(0x40, struct.pack('<HHI', 0x603, 1, fnmap.OVERRIDE))
 
+    def test_guard_rejects_wrong_payload_length_for_a_slot(self):
+        guard = usbdev.ParameterGuard(FakeTransport())
+        with self.assertRaises(ValueError):
+            guard.sendSenserPacket(0x40, struct.pack('<HHI', 0x603, 2, 0x01070bf1) + bytes([0x36, 0x00]))
+
+    def test_guard_rejects_short_override_payload(self):
+        guard = usbdev.ParameterGuard(FakeTransport())
+        with self.assertRaises(ValueError):
+            guard.sendSenserPacket(0x40, struct.pack('<HHI', 0x603, 2, fnmap.OVERRIDE) + bytes(10))
+
     def test_guard_blocks_read_of_unknown_property(self):
         guard = usbdev.ParameterGuard(FakeTransport())
         with self.assertRaises(ValueError):

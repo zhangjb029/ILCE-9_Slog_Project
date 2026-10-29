@@ -29,7 +29,10 @@ FEATURE_SELECTOR = 0x0107146D
 MENU_SELECTOR = 0x01070316
 
 READABLE = frozenset({fnmap.OVERRIDE, FEATURE_SELECTOR, MENU_SELECTOR, *fnmap.SLOT_PIDS})
-WRITABLE = frozenset({fnmap.OVERRIDE, *fnmap.SLOT_PIDS})
+# Property -> the only payload length that property accepts. Pinning the length
+# here means a sizing bug in core cannot send 1024 bytes at a one-byte slot.
+WRITE_SIZES = {fnmap.OVERRIDE: 1024, **{pid: 1 for pid in fnmap.SLOT_PIDS}}
+WRITABLE = frozenset(WRITE_SIZES)
 
 
 # --------------------------------------------------------------------------
@@ -46,8 +49,10 @@ def check_identity(identity: dict) -> None:
 
 def _select_single(devices):
     found = list(devices)
-    if len(found) != 1:
-        raise RuntimeError('Connect exactly one camera')
+    if not found:
+        raise RuntimeError('没找到相机')
+    if len(found) > 1:
+        raise RuntimeError('找到多台相机')
     return found[0]
 
 
@@ -86,6 +91,20 @@ def load_current_receipt(root=None) -> Path | None:
         return None
     check_identity(record.get('identity', {}))
     return path
+
+
+def discard_receipt(root=None) -> None:
+    """Drop the receipt once a connection succeeded.
+
+    A receipt only exists to get the user past the second driver install. Left
+    in place it would be auto-reused by the next run, which then skips the
+    mass-storage identification step and looks for a service device that is not
+    there yet — so every connection after a successful one would fail.
+    """
+    try:
+        (_receipt_root(root) / RECEIPT_FILENAME).unlink()
+    except FileNotFoundError:
+        pass
 
 
 def read_receipt(path: Path) -> dict:
@@ -129,7 +148,7 @@ class ParameterGuard:
                     allowed = len(body) == 4 and struct.unpack('<I', body)[0] in READABLE
                 elif command == 2 and len(body) >= 5:
                     pid = struct.unpack_from('<I', body)[0]
-                    allowed = pid in WRITABLE
+                    allowed = WRITE_SIZES.get(pid) == len(body) - 4
                     if allowed:
                         self.wrote = True
                 elif command == 3:
@@ -206,7 +225,7 @@ def _load_dependencies():
     backend = libusb_package.get_libusb1_backend()
     if backend is None:
         raise RuntimeError('Bundled libusb backend could not be loaded')
-    return usb, util, backend, sony, GenericUsbDriver, MscBbbDriver, MscCbiDriver, UsbBackend
+    return usb.core, usb.util, backend, sony, GenericUsbDriver, MscBbbDriver, MscCbiDriver, UsbBackend
 
 
 def _make_senser(sony, driver):
@@ -373,13 +392,23 @@ def connect(receipt: Path | None = None, progress=None) -> CameraHandle:
     auth = None
     try:
         expected_port = None
+        identity = None
         if receipt is not None:
             record = read_receipt(receipt)
             identity = record['identity']
             check_identity(identity)
             expected_port = record['usb_port']
-            say('使用上次的凭据继续')
-        else:
+            if candidates(True):
+                say('使用上次的凭据继续')
+            else:
+                # The camera is no longer in service mode (power-cycled, or never
+                # got there). Fall back to the normal path rather than hunting for
+                # a device that is not plugged in.
+                say('相机不在服务模式，重新从大容量存储开始')
+                identity = None
+                expected_port = None
+
+        if identity is None:
             found = candidates(False)
             device, interface = _select_single(found)
             if candidates(True):
@@ -438,6 +467,7 @@ def connect(receipt: Path | None = None, progress=None) -> CameraHandle:
         handle = CameraHandle(camera=camera, driver=driver, auth=auth,
                               identity=identity, devices=devices)
         auth = None  # ownership moves to the handle
+        discard_receipt()  # a receipt is only for getting past a failed switch
         return handle
     except BaseException:
         if auth is not None:

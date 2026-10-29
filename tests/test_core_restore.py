@@ -68,6 +68,15 @@ class TestRestore(unittest.TestCase):
         self.assertEqual(first, second)
         self.assertEqual(json.loads(first.read_text(encoding='utf-8'))['slots']['7'], 0x06)
 
+    def test_restore_refuses_a_session_from_another_camera(self):
+        cam = FakeCamera(override=_enabled_override())
+        mine = {'model': 'ILCE-9', 'firmware': '6.00', 'serial_sha256': 'a' * 64}
+        theirs = {'model': 'ILCE-9', 'firmware': '6.00', 'serial_sha256': 'b' * 64}
+        session = core.write_slot(cam, core.read_state(cam), 7, 0x36, self.root, identity=mine)
+        with self.assertRaises(ValueError) as ctx:
+            core.restore_session(cam, session, self.root, identity=theirs)
+        self.assertIn('另一台相机', str(ctx.exception))
+
     def test_restore_without_baseline_is_refused(self):
         cam = FakeCamera(override=_enabled_override())
         with self.assertRaises(ValueError):

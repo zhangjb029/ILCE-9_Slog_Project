@@ -230,9 +230,11 @@ class App:
             return
         self._set_busy(True)
         self.log('正在连接相机…')
-        receipt = usbdev.load_current_receipt()
 
         def work():
+            # Everything that can raise belongs in here: an exception on the Tk
+            # thread would leave busy=True and every button disabled forever.
+            receipt = usbdev.load_current_receipt()
             handle = usbdev.connect(receipt, progress=lambda message: self._post(self.log, message))
             state = core.read_state(handle.camera)
             core.save_baseline(state)
@@ -267,7 +269,8 @@ class App:
 
         def work():
             return core.enable_override(self.handle.camera, state, journal.sessions_root(),
-                                        progress=lambda message: self._post(self.log, message))
+                                        progress=lambda message: self._post(self.log, message),
+                                        identity=self.handle.identity)
 
         def done(result, error):
             self._set_busy(False)
@@ -296,7 +299,8 @@ class App:
 
         def work():
             return core.write_slot(self.handle.camera, state, slot, value, journal.sessions_root(),
-                                   progress=lambda message: self._post(self.log, message))
+                                   progress=lambda message: self._post(self.log, message),
+                                   identity=self.handle.identity)
 
         def done(result, error):
             self._set_busy(False)
@@ -366,7 +370,8 @@ class App:
 
         def work():
             return core.restore_session(self.handle.camera, session, journal.sessions_root(),
-                                        progress=lambda message: self._post(self.log, message))
+                                        progress=lambda message: self._post(self.log, message),
+                                        identity=self.handle.identity)
 
         def done(result, error):
             self._set_busy(False)

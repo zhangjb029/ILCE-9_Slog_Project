@@ -8,3 +8,4 @@ baseline/
 *.exe
 .pytest_cache/
 .superpowers/
+dist-debug/
