@@ -1,5 +1,6 @@
 """The camera's own Fn table: slot properties, saved values, and what is known about each."""
 from dataclasses import dataclass
+from functools import lru_cache
 
 from . import data
 
@@ -46,6 +47,7 @@ def slot_label(number: int) -> str:
     return f'Fn{number}'
 
 
+@lru_cache(maxsize=1)
 def load_functions() -> list[FunctionItem]:
     """Every saved value the camera's own Fn resolver accepts, in value order.
 

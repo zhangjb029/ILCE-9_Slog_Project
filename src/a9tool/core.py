@@ -113,3 +113,48 @@ def enable_override(camera, state: CameraState, root: Path, progress=None) -> jo
         return journal.save(session)
 
     return _perform(camera, session, fnmap.OVERRIDE, target, state, say)
+
+
+PIXEL_SHIFT_CONFIRMATION = (
+    '像素转换多重拍摄实测会在拍摄第一张后卡死，需要拔电池才能恢复。\n'
+    '确定继续吗？'
+)
+
+
+def _lookup(value: int) -> fnmap.FunctionItem:
+    for item in fnmap.load_functions():
+        if item.value == value:
+            return item
+    raise ValueError(f'{value:#04x} 不是相机 Fn 列表里的功能')
+
+
+def write_slot(camera, state: CameraState, slot: int, value: int, root: Path,
+               progress=None) -> journal.Session:
+    """Put one saved value into one Fn slot. Requires the override already on."""
+    say = progress or (lambda _message: None)
+    if slot not in fnmap.FN_SLOTS:
+        raise ValueError(f'Fn 槽位必须是 1-{max(fnmap.FN_SLOTS)}')
+    item = _lookup(value)
+    if override_status(state) != STATUS_ENABLED:
+        raise ValueError('请先开启 PP 放行，再写入功能槽位')
+
+    pid = fnmap.FN_SLOTS[slot]
+    original = state.slots[slot]
+    written_by = None
+    for prior in journal.list_sessions(root):
+        if prior.action == 'write_slot' and prior.payload.get('slot') == slot:
+            written_by = prior.directory.name
+            break
+
+    payload = dict(
+        slot=slot,
+        property=hex(pid),
+        original=f'{original:02x}',
+        target=f'{value:02x}',
+        symbol=item.symbol,
+        status=item.status,
+        confirmation_text=PIXEL_SHIFT_CONFIRMATION if item.status == fnmap.STATUS_KNOWN_BAD else '',
+        written_by=written_by,
+    )
+    session = journal.create(root, 'write_slot', payload, state.snapshot)
+    return _perform(camera, session, pid, bytes([value]), state, say)
