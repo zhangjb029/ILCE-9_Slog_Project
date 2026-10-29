@@ -42,3 +42,74 @@ def override_status(state: CameraState) -> str:
     if 2 not in values:
         return STATUS_DISABLED
     return STATUS_MIXED
+
+
+def _perform(camera, session, pid: int, target: bytes, state: CameraState, say) -> journal.Session:
+    """Write one property, confirm nothing else moved, then SAVE(0).
+
+    Shared by every write path. On any failure the session is left in
+    FAILED_REVIEW_REQUIRED with the error recorded, never silently retried.
+    """
+    try:
+        live = {p: bytes(camera.readBackup(p)) for p in READ_PIDS}
+        if live[fnmap.OVERRIDE] != state.override:
+            raise ValueError('机身参数在读取之后发生变化，已停止，没有写入')
+        for number, prop in fnmap.FN_SLOTS.items():
+            if live[prop] != bytes([state.slots[number]]):
+                raise ValueError('机身参数在读取之后发生变化，已停止，没有写入')
+
+        others = {p: value for p, value in live.items() if p != pid}
+        say('正在写入…')
+        session.journal['state'] = 'WRITE_PENDING'
+        journal.save(session)
+        camera.writeBackup(pid, target)
+        if bytes(camera.readBackup(pid)) != target:
+            raise ValueError('写入后立即回读不一致')
+        session.journal['state'] = 'WRITE_VERIFIED'
+        journal.save(session)
+
+        for other, expected in others.items():
+            if bytes(camera.readBackup(other)) != expected:
+                raise ValueError(f'一个不相关的参数被改动了（{other:#010x}），未保存')
+
+        say('正在保存…')
+        session.journal['state'] = 'SAVE_PENDING'
+        journal.save(session)
+        camera.saveBackup(0)
+
+        if bytes(camera.readBackup(pid)) != target:
+            raise ValueError('保存后回读与写入值不一致')
+        for other, expected in others.items():
+            if bytes(camera.readBackup(other)) != expected:
+                raise ValueError(f'保存后一个不相关的参数发生了变化（{other:#010x}）')
+
+        session.journal['state'] = 'SAVED_AND_READBACK_VERIFIED'
+        return journal.save(session)
+    except BaseException as error:
+        session.journal['state'] = 'FAILED_REVIEW_REQUIRED'
+        session.journal['error'] = str(error)
+        journal.save(session)
+        raise
+
+
+def enable_override(camera, state: CameraState, root: Path, progress=None) -> journal.Session:
+    """Turn on the five PP feature-override bytes. No Fn slot is touched."""
+    say = progress or (lambda _message: None)
+    status = override_status(state)
+    if status == STATUS_MIXED:
+        raise ValueError('放行位状态不一致：五个字节里只有一部分是 02，没有对应的安全写法')
+
+    target_bytes = bytearray(state.override)
+    for offset in fnmap.OVERRIDE_OFFSETS:
+        target_bytes[offset] = 2
+    target = bytes(target_bytes)
+
+    payload = dict(original=state.override.hex(), target=target.hex(),
+                   changed_offsets=list(fnmap.OVERRIDE_OFFSETS), written_by=None)
+    session = journal.create(root, 'enable_override', payload, state.snapshot)
+
+    if status == STATUS_ENABLED:
+        session.journal['state'] = 'ALREADY_AT_TARGET_NO_SAVE'
+        return journal.save(session)
+
+    return _perform(camera, session, fnmap.OVERRIDE, target, state, say)
