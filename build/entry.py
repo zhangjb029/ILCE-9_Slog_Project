@@ -38,11 +38,13 @@ def selfcheck() -> int:
         app = App(root)
         root.update()
         rows = len(app.all_tree.get_children())
+        tabs = [app.notebook.tab(i, 'text') for i in range(len(app.notebook.tabs()))]
         root.destroy()
     except Exception as error:
         print(f'GUI_FAIL: {type(error).__name__}: {error}')
         return 3 if strict_gui else 0
-    print('gui: 77-row table' if rows == 77 else f'gui: UNEXPECTED rows={rows}')
+    print('gui: 77-row table, 2 tabs' if rows == 77 and len(tabs) == 2
+          else f'gui: UNEXPECTED rows={rows} tabs={tabs}')
 
     print('SELFCHECK_OK')
     return 0

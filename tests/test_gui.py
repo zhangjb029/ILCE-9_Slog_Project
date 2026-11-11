@@ -91,6 +91,38 @@ class TestGui(unittest.TestCase):
         for value in (0x3A, 0x36):
             self.assertIn('✅', str(self.app.all_tree.item(str(value))['values']))
 
+    # -- electronic-shutter flash tab --------------------------------------
+    def test_flash_tab_exists(self):
+        self.assertEqual(len(self.app.notebook.tabs()), 2)
+        self.assertEqual(self.app.notebook.tab(1, 'text'), '电子快门引闪')
+
+    def test_flash_buttons_disabled_before_reading(self):
+        for button in (self.app.flash_menu_btn, self.app.flash_av_btn):
+            self.assertEqual(str(button['state']), 'disabled')
+        self.assertEqual(str(self.app.flash_status_btn['state']), 'normal')
+
+    def test_flash_menu_button_offers_the_first_step(self):
+        self.app._flash_status_done({'menu_restriction': 1, 'av_eligibility': 0}, None)
+        self.assertEqual(str(self.app.flash_menu_btn['state']), 'normal')
+        self.assertEqual(str(self.app.flash_av_btn['state']), 'disabled')
+        self.assertIn('45：1', self.app.flash_menu_var.get())
+
+    def test_flash_av_button_requires_menu_already_open(self):
+        self.app._flash_status_done({'menu_restriction': 0, 'av_eligibility': 0}, None)
+        self.assertEqual(str(self.app.flash_menu_btn['state']), 'disabled')
+        self.assertEqual(str(self.app.flash_av_btn['state']), 'normal')
+
+    def test_flash_buttons_idle_when_both_gates_open(self):
+        self.app._flash_status_done({'menu_restriction': 0, 'av_eligibility': 1}, None)
+        self.assertEqual(str(self.app.flash_menu_btn['state']), 'disabled')
+        self.assertEqual(str(self.app.flash_av_btn['state']), 'disabled')
+
+    def test_flash_read_failure_leaves_values_unknown(self):
+        self.app._flash_status_done(None, RuntimeError('boom'))
+        self.assertIsNone(self.app.flash_menu_value)
+        self.assertIsNone(self.app.flash_av_value)
+        self.assertEqual(str(self.app.flash_menu_btn['state']), 'disabled')
+
 
 if __name__ == '__main__':
     unittest.main()

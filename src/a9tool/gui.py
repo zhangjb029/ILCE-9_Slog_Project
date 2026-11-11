@@ -9,9 +9,10 @@ run of the program does exactly one transaction.
 import queue
 import threading
 import tkinter as tk
-from tkinter import messagebox, ttk
+from pathlib import Path
+from tkinter import filedialog, messagebox, ttk
 
-from . import core, errors, fnmap, journal, usbdev
+from . import core, errors, flash_av, flash_service, fnmap, journal, usbdev
 
 PICTURE_PROFILE = 0x3A
 SLOG_DISPLAY_ASSIST = 0x36
@@ -82,7 +83,14 @@ class App:
     def _build(self) -> None:
         pad = dict(padx=10, pady=6)
 
-        connect = ttk.LabelFrame(self.root, text='① 连接相机')
+        self.notebook = ttk.Notebook(self.root)
+        self.notebook.pack(fill='both', expand=True, padx=10, pady=(8, 0))
+        self.tab_fn = ttk.Frame(self.notebook)
+        self.tab_flash = ttk.Frame(self.notebook)
+        self.notebook.add(self.tab_fn, text='Fn 功能')
+        self.notebook.add(self.tab_flash, text='电子快门引闪')
+
+        connect = ttk.LabelFrame(self.tab_fn, text='① 连接相机')
         connect.pack(fill='x', **pad)
         ttk.Label(connect, text='相机 USB 连接模式设为「大容量存储」，只连这一台相机。').pack(anchor='w', padx=10, pady=(8, 4))
         row = ttk.Frame(connect)
@@ -93,7 +101,7 @@ class App:
         self.retry_btn.pack(side='left', padx=8)
         self.retry_btn.pack_forget()
 
-        status = ttk.LabelFrame(self.root, text='② 检测结果')
+        status = ttk.LabelFrame(self.tab_fn, text='② 检测结果')
         status.pack(fill='x', **pad)
         self.status_var = tk.StringVar(value='尚未连接')
         self.override_var = tk.StringVar(value='')
@@ -102,7 +110,7 @@ class App:
         self.override_btn = ttk.Button(status, text='开启 PP 放行', command=self.on_enable_override)
         self.override_btn.pack(anchor='w', padx=10, pady=(6, 10))
 
-        cards = ttk.LabelFrame(self.root, text='③ 选择功能')
+        cards = ttk.LabelFrame(self.tab_fn, text='③ 选择功能')
         cards.pack(fill='x', **pad)
         row = ttk.Frame(cards)
         row.pack(fill='x', padx=10, pady=(8, 4))
@@ -127,7 +135,7 @@ class App:
         self.all_row.pack(anchor='w', padx=10, pady=(0, 10))
         self.all_row.pack_forget()
 
-        restore = ttk.LabelFrame(self.root, text='④ 恢复')
+        restore = ttk.LabelFrame(self.tab_fn, text='④ 恢复')
         restore.pack(fill='both', expand=False, **pad)
         self.sessions_tree = ttk.Treeview(restore, columns=('time', 'what', 'note'), show='headings', height=4)
         for column, title, width in (('time', '时间', 150), ('what', '做了什么', 320), ('note', '备注', 240)):
@@ -145,10 +153,11 @@ class App:
         self.refresh_btn.pack(side='left')
 
         log_frame = ttk.LabelFrame(self.root, text='日志')
-        log_frame.pack(fill='both', expand=True, **pad)
+        log_frame.pack(fill='x', expand=False, padx=10, pady=6)
         self.log_box = tk.Text(log_frame, height=8, wrap='word', state='disabled')
         self.log_box.pack(fill='both', expand=True, padx=10, pady=8)
 
+        self._build_flash_tab(self.tab_flash)
         self.reload_sessions()
         self._refresh()
 
@@ -200,6 +209,7 @@ class App:
         self.restore_btn.configure(state=normal(writable and self.selected_session is not None))
         self.baseline_btn.configure(state=normal(writable))
         self.refresh_btn.configure(state=normal(not self.busy))
+        self._refresh_flash()
 
     def _show_status(self) -> None:
         identity = self.handle.identity
@@ -407,6 +417,215 @@ class App:
 
         self._background(work, done)
 
+
+    # -- electronic-shutter flash tab -------------------------------------
+    def _build_flash_tab(self, parent) -> None:
+        self.flash_menu_value = None
+        self.flash_av_value = None
+
+        warn = ttk.LabelFrame(parent, text='使用前必读')
+        warn.pack(fill='x', padx=10, pady=8)
+        ttk.Label(warn, justify='left', wraplength=720, text=(
+            '开启电子快门引闪要改两处配置，分两次写入，每次写完都要关机重启。\n'
+            '· 两项都开启后，电子快门单张可以引闪（已确认）。\n'
+            '· 电子快门连拍仍只有第一张引闪，尚未解决。\n'
+            '· 快于 1/160 s 的照片有黑边，慢于它（如 1/125 s）可用。\n'
+            '· 硬件安全、TTL 精度、HSS、无线引闪均未验证。\n'
+            '操作前务必在相机和闪光灯都关机时拆下热靴附件。'
+        )).pack(anchor='w', padx=10, pady=8)
+
+        state = ttk.LabelFrame(parent, text='当前配置')
+        state.pack(fill='x', padx=10, pady=8)
+        self.flash_menu_var = tk.StringVar(value='上层索引 45：未读取')
+        self.flash_av_var = tk.StringVar(value='AV 偏移 AD：未读取')
+        ttk.Label(state, textvariable=self.flash_menu_var).pack(anchor='w', padx=10, pady=(8, 2))
+        ttk.Label(state, textvariable=self.flash_av_var).pack(anchor='w', padx=10, pady=(0, 6))
+        self.flash_status_btn = ttk.Button(state, text='连接并读取状态', command=self.on_flash_status)
+        self.flash_status_btn.pack(anchor='w', padx=10, pady=(0, 10))
+
+        steps = ttk.LabelFrame(parent, text='分两步开放')
+        steps.pack(fill='x', padx=10, pady=8)
+        ttk.Label(steps, justify='left', wraplength=720, text=(
+            '① 上层规则：单独开放只让菜单恢复可选，不会引闪。\n'
+            '② AV 资格：要求 ① 已完成，并且重启过相机。'
+        )).pack(anchor='w', padx=10, pady=(8, 6))
+        row = ttk.Frame(steps)
+        row.pack(anchor='w', padx=10, pady=(0, 10))
+        self.flash_menu_btn = ttk.Button(row, text='① 开放上层规则（45：1 → 0）',
+                                         command=self.on_flash_menu_apply)
+        self.flash_menu_btn.pack(side='left')
+        self.flash_av_btn = ttk.Button(row, text='② 开放 AV 资格（AD：0 → 1）',
+                                       command=self.on_flash_av_apply)
+        self.flash_av_btn.pack(side='left', padx=8)
+
+        restore = ttk.LabelFrame(parent, text='恢复')
+        restore.pack(fill='x', padx=10, pady=8)
+        self.flash_restore_var = tk.StringVar(value='未选择日志')
+        ttk.Label(restore, textvariable=self.flash_restore_var, wraplength=720).pack(anchor='w', padx=10, pady=(8, 4))
+        self.flash_restore_btn = ttk.Button(restore, text='选择日志并恢复', command=self.on_flash_restore)
+        self.flash_restore_btn.pack(anchor='w', padx=10, pady=(0, 10))
+
+    def _refresh_flash(self) -> None:
+        def normal(ok):
+            return 'normal' if ok else 'disabled'
+
+        busy = self.busy
+        menu, av = self.flash_menu_value, self.flash_av_value
+        self.flash_status_btn.configure(state=normal(not busy))
+        self.flash_menu_btn.configure(state=normal(not busy and menu == 1))
+        self.flash_av_btn.configure(state=normal(not busy and menu == 0 and av == 0))
+        self.flash_restore_btn.configure(state=normal(not busy))
+
+    def _close_main_handle(self) -> None:
+        """Both flash guards forbid the PP/Fn properties, so they need their own
+        connection. Drop the Fn session first - one camera, one session."""
+        if self.handle is not None:
+            self.handle.close()
+            self.handle = None
+            self.state = None
+
+    def _flash_root(self, which: str) -> Path:
+        return journal.sessions_root() / which
+
+    def _confirm_flash(self, title: str, message: str) -> bool:
+        return messagebox.askyesno(
+            title,
+            message + '\n\n确认相机和闪光灯都已关机、热靴附件已拆下，然后继续？',
+            default='no')
+
+    def _flash_progress(self, message: str) -> None:
+        self._post(self.log, message)
+
+    def on_flash_status(self) -> None:
+        if self.busy:
+            return
+        self._set_busy(True)
+        self._close_main_handle()
+        self.log('正在连接相机读取闪光配置（会切换服务模式）…')
+
+        def work():
+            handle = usbdev.connect(usbdev.load_current_receipt(),
+                                    progress=self._flash_progress,
+                                    guard_factory=flash_av.AVGuard)
+            try:
+                session = flash_av.status(handle.camera, handle.identity, self._flash_root('flash_av'))
+                return dict(session.payload)
+            finally:
+                handle.close()
+
+        self._background(work, self._flash_status_done)
+
+    def _flash_status_done(self, payload, error) -> None:
+        self._set_busy(False)
+        if error is not None:
+            self.log(errors.user_message(error))
+            self._refresh_flash()
+            return
+        menu = payload.get('menu_restriction')
+        av = payload.get('av_eligibility')
+        self.flash_menu_value = menu
+        self.flash_av_value = av
+        self.flash_menu_var.set(f'上层索引 45：{menu}（0 = 不施加该项限制）')
+        self.flash_av_var.set(f'AV 偏移 AD：{av}（0 = 仍否决，1 = 通过此项检查）')
+        self.log('状态已读取。')
+        self._refresh_flash()
+
+    def on_flash_menu_apply(self) -> None:
+        if self.busy:
+            return
+        if not self._confirm_flash('开放上层规则',
+                                   '这会改写 00020008 的索引 45（1 → 0），然后保存。\n'
+                                   '单独做这一步不会引闪，只是让菜单恢复可选。'):
+            return
+        self._set_busy(True)
+        self._close_main_handle()
+        root = self._flash_root('flash')
+
+        def work():
+            handle = usbdev.connect(usbdev.load_current_receipt(),
+                                    progress=self._flash_progress,
+                                    guard_factory=flash_service.FlashGuard)
+            try:
+                return flash_service.apply(handle.camera, handle.guard, handle.identity, root,
+                                           progress=self._flash_progress)
+            finally:
+                handle.close()
+
+        self._background(work, self._flash_apply_done)
+
+    def on_flash_av_apply(self) -> None:
+        if self.busy:
+            return
+        if not self._confirm_flash('开放 AV 资格',
+                                   '这会改写 0003000B 的偏移 AD（0 → 1），然后保存。\n'
+                                   '原厂回调可能在保存或重启之前就生效。'):
+            return
+        self._set_busy(True)
+        self._close_main_handle()
+        root = self._flash_root('flash_av')
+
+        def work():
+            handle = usbdev.connect(usbdev.load_current_receipt(),
+                                    progress=self._flash_progress,
+                                    guard_factory=flash_av.AVGuard)
+            try:
+                return flash_av.apply(handle.camera, handle.guard, handle.identity, root,
+                                      progress=self._flash_progress)
+            finally:
+                handle.close()
+
+        self._background(work, self._flash_apply_done)
+
+    def _flash_apply_done(self, session, error) -> None:
+        self._set_busy(False)
+        if error is not None:
+            self.log(errors.user_message(error))
+            return
+        self.log(f'事务结果：{session.state}')
+        self.log(f'日志：{session.directory}')
+        self.flash_menu_value = None
+        self.flash_av_value = None
+        self.flash_menu_var.set('上层索引 45：已写入，请重启后重新读取')
+        self.flash_av_var.set('AV 偏移 AD：已写入，请重启后重新读取')
+        self._refresh_flash()
+        self.log('请保持热靴空置，关机、拔 USB、再开机，然后重新读取状态核对。')
+
+    def on_flash_restore(self) -> None:
+        if self.busy:
+            return
+        path = filedialog.askopenfilename(title='选择 journal.json',
+                                          filetypes=[('journal.json', 'journal.json'), ('JSON', '*.json')])
+        if not path:
+            return
+        try:
+            session = journal.load(Path(path))
+        except Exception as error:
+            self.log(errors.user_message(error))
+            return
+        if session.action == 'flash_apply':
+            guard_cls, module, root = flash_service.FlashGuard, flash_service, self._flash_root('flash')
+        elif session.action == 'flash_av_apply':
+            guard_cls, module, root = flash_av.AVGuard, flash_av, self._flash_root('flash_av')
+        else:
+            self.log('这份日志不是闪光配置的 apply 记录，不能用来恢复。')
+            return
+        if not self._confirm_flash('恢复', '会按这份日志把对应配置写回原值。'):
+            return
+        self.flash_restore_var.set(f'已选择：{Path(path).name}')
+        self._set_busy(True)
+        self._close_main_handle()
+
+        def work():
+            handle = usbdev.connect(usbdev.load_current_receipt(),
+                                    progress=self._flash_progress,
+                                    guard_factory=guard_cls)
+            try:
+                return module.restore(handle.camera, handle.guard, handle.identity, root, Path(path),
+                                      progress=self._flash_progress)
+            finally:
+                handle.close()
+
+        self._background(work, self._flash_apply_done)
 
 def _slot_number(label: str) -> int:
     return int(label.replace('Fn', ''))
