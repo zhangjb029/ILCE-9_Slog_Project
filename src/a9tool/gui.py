@@ -10,9 +10,9 @@ import queue
 import threading
 import tkinter as tk
 from pathlib import Path
-from tkinter import filedialog, messagebox, ttk
+from tkinter import messagebox, ttk
 
-from . import core, errors, flash_av, flash_service, fnmap, journal, usbdev
+from . import core, errors, flash_av, flash_baseline, flash_service, fnmap, journal, usbdev
 
 PICTURE_PROFILE = 0x3A
 SLOG_DISPLAY_ASSIST = 0x36
@@ -460,10 +460,28 @@ class App:
 
         restore = ttk.LabelFrame(parent, text='恢复')
         restore.pack(fill='x', padx=10, pady=8)
-        self.flash_restore_var = tk.StringVar(value='未选择日志')
-        ttk.Label(restore, textvariable=self.flash_restore_var, wraplength=720).pack(anchor='w', padx=10, pady=(8, 4))
-        self.flash_restore_btn = ttk.Button(restore, text='选择日志并恢复', command=self.on_flash_restore)
+        self.flash_baseline = flash_baseline.load()
+        self.flash_restore_var = tk.StringVar()
+        ttk.Label(restore, textvariable=self.flash_restore_var, wraplength=720,
+                  justify='left').pack(anchor='w', padx=10, pady=(8, 4))
+        self.flash_restore_btn = ttk.Button(restore, text='恢复到初始备份',
+                                            command=self.on_flash_restore)
         self.flash_restore_btn.pack(anchor='w', padx=10, pady=(0, 10))
+        self._update_flash_baseline_text()
+
+    def _update_flash_baseline_text(self) -> None:
+        baseline = self.flash_baseline
+        if baseline is None:
+            self.flash_restore_var.set(
+                '初始备份：尚未保存。\n'
+                '第一次写入之前必须点「连接并读取状态」，那一步会把当前两项值存成初始备份；'
+                '没有初始备份时，下面的写入按钮是灰的。')
+            return
+        record = baseline['record']
+        self.flash_restore_var.set(
+            f'初始备份：{record["created"]} 保存 —— 上层索引 45 = {record["menu_value"]}，'
+            f'AV 偏移 AD = {record["av_value"]}。\n'
+            '「恢复到初始备份」会把两项都写回这组值。')
 
     def _refresh_flash(self) -> None:
         def normal(ok):
@@ -471,10 +489,11 @@ class App:
 
         busy = self.busy
         menu, av = self.flash_menu_value, self.flash_av_value
+        has_baseline = self.flash_baseline is not None
         self.flash_status_btn.configure(state=normal(not busy))
-        self.flash_menu_btn.configure(state=normal(not busy and menu == 1))
-        self.flash_av_btn.configure(state=normal(not busy and menu == 0 and av == 0))
-        self.flash_restore_btn.configure(state=normal(not busy))
+        self.flash_menu_btn.configure(state=normal(not busy and has_baseline and menu == 1))
+        self.flash_av_btn.configure(state=normal(not busy and has_baseline and menu == 0 and av == 0))
+        self.flash_restore_btn.configure(state=normal(not busy and has_baseline))
 
     def _close_main_handle(self) -> None:
         """Both flash guards forbid the PP/Fn properties, so they need their own
@@ -509,6 +528,11 @@ class App:
                                     guard_factory=flash_av.AVGuard)
             try:
                 session = flash_av.status(handle.camera, handle.identity, self._flash_root('flash_av'))
+                # First successful read is the only moment the untouched values
+                # are guaranteed to be on the camera; capture them here, before
+                # any write is possible.
+                snapshot = (session.directory / 'Backup-original.bin').read_bytes()
+                flash_baseline.save(snapshot, handle.identity)
                 return dict(session.payload)
             finally:
                 handle.close()
@@ -527,7 +551,10 @@ class App:
         self.flash_av_value = av
         self.flash_menu_var.set(f'上层索引 45：{menu}（0 = 不施加该项限制）')
         self.flash_av_var.set(f'AV 偏移 AD：{av}（0 = 仍否决，1 = 通过此项检查）')
-        self.log('状态已读取。')
+        before = self.flash_baseline is not None
+        self.flash_baseline = flash_baseline.load()
+        self._update_flash_baseline_text()
+        self.log('状态已读取。' if before else '状态已读取，并已保存初始备份。')
         self._refresh_flash()
 
     def on_flash_menu_apply(self) -> None:
@@ -591,41 +618,68 @@ class App:
         self.log('请保持热靴空置，关机、拔 USB、再开机，然后重新读取状态核对。')
 
     def on_flash_restore(self) -> None:
-        if self.busy:
+        if self.busy or self.flash_baseline is None:
             return
-        path = filedialog.askopenfilename(title='选择 journal.json',
-                                          filetypes=[('journal.json', 'journal.json'), ('JSON', '*.json')])
-        if not path:
+        baseline = self.flash_baseline
+        record = baseline['record']
+        if not self._confirm_flash(
+                '恢复到初始备份',
+                '会把两项闪光配置写回第一次读取时的值：\n'
+                f'  上层索引 45 = {record["menu_value"]}\n'
+                f'  AV 偏移 AD = {record["av_value"]}'):
             return
-        try:
-            session = journal.load(Path(path))
-        except Exception as error:
-            self.log(errors.user_message(error))
-            return
-        if session.action == 'flash_apply':
-            guard_cls, module, root = flash_service.FlashGuard, flash_service, self._flash_root('flash')
-        elif session.action == 'flash_av_apply':
-            guard_cls, module, root = flash_av.AVGuard, flash_av, self._flash_root('flash_av')
-        else:
-            self.log('这份日志不是闪光配置的 apply 记录，不能用来恢复。')
-            return
-        if not self._confirm_flash('恢复', '会按这份日志把对应配置写回原值。'):
-            return
-        self.flash_restore_var.set(f'已选择：{Path(path).name}')
         self._set_busy(True)
         self._close_main_handle()
 
         def work():
+            done = []
             handle = usbdev.connect(usbdev.load_current_receipt(),
                                     progress=self._flash_progress,
-                                    guard_factory=guard_cls)
+                                    guard_factory=flash_av.AVGuard)
             try:
-                return module.restore(handle.camera, handle.guard, handle.identity, root, Path(path),
-                                      progress=self._flash_progress)
+                if not flash_baseline.belongs_to(baseline, handle.identity):
+                    raise ValueError('这份初始备份属于另一台相机，不能写到现在这台')
+                menu_now, av_now = flash_av.current(handle.camera)
+                if av_now != record['av_value']:
+                    done.append(flash_av.restore_baseline(
+                        handle.camera, handle.guard, handle.identity,
+                        self._flash_root('flash_av'), baseline['av'],
+                        progress=self._flash_progress))
             finally:
                 handle.close()
 
-        self._background(work, self._flash_apply_done)
+            if menu_now != record['menu_value']:
+                handle = usbdev.connect(usbdev.load_current_receipt(),
+                                        progress=self._flash_progress,
+                                        guard_factory=flash_service.FlashGuard)
+                try:
+                    done.append(flash_service.restore_baseline(
+                        handle.camera, handle.guard, handle.identity,
+                        self._flash_root('flash'), baseline['menu'],
+                        progress=self._flash_progress))
+                finally:
+                    handle.close()
+            return done
+
+        self._background(work, self._flash_restore_done)
+
+    def _flash_restore_done(self, results, error) -> None:
+        self._set_busy(False)
+        if error is not None:
+            self.log(errors.user_message(error))
+            self._refresh_flash()
+            return
+        if not results:
+            self.log('两项配置已经是初始值，没有写入。')
+        else:
+            for session in results:
+                self.log(f'恢复结果：{session.state}（{session.directory}）')
+        self.flash_menu_value = None
+        self.flash_av_value = None
+        self.flash_menu_var.set('上层索引 45：已请求恢复，请重启后重新读取')
+        self.flash_av_var.set('AV 偏移 AD：已请求恢复，请重启后重新读取')
+        self._refresh_flash()
+        self.log('请保持热靴空置，关机、拔 USB、再开机，然后重新读取状态核对。')
 
 def _slot_number(label: str) -> int:
     return int(label.replace('Fn', ''))

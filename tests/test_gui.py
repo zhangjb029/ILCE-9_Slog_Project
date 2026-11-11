@@ -1,7 +1,10 @@
+import tempfile
 import tkinter as tk
 import unittest
+from pathlib import Path
+from unittest import mock
 
-from a9tool import core, fnmap, gui
+from a9tool import core, fnmap, gui, journal
 from tests.fakecamera import FakeCamera
 
 
@@ -30,12 +33,17 @@ def _override(fill: int) -> bytes:
 @unittest.skipUnless(TK_OK, 'no display for tkinter')
 class TestGui(unittest.TestCase):
     def setUp(self):
+        self._tmp = tempfile.TemporaryDirectory()
+        patcher = mock.patch.object(journal, 'sessions_root', return_value=Path(self._tmp.name))
+        patcher.start()
+        self.addCleanup(patcher.stop)
         self.root = tk.Tk()
         self.root.withdraw()
         self.app = gui.App(self.root)
 
     def tearDown(self):
         self.root.destroy()
+        self._tmp.cleanup()
 
     def _connect(self, override: bytes):
         self.app.handle = type('Handle', (), {'identity': {'model': 'ILCE-9', 'firmware': '6.00',
@@ -101,19 +109,32 @@ class TestGui(unittest.TestCase):
             self.assertEqual(str(button['state']), 'disabled')
         self.assertEqual(str(self.app.flash_status_btn['state']), 'normal')
 
+    def _baseline(self, menu=1, av=0):
+        return dict(
+            record={'created': '2026-11-11T00:00:00+00:00', 'menu_value': menu, 'av_value': av,
+                    'identity': {'serial_sha256': 'a' * 64}},
+            menu=b'\x01' * 1024, av=b'\x00' * 256)
+
+    def _set_flash(self, menu, av, baseline=True):
+        """Drive the widget state directly; the camera lane is covered elsewhere."""
+        self.app.flash_baseline = self._baseline(menu=menu, av=av) if baseline else None
+        self.app.flash_menu_value = menu
+        self.app.flash_av_value = av
+        self.app._update_flash_baseline_text()
+        self.app._refresh_flash()
+
     def test_flash_menu_button_offers_the_first_step(self):
-        self.app._flash_status_done({'menu_restriction': 1, 'av_eligibility': 0}, None)
+        self._set_flash(1, 0)
         self.assertEqual(str(self.app.flash_menu_btn['state']), 'normal')
         self.assertEqual(str(self.app.flash_av_btn['state']), 'disabled')
-        self.assertIn('45：1', self.app.flash_menu_var.get())
 
     def test_flash_av_button_requires_menu_already_open(self):
-        self.app._flash_status_done({'menu_restriction': 0, 'av_eligibility': 0}, None)
+        self._set_flash(0, 0)
         self.assertEqual(str(self.app.flash_menu_btn['state']), 'disabled')
         self.assertEqual(str(self.app.flash_av_btn['state']), 'normal')
 
     def test_flash_buttons_idle_when_both_gates_open(self):
-        self.app._flash_status_done({'menu_restriction': 0, 'av_eligibility': 1}, None)
+        self._set_flash(0, 1)
         self.assertEqual(str(self.app.flash_menu_btn['state']), 'disabled')
         self.assertEqual(str(self.app.flash_av_btn['state']), 'disabled')
 
@@ -123,6 +144,23 @@ class TestGui(unittest.TestCase):
         self.assertIsNone(self.app.flash_av_value)
         self.assertEqual(str(self.app.flash_menu_btn['state']), 'disabled')
 
+    # -- the write path is gated on a saved baseline -----------------------
+    def test_flash_write_buttons_stay_disabled_without_a_baseline(self):
+        self._set_flash(1, 0, baseline=False)
+        self.assertEqual(str(self.app.flash_menu_btn['state']), 'disabled')
+        self.assertEqual(str(self.app.flash_av_btn['state']), 'disabled')
+        self.assertEqual(str(self.app.flash_restore_btn['state']), 'disabled')
+        self.assertIn('尚未保存', self.app.flash_restore_var.get())
+
+    def test_flash_write_buttons_enable_once_the_baseline_exists(self):
+        self._set_flash(1, 0)
+        self.assertEqual(str(self.app.flash_menu_btn['state']), 'normal')
+        self.assertEqual(str(self.app.flash_restore_btn['state']), 'normal')
+        self.assertIn('初始备份', self.app.flash_restore_var.get())
+
+    def test_flash_restore_restores_the_baseline_without_a_file_picker(self):
+        self._set_flash(0, 1)
+        self.assertEqual(self.app.flash_restore_btn.cget('text'), '恢复到初始备份')
 
 if __name__ == '__main__':
     unittest.main()

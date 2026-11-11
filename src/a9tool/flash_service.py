@@ -181,3 +181,20 @@ def restore(camera, guard: FlashGuard, identity: dict, root: Path, source: Path,
     if state.data not in (original, target):
         raise ValueError('恢复冲突：当前完整属性既非记录原值也非记录目标，不覆盖其他配置变化')
     return _perform(camera, guard, identity, root, state, original, 'flash_restore', progress, source)
+
+
+def current(camera) -> int:
+    """The upper-layer restriction as it is now (0 = not applied)."""
+    return cfg.parse(_read(camera).data).value
+
+
+def restore_baseline(camera, guard: FlashGuard, identity: dict, root: Path, original: bytes,
+                     progress=None) -> journal.Session:
+    """Write back the value captured at first read. No journal to choose from."""
+    usbdev.check_identity(identity)
+    if not isinstance(guard, FlashGuard):
+        raise ValueError('必须使用闪光配置专用报文白名单')
+    cfg.parse(original)
+    state = _read(camera)
+    return _perform(camera, guard, identity, root, state, bytes(original),
+                    'flash_restore_baseline', progress)

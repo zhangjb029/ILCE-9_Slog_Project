@@ -226,6 +226,23 @@ def restore(camera, guard, identity, root, source, progress=None):
     return _perform(camera, guard, identity, root, state, original, 'flash_av_restore', progress, source)
 
 
+def current(camera) -> tuple[int, int]:
+    """(upper-layer restriction, AV eligibility) as read now."""
+    _snapshot, menu, data = _read(camera)
+    return menu_cfg.parse(menu).value, parse(data)
+
+
+def restore_baseline(camera, guard, identity, root, original, progress=None):
+    """Write back the value captured at first read. No journal to choose from."""
+    usbdev.check_identity(identity)
+    if not isinstance(guard, AVGuard):
+        raise ValueError('必须使用 AV 试验专用白名单')
+    parse(original)
+    state = _read(camera)
+    return _perform(camera, guard, identity, root, state, bytes(original),
+                    'flash_av_restore_baseline', progress)
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(description='A9 6.00 第二处 AV 闪光资格试验；硬件安全未验证；默认只读')
     parser.add_argument('action', nargs='?', default='status', choices=('status', 'apply', 'restore'))
