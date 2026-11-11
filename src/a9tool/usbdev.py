@@ -193,6 +193,7 @@ class CameraHandle:
     identity: dict
     devices: list = field(default_factory=list)
     _closed: bool = False
+    guard: object | None = None
 
     def close(self) -> None:
         if self._closed:
@@ -345,12 +346,15 @@ def _wait_for_service(enumerate_devices, transient_error):
     return []
 
 
-def connect(receipt: Path | None = None, progress=None) -> CameraHandle:
+def connect(receipt: Path | None = None, progress=None, *, guard_factory=None) -> CameraHandle:
     """Open exactly one ILCE-9 and switch it into service mode.
 
     With ``receipt`` (a fresh identity file written before the mode switch) the
     mass-storage step is skipped, which is what makes the second driver install
     recoverable without asking the user to hunt for a path.
+
+    ``guard_factory`` may supply an operation-specific, more restricted guard;
+    leaving it unset preserves the PP/Fn parameter guard.
     """
     say = progress or (lambda _msg: None)
     usb, util, backend, sony, Generic, BBB, CBI, UsbBackend = _load_dependencies()
@@ -461,11 +465,11 @@ def connect(receipt: Path | None = None, progress=None) -> CameraHandle:
         auth.start()
         auth.authenticate()
         say('服务模式已认证，正在读取机身参数')
-        guard = ParameterGuard(_make_senser(sony, driver))
+        guard = (guard_factory or ParameterGuard)(_make_senser(sony, driver))
         camera = sony.SonySenserCamera(guard)
         camera.readHasp()
         handle = CameraHandle(camera=camera, driver=driver, auth=auth,
-                              identity=identity, devices=devices)
+                              identity=identity, devices=devices, guard=guard)
         auth = None  # ownership moves to the handle
         discard_receipt()  # a receipt is only for getting past a failed switch
         return handle

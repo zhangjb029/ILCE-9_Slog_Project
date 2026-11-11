@@ -1,0 +1,130 @@
+{
+  "status": "PASS_OFFLINE_EXACT_AV_BYTE_AND_RESTORE",
+  "cases": 12,
+  "results": [
+    {
+      "path": "<固件分析目录>\\a9_v600\\firmware.tar_unpacked\\0110_backup\\SYSASTRA-DSLR\\KT\\CX79900_ALLLANG.bin",
+      "snapshot_sha256": "482b0611db6ad836aa36954b3900af197907e41877733656289c015a5ebbfc78",
+      "property_sha256": "0b1b84581f2612822db68ec321e06f847529d077e6c5260ed2d761bd296a10dd",
+      "changed_offsets": [
+        173
+      ],
+      "round_trip": true
+    },
+    {
+      "path": "<固件分析目录>\\a9_v600\\firmware.tar_unpacked\\0110_backup\\SYSASTRA-DSLR\\KT\\CX79900_E38.bin",
+      "snapshot_sha256": "541e020193cc39a98fe6b2741ff5741cb856ffc9df8da0d52af3192b6dd32f3e",
+      "property_sha256": "0b1b84581f2612822db68ec321e06f847529d077e6c5260ed2d761bd296a10dd",
+      "changed_offsets": [
+        173
+      ],
+      "round_trip": true
+    },
+    {
+      "path": "<固件分析目录>\\a9_v600\\firmware.tar_unpacked\\0110_backup\\SYSASTRA-DSLR\\KT\\CX79900_J1.bin",
+      "snapshot_sha256": "09b77fe2e288ed48cc9475d71706fe5c6ab0d327352f474c82455f7ae9f69609",
+      "property_sha256": "0b1b84581f2612822db68ec321e06f847529d077e6c5260ed2d761bd296a10dd",
+      "changed_offsets": [
+        173
+      ],
+      "round_trip": true
+    },
+    {
+      "path": "<固件分析目录>\\a9_v600\\firmware.tar_unpacked\\0110_backup\\SYSASTRA-DSLR\\KT\\CX79900_KR2.bin",
+      "snapshot_sha256": "300f691e15fa362e71ead689860446788219b5443922da5e6e3e40edcb0ac163",
+      "property_sha256": "0b1b84581f2612822db68ec321e06f847529d077e6c5260ed2d761bd296a10dd",
+      "changed_offsets": [
+        173
+      ],
+      "round_trip": true
+    },
+    {
+      "path": "<固件分析目录>\\a9_v600\\firmware.tar_unpacked\\0110_backup\\SYSASTRA-DSLR\\KT\\CX79900_UC2.bin",
+      "snapshot_sha256": "58f39acdda52ab50a57af5c15c57a80b70fcf0f9b2aeaad0c2d7a9f35280ac7d",
+      "property_sha256": "0b1b84581f2612822db68ec321e06f847529d077e6c5260ed2d761bd296a10dd",
+      "changed_offsets": [
+        173
+      ],
+      "round_trip": true
+    },
+    {
+      "path": "<固件分析目录>\\a9_v600\\firmware.tar_unpacked\\0110_backup\\SYSASTRA-DSLR\\KT\\CX79901_ALLLANG.bin",
+      "snapshot_sha256": "604f20816dbaad8b5b736a430562230c0c685bcd4915d4d88f02568192b6d0a8",
+      "property_sha256": "0b1b84581f2612822db68ec321e06f847529d077e6c5260ed2d761bd296a10dd",
+      "changed_offsets": [
+        173
+      ],
+      "round_trip": true
+    },
+    {
+      "path": "<固件分析目录>\\a9_v600\\firmware.tar_unpacked\\0110_backup\\SYSASTRA-DSLR\\KT\\CX79901_AP2.bin",
+      "snapshot_sha256": "74a2365c07d601c3059d44b22ad4c95014dabc970aa71293063b18e71c933706",
+      "property_sha256": "0b1b84581f2612822db68ec321e06f847529d077e6c5260ed2d761bd296a10dd",
+      "changed_offsets": [
+        173
+      ],
+      "round_trip": true
+    },
+    {
+      "path": "<固件分析目录>\\a9_v600\\firmware.tar_unpacked\\0110_backup\\SYSASTRA-DSLR\\KT\\CX79901_CEC.bin",
+      "snapshot_sha256": "c5fbd29763cab8ddbbe9a4de920840883e298806fe51ba669ac97dfc384a0c7f",
+      "property_sha256": "0b1b84581f2612822db68ec321e06f847529d077e6c5260ed2d761bd296a10dd",
+      "changed_offsets": [
+        173
+      ],
+      "round_trip": true
+    },
+    {
+      "path": "<固件分析目录>\\a9_v600\\firmware.tar_unpacked\\0110_backup\\SYSASTRA-DSLR\\KT\\CX79901_CN2.bin",
+      "snapshot_sha256": "8ea063311ad298808e2fdce3893c5650acdad2631fab324864120c1e96324ae4",
+      "property_sha256": "0b1b84581f2612822db68ec321e06f847529d077e6c5260ed2d761bd296a10dd",
+      "changed_offsets": [
+        173
+      ],
+      "round_trip": true
+    },
+    {
+      "path": "<固件分析目录>\\a9_v600\\firmware.tar_unpacked\\0110_backup\\SYSASTRA-DSLR\\KT\\CX79901_IN5.bin",
+      "snapshot_sha256": "6fa379c12915896f4d67ca45db5eb95b78c6913d1243053a12eac3d2781d2c96",
+      "property_sha256": "0b1b84581f2612822db68ec321e06f847529d077e6c5260ed2d761bd296a10dd",
+      "changed_offsets": [
+        173
+      ],
+      "round_trip": true
+    },
+    {
+      "path": "<固件分析目录>\\a9_v600\\firmware.tar_unpacked\\0110_backup\\SYSASTRA-DSLR\\KT\\CX79901_JE3.bin",
+      "snapshot_sha256": "7aeb09ea5406bdc837f1758fb20cf246f33110b8c13b2ee526ccd3e43a246d36",
+      "property_sha256": "0b1b84581f2612822db68ec321e06f847529d077e6c5260ed2d761bd296a10dd",
+      "changed_offsets": [
+        173
+      ],
+      "round_trip": true
+    },
+    {
+      "path": "<项目目录>\\sessions\\flash\\<会话目录>\\Backup-original.bin",
+      "snapshot_sha256": "ca1ca59abd3e0fd4081c1518c91c003ade4853d6f730151e8c774c1e8513feb0",
+      "property_sha256": "fb255d87af13ffeff97bda55ec58bb5bb33e133f64ca7fd7b5b465ca0e5c5519",
+      "changed_offsets": [
+        173
+      ],
+      "round_trip": true
+    }
+  ],
+  "source_sha256": "1295c0f4e35114cc538f958a69e745a74d52bcd57590f4e3d1fd84ffceabd81f",
+  "camera_access": false,
+  "original_files_modified": false,
+  "modified_backup_written": false,
+  "hardware_safety_verified": false,
+  "physical_trigger_verified": false,
+  "unit_test_run": {
+    "command": "python -m unittest discover -v",
+    "total": 134,
+    "new_flash_av_tests": 23,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "exit_code": 0,
+    "source": "observed command result 2026-11-11; synthetic transports only"
+  }
+}

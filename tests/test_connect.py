@@ -175,6 +175,14 @@ class TestConnect(unittest.TestCase):
         self.assertEqual(handle.identity['firmware'], '6.00')
         handle.close()
 
+    def test_connect_uses_the_requested_restricted_guard(self):
+        self._plug_mass_storage()
+        marker = object()
+        handle = usbdev.connect(guard_factory=lambda transport: marker)
+        self.assertIs(handle.guard, marker)
+        self.assertIs(handle.camera.guard, marker)
+        handle.close()
+
     def test_successful_connect_leaves_no_reusable_receipt(self):
         self._plug_mass_storage()
         handle = usbdev.connect()

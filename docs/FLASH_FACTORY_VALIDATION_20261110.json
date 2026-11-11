@@ -1,0 +1,97 @@
+{
+  "result": "PASS_11_ORIGINAL_FACTORY_TABLES",
+  "camera_access": false,
+  "originals_modified": false,
+  "modified_payload_files_generated": false,
+  "scope": "In-memory property parsing and transformation; no boot or hardware verification.",
+  "rows": [
+    {
+      "template": "CX79900_ALLLANG.bin",
+      "sha256": "482b0611db6ad836aa36954b3900af197907e41877733656289c015a5ebbfc78",
+      "changed_byte_offsets": [
+        552
+      ],
+      "roundtrip_exact": true
+    },
+    {
+      "template": "CX79900_E38.bin",
+      "sha256": "541e020193cc39a98fe6b2741ff5741cb856ffc9df8da0d52af3192b6dd32f3e",
+      "changed_byte_offsets": [
+        552
+      ],
+      "roundtrip_exact": true
+    },
+    {
+      "template": "CX79900_J1.bin",
+      "sha256": "09b77fe2e288ed48cc9475d71706fe5c6ab0d327352f474c82455f7ae9f69609",
+      "changed_byte_offsets": [
+        552
+      ],
+      "roundtrip_exact": true
+    },
+    {
+      "template": "CX79900_KR2.bin",
+      "sha256": "300f691e15fa362e71ead689860446788219b5443922da5e6e3e40edcb0ac163",
+      "changed_byte_offsets": [
+        552
+      ],
+      "roundtrip_exact": true
+    },
+    {
+      "template": "CX79900_UC2.bin",
+      "sha256": "58f39acdda52ab50a57af5c15c57a80b70fcf0f9b2aeaad0c2d7a9f35280ac7d",
+      "changed_byte_offsets": [
+        552
+      ],
+      "roundtrip_exact": true
+    },
+    {
+      "template": "CX79901_ALLLANG.bin",
+      "sha256": "604f20816dbaad8b5b736a430562230c0c685bcd4915d4d88f02568192b6d0a8",
+      "changed_byte_offsets": [
+        552
+      ],
+      "roundtrip_exact": true
+    },
+    {
+      "template": "CX79901_AP2.bin",
+      "sha256": "74a2365c07d601c3059d44b22ad4c95014dabc970aa71293063b18e71c933706",
+      "changed_byte_offsets": [
+        552
+      ],
+      "roundtrip_exact": true
+    },
+    {
+      "template": "CX79901_CEC.bin",
+      "sha256": "c5fbd29763cab8ddbbe9a4de920840883e298806fe51ba669ac97dfc384a0c7f",
+      "changed_byte_offsets": [
+        552
+      ],
+      "roundtrip_exact": true
+    },
+    {
+      "template": "CX79901_CN2.bin",
+      "sha256": "8ea063311ad298808e2fdce3893c5650acdad2631fab324864120c1e96324ae4",
+      "changed_byte_offsets": [
+        552
+      ],
+      "roundtrip_exact": true
+    },
+    {
+      "template": "CX79901_IN5.bin",
+      "sha256": "6fa379c12915896f4d67ca45db5eb95b78c6913d1243053a12eac3d2781d2c96",
+      "changed_byte_offsets": [
+        552
+      ],
+      "roundtrip_exact": true
+    },
+    {
+      "template": "CX79901_JE3.bin",
+      "sha256": "7aeb09ea5406bdc837f1758fb20cf246f33110b8c13b2ee526ccd3e43a246d36",
+      "changed_byte_offsets": [
+        552
+      ],
+      "roundtrip_exact": true
+    }
+  ]
+}

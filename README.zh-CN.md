@@ -4,6 +4,12 @@
 
 [English](README.md)
 
+电子快门闪光现有两个独立源码入口：`python -m a9tool.flash` 和
+`python -m a9tool.flash_av`，均默认只读，提供对应配置的 apply／restore。
+2026-11-11 用户确认两项配置合用后电子单张可实际引闪；电子连拍仍仅首张，
+硬件安全尚未验证。操作、恢复及限制见[交付说明](docs/FLASH_DELIVERY.zh-CN.md)。
+原 PP/Fn 图形界面和既有 exe 的使用方式保持原样。
+
 ---
 
 ## 它做什么
