@@ -156,6 +156,49 @@ Uninstall only the camera entry. Leave every other USB device alone.
 
 ---
 
+## Electronic-shutter flash  ⚠ writes to the camera
+
+This is a second tab in the same window. It lets an electronic shutter fire a flash on the A9. **Nothing here is verified beyond what is written below, and hardware safety has not been established.**
+
+**Do this with the camera and the flash both switched off. Take the hot-shoe flash off before connecting.** Put it back only after the app has exited and the camera has been power-cycled and disconnected.
+
+### What is known
+
+| Situation | Result |
+|---|---|
+| Electronic shutter, single shot, both settings open | Fires the flash |
+| Electronic shutter faster than 1/160 s | Black band in the frame |
+| Electronic shutter at 1/125 s or slower | Full-frame illumination reported by the user |
+| Mechanical shutter continuous | Fires every frame |
+| Electronic shutter continuous | **First frame only**; the flash icon then greys out |
+| Hardware safety, TTL accuracy, HSS, wireless | Not verified |
+
+### Step 1 — Read, which also saves the baseline
+
+Switch to the **电子快门引闪** tab and click **连接并读取状态**.
+
+Two values appear: the upper-layer rule (`45`) and the AV eligibility byte (`AD`). **The first successful read also writes a baseline into `sessions\flash_baseline\`.** That baseline is what the restore button puts back. Until it exists, both write buttons stay grey on purpose — you cannot reach a state you have no way to undo from the same window.
+
+### Step 2 — Open the upper-layer rule  ⚠
+
+With `45 = 1`, click **① 开放上层规则（45：1 → 0）**. Confirm the dialog. Wait for `SAVED_AND_READBACK_VERIFIED` in the log.
+
+**Power-cycle the camera.** This step alone does not make the flash fire — it only makes the menu item selectable again.
+
+### Step 3 — Open the AV eligibility  ⚠
+
+Reconnect, read the state again (it should show `45 = 0`), then click **② 开放 AV 资格（AD：0 → 1）**. Confirm. Wait for the same success line, then **power-cycle again**.
+
+With both open, single-frame electronic shutter fires the flash.
+
+### Step 4 — Undo
+
+Open the tab and click **恢复到初始备份**. It writes both properties back to the values captured on the first read and tells you which ones actually needed restoring. If the baseline was recorded on a different camera body, it refuses.
+
+### Why it takes two connections
+
+Each of the two settings is guarded by its own packet allowlist, and neither guard permits the other's property. The tab therefore opens a fresh connection per step, and closes the Fn session first. A read or a write takes about as long as the connect step in the Fn tab.
+
 ## If something goes wrong
 
 | Log message | Meaning | What to do |
