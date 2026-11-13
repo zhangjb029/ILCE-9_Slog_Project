@@ -26,6 +26,17 @@ def selfcheck() -> int:
         return 2
     print('libusb backend:', backend)
 
+    from a9tool import menu_deploy
+    try:
+        runs = len(menu_deploy.load_fl_patch())
+    except Exception as error:
+        print(f'FL_PATCH_FAIL: {type(error).__name__}: {error}')
+        return 4
+    print('fl patch runs:', runs)
+    if runs != 26322:
+        print(f'FL_PATCH_UNEXPECTED: {runs}')
+        return 4
+
     # GUI construction needs a desktop. A CI runner may not have one, so a
     # failure here is fatal only when A9TOOL_SELFCHECK_GUI=1 (which is what you
     # should set when verifying a build by hand).

@@ -229,6 +229,10 @@ def _write_json(path: Path, payload: dict) -> None:
         os.fsync(stream.fileno())
 
 
+def record_path_for(path: Path) -> Path:
+    return path.with_suffix('.json')
+
+
 def _new_session(root: Path, label: str) -> Path:
     stamp = time.strftime('%Y%m%d_%H%M%S')
     folder = Path(root) / f'{label}_{stamp}_{uuid.uuid4().hex[:8]}'
@@ -236,91 +240,137 @@ def _new_session(root: Path, label: str) -> Path:
     return folder
 
 
-def _baseline_path(root: Path) -> Path:
+def baseline_path(root: Path) -> Path:
     return Path(root) / 'baseline' / 'preimage.bin'
 
 
-def _save_baseline_once(root: Path, session: Path) -> Path:
-    """The first full preimage is what the restore button writes back."""
-    target = _baseline_path(root)
-    if target.exists():
-        return target
-    target.parent.mkdir(parents=True, exist_ok=True)
-    with target.open('xb') as stream:
-        with (session / 'preimage.bin').open('rb') as source:
-            while True:
-                chunk = source.read(1 << 20)
-                if not chunk:
-                    break
-                stream.write(chunk)
-        stream.flush()
-        os.fsync(stream.fileno())
-    _write_json(target.with_suffix('.json'), dict(sha256=file_sha256(target),
-                                                  bytes=target.stat().st_size,
-                                                  from_session=session.name))
-    return target
+def pending_dir(root: Path) -> Path:
+    return Path(root) / 'pending'
 
 
-def deploy(camera, identity: dict, root: Path, progress=None, target: str = 'menu') -> dict:
-    """Back up completely, derive the candidate from it, write once, verify."""
+def _move(src: Path, dst: Path) -> None:
+    dst.parent.mkdir(parents=True, exist_ok=True)
+    os.replace(src, dst)
+
+
+def backup(camera, identity: dict, root: Path, progress=None) -> dict:
+    """Step 1: read the whole partition once and keep it as the baseline.
+
+    Refuses to overwrite an existing baseline: everything else (patch, write,
+    restore) is defined relative to this one capture.
+    """
     say = progress or (lambda _message: None)
-    if target not in TARGETS:
-        raise ValueError('未知的目标版本')
-    want_sha, want_label = TARGETS[target]
+    target = baseline_path(root)
+    if target.exists():
+        raise ValueError('已经存在初始备份，不会覆盖')
 
-    session = _new_session(root, 'deploy_' + target)
+    session = _new_session(root, 'backup')
     _write_json(session / 'request.json', dict(
-        partition=PARTITION, factory_sha256=FACTORY_SHA, target=target,
-        candidate_sha256=want_sha, identity=identity, created_epoch=time.time()))
-
+        partition=PARTITION, identity=identity, created_epoch=time.time()))
     say('正在完整读取当前分区（约 300 MB，需要几分钟）…')
     snapshot = read_partition(camera, session / 'preimage.bin')
     _write_json(session / 'preimage.json', snapshot)
     if snapshot['bytes'] != PARTITION_BYTES:
         _write_json(session / 'failure.json', dict(
-            stage='read_preimage', write_attempted=False,
-            error='分区读取不完整', preimage_bytes=snapshot['bytes']))
-        raise ValueError(f'分区读取不完整（{snapshot["bytes"]:,} 字节），已停止，没有写入')
+            stage='read_preimage', error='分区读取不完整', bytes=snapshot['bytes']))
+        raise ValueError(f'分区读取不完整（{snapshot["bytes"]:,} 字节），已停止')
 
+    _move(session / 'preimage.bin', target)
+    meta = dict(sha256=snapshot['sha256'], bytes=snapshot['bytes'],
+                from_session=session.name, identity=identity,
+                created=time.strftime('%Y-%m-%dT%H:%M:%S'))
+    _write_json(record_path_for(target), meta)
+    return meta
+
+
+def patch_from_baseline(root: Path, target: str, progress=None) -> dict:
+    """Step 2: build the target image from the baseline, locally. No camera."""
+    say = progress or (lambda _message: None)
+    baseline = baseline_path(root)
+    if not baseline.exists():
+        raise ValueError('还没有初始备份，请先执行初始备份')
+    if target not in TARGETS:
+        raise ValueError('未知的目标版本')
+
+    say(f'正在本地生成：{TARGETS[target][1]}…')
+    candidate = build_candidate(baseline.read_bytes(), target)
+    out = pending_dir(root) / 'candidate.bin'
+    out.parent.mkdir(parents=True, exist_ok=True)
+    with out.open('wb') as stream:
+        stream.write(candidate)
+        stream.flush()
+        os.fsync(stream.fileno())
+    meta = dict(target=target, label=TARGETS[target][1],
+                sha256=hashlib.sha256(candidate).hexdigest(),
+                bytes=len(candidate),
+                baseline_sha256=file_sha256(baseline),
+                created=time.strftime('%Y-%m-%dT%H:%M:%S'))
+    _write_json(out.with_suffix('.json'), meta)
+    return meta
+
+
+def pending_info(root: Path) -> dict | None:
+    out = pending_dir(root) / 'candidate.bin'
+    meta_path = out.with_suffix('.json')
+    if not out.exists() or not meta_path.exists():
+        return None
+    try:
+        meta = json.loads(meta_path.read_text(encoding='utf-8'))
+    except (OSError, ValueError):
+        return None
+    if file_sha256(out) != meta.get('sha256'):
+        return None
+    return meta
+
+
+def write_candidate(camera, identity: dict, root: Path, progress=None) -> dict:
+    """Step 3: write the image prepared in step 2, once, and verify the readback."""
+    say = progress or (lambda _message: None)
+    info = pending_info(root)
+    if info is None:
+        raise ValueError('还没有生成目标镜像，请先执行修补')
+    candidate_path = pending_dir(root) / 'candidate.bin'
+    want_sha = info['sha256']
+
+    session = _new_session(root, 'write')
+    _write_json(session / 'request.json', dict(
+        partition=PARTITION, target=info['target'], candidate_sha256=want_sha,
+        identity=identity, created_epoch=time.time()))
+
+    say('正在完整读取当前分区（写入前留一份现场）…')
+    snapshot = read_partition(camera, session / 'preimage.bin')
+    if snapshot['bytes'] != PARTITION_BYTES:
+        raise ValueError(f'分区读取不完整（{snapshot["bytes"]:,} 字节），已停止，没有写入')
     _write_json(session / 'intent.json', dict(
-        partition=PARTITION, preimage_sha256=snapshot['sha256'], target=target,
+        partition=PARTITION, preimage_sha256=snapshot['sha256'], target=info['target'],
         target_sha256=want_sha, identity=identity, created_epoch=time.time()))
-    _save_baseline_once(Path(root), session)
-    say(f'原分区已保存：{session / "preimage.bin"}')
 
     if snapshot['sha256'] == want_sha:
         _write_json(session / 'result.json', dict(
             pass_=True, write_attempted=False, already_at_target=True,
-            target_sha256=want_sha, completed_epoch=time.time()))
+            target_sha256=want_sha))
         return dict(directory=session, state='ALREADY_AT_TARGET_NO_WRITE')
-
-    say(f'正在本地生成目标镜像：{want_label}…')
-    candidate = build_candidate((session / 'preimage.bin').read_bytes(), target)
-    _write_json(session / 'candidate.json', dict(
-        sha256=hashlib.sha256(candidate).hexdigest(), target=target))
 
     say('正在写入整分区…')
     _write_json(session / 'write_attempt.json', dict(
         target_sha256=want_sha, started_epoch=time.time()))
-    camera.writeFile(PARTITION, candidate)
-    del candidate
+    camera.writeFile(PARTITION, candidate_path.read_bytes())
 
     say('正在回读校验…')
     back = read_partition(camera, session / 'readback.bin')
     ok = back['bytes'] == PARTITION_BYTES and back['sha256'] == want_sha
     _write_json(session / 'result.json', dict(
         pass_=ok, write_attempted=True, target_sha256=want_sha,
-        readback_sha256=back['sha256'], readback_bytes=back['bytes'],
-        completed_epoch=time.time()))
+        readback_sha256=back['sha256'], readback_bytes=back['bytes']))
     if not ok:
-        raise ValueError('写入后回读与候选镜像不一致，已停止；请保留会话目录')
+        raise ValueError('写入后回读与目标镜像不一致，已停止；请保留会话目录')
     return dict(directory=session, state='SAVED_AND_READBACK_VERIFIED')
 
 
 def restore(camera, identity: dict, root: Path, progress=None) -> dict:
     """Write the first recorded preimage back. Requires a complete baseline."""
     say = progress or (lambda _message: None)
-    baseline = _baseline_path(root)
+    baseline = baseline_path(root)
     record = baseline.with_suffix('.json')
     if not baseline.exists() or not record.exists():
         raise ValueError('还没有初始备份，无法恢复。请先完成一次部署。')
@@ -364,7 +414,7 @@ def restore(camera, identity: dict, root: Path, progress=None) -> dict:
 
 
 def baseline_info(root: Path) -> dict | None:
-    baseline = _baseline_path(root)
+    baseline = baseline_path(root)
     record = baseline.with_suffix('.json')
     if not baseline.exists() or not record.exists():
         return None

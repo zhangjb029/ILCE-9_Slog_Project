@@ -12,8 +12,8 @@ import tkinter as tk
 from pathlib import Path
 from tkinter import messagebox, ttk
 
-from . import (core, errors, flash_av, flash_baseline, flash_service, fnmap, journal,
-               menu_deploy, usbdev)
+from . import (aspect_params, core, data, errors, flash_av, flash_baseline, flash_service,
+               fnmap, journal, menu_deploy, usbdev)
 
 PICTURE_PROFILE = 0x3A
 SLOG_DISPLAY_ASSIST = 0x36
@@ -91,7 +91,7 @@ class App:
         self.tab_menu = ttk.Frame(self.notebook)
         self.notebook.add(self.tab_fn, text='Fn 功能')
         self.notebook.add(self.tab_flash, text='电子快门引闪')
-        self.notebook.add(self.tab_menu, text='菜单移植')
+        self.notebook.add(self.tab_menu, text='菜单移植与创意外观')
 
         connect = ttk.LabelFrame(self.tab_fn, text='① 连接相机')
         connect.pack(fill='x', **pad)
@@ -687,19 +687,24 @@ class App:
         self.log('请保持热靴空置，关机、拔 USB、再开机，然后重新读取状态核对。')
 
     # -- menu deployment tab ----------------------------------------------
+    PREVIEW = {
+        'menu': ('menu-1.png', 'menu-2.png'),
+        'fl': ('fl-1.png', 'fl-2.png', 'fl-3.png'),
+    }
+
     def _build_menu_tab(self, parent) -> None:
         self.menu_root = journal.sessions_root() / 'menu'
+        self.menu_preview = []
 
         warn = ttk.LabelFrame(parent, text='使用前必读')
         warn.pack(fill='x', padx=10, pady=8)
         ttk.Label(warn, justify='left', wraplength=720, text=(
             '这不是改参数，是把 /dev/nflasha15 整个 300 MiB 分区换掉。\n'
             '· 曾经有一个不同布局的版本让相机按 MENU 毫无反应并整机冷启动，那个版本已停用。\n'
-            '· 工具会先把相机分区完整读出来，确认它处于原厂状态，'
-            '再在本地用内置的 677 字节补丁生成目标镜像；不下载、不分发任何镜像文件。\n'
-            '· 写入前会存档当前分区，恢复就是把它写回去。\n'
+            '· 分四步：先做一次初始备份，再在本地修补出目标镜像，然后才写入；回退只在有初始备份时可用。\n'
+            '· 不下载、不分发任何镜像文件：修补用的补丁内置在程序里。\n'
             '· 写入后必须正常关机、完整断电、冷启动。\n'
-            '· 全程约 10–20 分钟，本地至少需要 1.2 GB 空闲空间。'
+            '· 本地至少需要 1.2 GB 空闲空间。'
         )).pack(anchor='w', padx=10, pady=8)
 
         backup = ttk.LabelFrame(parent, text='① 初始备份')
@@ -707,39 +712,85 @@ class App:
         self.menu_baseline_var = tk.StringVar()
         ttk.Label(backup, textvariable=self.menu_baseline_var, wraplength=720,
                   justify='left').pack(anchor='w', padx=10, pady=(8, 4))
-        self.menu_restore_btn = ttk.Button(backup, text='恢复到初始备份',
-                                           command=self.on_menu_restore)
-        self.menu_restore_btn.pack(anchor='w', padx=10, pady=(0, 10))
+        self.menu_backup_btn = ttk.Button(backup, text='执行初始备份', command=self.on_menu_backup)
+        self.menu_backup_btn.pack(anchor='w', padx=10, pady=(0, 10))
 
-        action = ttk.LabelFrame(parent, text='② 写入')
-        action.pack(fill='x', padx=10, pady=8)
-        ttk.Label(action, text='目标版本：').pack(anchor='w', padx=10, pady=(8, 2))
+        patch = ttk.LabelFrame(parent, text='② 修改')
+        patch.pack(fill='x', padx=10, pady=8)
         self.menu_target_var = tk.StringVar(value='menu')
-        ttk.Radiobutton(action, text='菜单修改（PP / S-Log / 四比例 + 复古衣橱）',
-                        value='menu', variable=self.menu_target_var).pack(anchor='w', padx=24)
-        ttk.Radiobutton(action, text='菜单 + 创意外观 FL（实验版）',
-                        value='fl', variable=self.menu_target_var).pack(anchor='w', padx=24)
-        ttk.Label(action, justify='left', wraplength=700, text=(
-            '· 菜单版：已实机确认，无已知遗留问题。\n'
-            '· FL 版：新增创意外观入口与 10 条菜单文字，用户已确认全部正常显示；'
-            '但整分区回读有 9 字节文件系统计数差异（空闲块/inode 计数与位图不一致），'
-            '不影响使用，尚未修复。'
-        )).pack(anchor='w', padx=24, pady=(2, 6))
-        self.menu_deploy_btn = ttk.Button(action, text='读取分区并写入…',
-                                          command=self.on_menu_deploy)
-        self.menu_deploy_btn.pack(anchor='w', padx=10, pady=(0, 10))
-        self._update_menu_baseline_text()
+        row = ttk.Frame(patch)
+        row.pack(anchor='w', padx=10, pady=(8, 4))
+        ttk.Radiobutton(row, text='菜单修改', value='menu', variable=self.menu_target_var,
+                        command=self._refresh_menu_preview).pack(side='left')
+        ttk.Radiobutton(row, text='创意外观 FL（实验版）', value='fl', variable=self.menu_target_var,
+                        command=self._refresh_menu_preview).pack(side='left', padx=12)
+        self.menu_preview_frame = ttk.Frame(patch)
+        self.menu_preview_frame.pack(anchor='w', padx=10, pady=(0, 4))
+        ttk.Label(patch, justify='left', wraplength=720, text=(
+            '菜单修改：PP / S-Log / 四比例 + 复古衣橱，已实机确认。\n'
+            '创意外观 FL：在上面基础上增加创意外观入口和 10 条菜单文字，'
+            '文字已实机确认全部显示；整分区回读有 9 字节文件系统计数差异，不影响使用，尚未修复。'
+        )).pack(anchor='w', padx=10, pady=(0, 4))
+        self.menu_pending_var = tk.StringVar(value='尚未修补')
+        ttk.Label(patch, textvariable=self.menu_pending_var, wraplength=720,
+                  justify='left').pack(anchor='w', padx=10, pady=(0, 4))
+        self.menu_patch_btn = ttk.Button(patch, text='修补', command=self.on_menu_patch)
+        self.menu_patch_btn.pack(anchor='w', padx=10, pady=(0, 10))
 
-    def _update_menu_baseline_text(self) -> None:
+        write = ttk.LabelFrame(parent, text='③ 写入')
+        write.pack(fill='x', padx=10, pady=8)
+        self.menu_write_btn = ttk.Button(write, text='写入相机', command=self.on_menu_write)
+        self.menu_write_btn.pack(anchor='w', padx=10, pady=8)
+
+        aspect = ttk.LabelFrame(parent, text='④ 4:3 保存参数')
+        aspect.pack(fill='x', padx=10, pady=8)
+        ttk.Label(aspect, justify='left', wraplength=720, text=(
+            '四项比例菜单在分区里，但选 4:3 要真的能保存，还需要写 51 项出图尺寸／像素数／'
+            'JPEG 容量参数到 /setting/Backup.bin（nflasha2）。\n'
+            '这一步是参数写入，不替换分区；写前会记录当前值。'
+        )).pack(anchor='w', padx=10, pady=(8, 4))
+        self.aspect_btn = ttk.Button(aspect, text='写入 4:3 保存参数',
+                                     command=self.on_menu_aspect)
+        self.aspect_btn.pack(anchor='w', padx=10, pady=(0, 10))
+
+        rollback = ttk.LabelFrame(parent, text='⑤ 回退')
+        rollback.pack(fill='x', padx=10, pady=8)
+        self.menu_restore_btn = ttk.Button(rollback, text='回退到初始备份',
+                                           command=self.on_menu_restore)
+        self.menu_restore_btn.pack(anchor='w', padx=10, pady=8)
+
+        self._update_menu_texts()
+        self._refresh_menu_preview()
+        self._refresh_menu()
+
+    def _refresh_menu_preview(self) -> None:
+        for widget in self.menu_preview_frame.winfo_children():
+            widget.destroy()
+        self.menu_preview = []
+        for name in self.PREVIEW.get(self.menu_target_var.get(), ()):
+            path = data.data_root() / 'preview' / name
+            try:
+                image = tk.PhotoImage(file=str(path)).subsample(3)
+            except Exception:
+                continue
+            self.menu_preview.append(image)
+            ttk.Label(self.menu_preview_frame, image=image).pack(side='left', padx=4)
+
+    def _update_menu_texts(self) -> None:
         info = menu_deploy.baseline_info(self.menu_root)
         if info is None:
+            self.menu_baseline_var.set('尚未备份。点「执行初始备份」，程序会完整读出当前分区并存档。')
+        else:
             self.menu_baseline_var.set(
-                '尚未保存。第一次写入时会自动完整读取当前分区并存成初始备份；'
-                '备份没读完整就不会写入。')
-            return
-        size = info.get('bytes', menu_deploy.PARTITION_BYTES)
-        self.menu_baseline_var.set(
-            f'已保存：{size:,} 字节，SHA256 {info.get("sha256", "")[:16]}…')
+                f'已备份：{info.get("bytes", menu_deploy.PARTITION_BYTES):,} 字节，'
+                f'{info.get("created", "")}，SHA256 {info.get("sha256", "")[:16]}…')
+        pending = menu_deploy.pending_info(self.menu_root)
+        if pending is None:
+            self.menu_pending_var.set('尚未修补。选好目标后点「修补」，会在本地生成目标镜像。')
+        else:
+            self.menu_pending_var.set(
+                f'已修补：{pending["label"]}，{pending["bytes"]:,} 字节，'
+                f'SHA256 {pending["sha256"][:16]}…（{pending["created"]}）')
 
     def _refresh_menu(self) -> None:
         def normal(ok):
@@ -747,20 +798,68 @@ class App:
 
         busy = self.busy
         has_baseline = menu_deploy.baseline_info(self.menu_root) is not None
-        self.menu_deploy_btn.configure(state=normal(not busy))
+        has_pending = menu_deploy.pending_info(self.menu_root) is not None
+        self.menu_backup_btn.configure(state=normal(not busy and not has_baseline))
+        self.menu_patch_btn.configure(state=normal(not busy and has_baseline))
+        self.menu_write_btn.configure(state=normal(not busy and has_pending))
+        self.aspect_btn.configure(state=normal(not busy))
         self.menu_restore_btn.configure(state=normal(not busy and has_baseline))
 
     def _menu_progress(self, message: str) -> None:
         self._post(self.log, message)
 
-    def on_menu_deploy(self) -> None:
-        if self.busy:
+    def _menu_connect(self, work, done) -> None:
+        handle = usbdev.connect(
+            usbdev.load_current_receipt(),
+            progress=self._menu_progress,
+            guard_factory=lambda transport: menu_deploy.PartitionGuard(transport, allow_write=True),
+            response_timeout=menu_deploy.TRANSFER_TIMEOUT_SECONDS)
+        try:
+            usbdev.check_identity(handle.identity)
+            return work(handle)
+        finally:
+            handle.close()
+
+    def on_menu_backup(self) -> None:
+        if self.busy or menu_deploy.baseline_info(self.menu_root) is not None:
             return
         if not messagebox.askyesno(
-                '整分区写入',
-                '这会替换相机 /dev/nflasha15 的整个 300 MiB 分区。\n\n'
-                '工具会先完整读出当前分区并存档，确认是原厂状态后才在本地生成目标镜像；'
-                '分区不是原厂状态就不会写入。\n\n'
+                '执行初始备份',
+                '会完整读出相机 /dev/nflasha15 分区（300 MiB）并存档。\n\n'
+                '这一步只读，不写入相机。之后的修补和回退都以这份备份为准。\n\n继续吗？'):
+            return
+        self._set_busy(True)
+        self._close_main_handle()
+
+        def work():
+            return self._menu_connect(
+                lambda handle: menu_deploy.backup(handle.camera, handle.identity,
+                                                  self.menu_root, progress=self._menu_progress),
+                None)
+
+        self._background(work, self._menu_done)
+
+    def on_menu_patch(self) -> None:
+        if self.busy or menu_deploy.baseline_info(self.menu_root) is None:
+            return
+        target = self.menu_target_var.get()
+        self._set_busy(True)
+
+        def work():
+            return menu_deploy.patch_from_baseline(self.menu_root, target,
+                                                   progress=self._menu_progress)
+
+        self._background(work, self._menu_done)
+
+    def on_menu_write(self) -> None:
+        if self.busy or menu_deploy.pending_info(self.menu_root) is None:
+            return
+        pending = menu_deploy.pending_info(self.menu_root)
+        if not messagebox.askyesno(
+                '写入相机',
+                f'目标：{pending["label"]}\n\n'
+                '这会替换相机 /dev/nflasha15 的整个 300 MiB 分区。\n'
+                '写入前会再完整读一次现场并存档。\n\n'
                 '写入后必须正常关机、完整断电、冷启动。\n'
                 '这个操作曾经导致过整机无法显示菜单。确定继续吗？',
                 default='no'):
@@ -774,31 +873,20 @@ class App:
         self._close_main_handle()
 
         def work():
-            handle = usbdev.connect(
-                usbdev.load_current_receipt(),
-                progress=self._menu_progress,
-                guard_factory=lambda transport: menu_deploy.PartitionGuard(transport, allow_write=True),
-                response_timeout=menu_deploy.TRANSFER_TIMEOUT_SECONDS)
-            try:
-                usbdev.check_identity(handle.identity)
-                return menu_deploy.deploy(handle.camera, handle.identity,
-                                          self.menu_root, progress=self._menu_progress,
-                                          target=target)
-            finally:
-                handle.close()
+            return self._menu_connect(
+                lambda handle: menu_deploy.write_candidate(handle.camera, handle.identity,
+                                                           self.menu_root, progress=self._menu_progress),
+                None)
 
         self._background(work, self._menu_done)
 
-    def on_menu_restore(self) -> None:
+    def on_menu_aspect(self) -> None:
         if self.busy:
             return
-        if menu_deploy.baseline_info(self.menu_root) is None:
-            return
         if not messagebox.askyesno(
-                '恢复初始备份',
-                '会把第一次写入前保存的整个 300 MiB 分区写回相机。\n\n'
-                '确认相机型号是 ILCE-9、固件 6.00，且电池电量充足？',
-                default='no'):
+                '写入 4:3 保存参数',
+                f'会写入 {len(aspect_params.PIDS)} 项参数到 /setting/Backup.bin，然后保存。\n\n'
+                '写入前会记录当前值。这是参数写入，不替换分区。\n\n继续吗？'):
             return
         self._set_busy(True)
         self._close_main_handle()
@@ -807,14 +895,33 @@ class App:
             handle = usbdev.connect(
                 usbdev.load_current_receipt(),
                 progress=self._menu_progress,
-                guard_factory=lambda transport: menu_deploy.PartitionGuard(transport, allow_write=True),
-                response_timeout=menu_deploy.TRANSFER_TIMEOUT_SECONDS)
+                guard_factory=lambda transport: aspect_params.AspectGuard(transport))
             try:
                 usbdev.check_identity(handle.identity)
-                return menu_deploy.restore(handle.camera, handle.identity,
+                return aspect_params.apply(handle.camera, handle.identity,
                                            self.menu_root, progress=self._menu_progress)
             finally:
                 handle.close()
+
+        self._background(work, self._menu_done)
+
+    def on_menu_restore(self) -> None:
+        if self.busy or menu_deploy.baseline_info(self.menu_root) is None:
+            return
+        if not messagebox.askyesno(
+                '回退到初始备份',
+                '会把初始备份的整个 300 MiB 分区写回相机。\n\n'
+                '确认相机型号是 ILCE-9、固件 6.00，且电池电量充足？',
+                default='no'):
+            return
+        self._set_busy(True)
+        self._close_main_handle()
+
+        def work():
+            return self._menu_connect(
+                lambda handle: menu_deploy.restore(handle.camera, handle.identity,
+                                                   self.menu_root, progress=self._menu_progress),
+                None)
 
         self._background(work, self._menu_done)
 
@@ -822,14 +929,20 @@ class App:
         self._set_busy(False)
         if error is not None:
             self.log(errors.user_message(error))
-            self._update_menu_baseline_text()
+            self._update_menu_texts()
             self._refresh_menu()
             return
-        self.log(f'事务结果：{result["state"]}')
-        self.log(f'会话目录：{result["directory"]}')
-        self._update_menu_baseline_text()
+        if isinstance(result, dict) and 'state' in result:
+            self.log(f'事务结果：{result["state"]}')
+            self.log(f'会话目录：{result["directory"]}')
+            self.log('请正常关机、完整断电、冷启动，然后再连接确认菜单。')
+        elif isinstance(result, dict) and 'label' in result:
+            self.log(f'已修补：{result["label"]}，SHA256 {result["sha256"]}')
+            self.log('确认无误后点「写入相机」。')
+        elif isinstance(result, dict) and 'sha256' in result:
+            self.log(f'初始备份完成：{result["bytes"]:,} 字节，SHA256 {result["sha256"]}')
+        self._update_menu_texts()
         self._refresh_menu()
-        self.log('请正常关机、完整断电、冷启动，然后再连接确认菜单。')
 
 def _slot_number(label: str) -> int:
     return int(label.replace('Fn', ''))

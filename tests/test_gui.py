@@ -103,7 +103,7 @@ class TestGui(unittest.TestCase):
     def test_tabs_exist(self):
         self.assertEqual(len(self.app.notebook.tabs()), 3)
         self.assertEqual(self.app.notebook.tab(1, 'text'), '电子快门引闪')
-        self.assertEqual(self.app.notebook.tab(2, 'text'), '菜单移植')
+        self.assertEqual(self.app.notebook.tab(2, 'text'), '菜单移植与创意外观')
 
     def test_flash_buttons_disabled_before_reading(self):
         for button in (self.app.flash_menu_btn, self.app.flash_av_btn):
@@ -164,14 +164,21 @@ class TestGui(unittest.TestCase):
         self.assertEqual(self.app.flash_restore_btn.cget('text'), '恢复到初始备份')
 
     # -- menu deployment tab ----------------------------------------------
-    def test_menu_deploy_needs_no_image_file(self):
-        """The candidate is derived from the camera's own partition."""
-        self.assertEqual(str(self.app.menu_deploy_btn['state']), 'normal')
-        self.assertFalse(hasattr(self.app, 'menu_image'))
-
-    def test_menu_restore_waits_for_a_baseline(self):
+    def test_menu_steps_gate_each_other(self):
+        """backup -> patch -> write, and rollback needs the backup."""
+        self.assertEqual(str(self.app.menu_backup_btn['state']), 'normal')
+        self.assertEqual(str(self.app.menu_patch_btn['state']), 'disabled')
+        self.assertEqual(str(self.app.menu_write_btn['state']), 'disabled')
         self.assertEqual(str(self.app.menu_restore_btn['state']), 'disabled')
-        self.assertIn('尚未保存', self.app.menu_baseline_var.get())
+        self.assertIn('尚未备份', self.app.menu_baseline_var.get())
+
+    def test_menu_preview_switches_with_the_target(self):
+        self.app.menu_target_var.set('fl')
+        self.app._refresh_menu_preview()
+        self.assertEqual(len(self.app.menu_preview), 3)
+        self.app.menu_target_var.set('menu')
+        self.app._refresh_menu_preview()
+        self.assertEqual(len(self.app.menu_preview), 2)
 
 if __name__ == '__main__':
     unittest.main()

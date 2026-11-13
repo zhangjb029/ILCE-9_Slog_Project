@@ -246,6 +246,20 @@ Normal shutdown, full power removal, cold start. A warm restart is not enough �
 
 Reconnect, press **MENU**. You should see Picture Profile and S-Log Display Assist where the old entries were, and four aspect ratios.
 
+**After the menu target** (screenshots from the camera):
+
+![Picture Profile appears in the Colour/WB menu](docs/assets/img/menu-1.png)
+
+![Four aspect ratios: 3:2, 16:9, 4:3, 1:1](docs/assets/img/menu-2.png)
+
+**The FL target** adds these:
+
+![Creative Look appears in the Shooting Assist menu](docs/assets/img/fl-1.png)
+
+![Creative Look page 1: contrast, highlight, shadow, fade, saturation](docs/assets/img/fl-2.png)
+
+![Creative Look page 2: sharpness, sharpness range, clarity, save](docs/assets/img/fl-3.png)
+
 ### Undo
 
 **恢复到初始备份** writes the partition captured before the first deploy back to the camera. It refuses if that backup is missing or damaged.
