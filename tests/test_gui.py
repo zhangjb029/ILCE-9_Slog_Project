@@ -164,18 +164,14 @@ class TestGui(unittest.TestCase):
         self.assertEqual(self.app.flash_restore_btn.cget('text'), '恢复到初始备份')
 
     # -- menu deployment tab ----------------------------------------------
-    def test_menu_buttons_disabled_before_choices(self):
-        self.assertIsNone(self.app.menu_image)
-        self.assertEqual(str(self.app.menu_deploy_btn['state']), 'disabled')
+    def test_menu_deploy_needs_no_image_file(self):
+        """The candidate is derived from the camera's own partition."""
+        self.assertEqual(str(self.app.menu_deploy_btn['state']), 'normal')
+        self.assertFalse(hasattr(self.app, 'menu_image'))
+
+    def test_menu_restore_waits_for_a_baseline(self):
         self.assertEqual(str(self.app.menu_restore_btn['state']), 'disabled')
         self.assertIn('尚未保存', self.app.menu_baseline_var.get())
-
-    def test_menu_deploy_enables_once_an_image_is_chosen(self):
-        self.app.menu_image = {'path': Path('x.bin'), 'sha256': 'a' * 64,
-                               'kind': 'menu_inplace', 'label': '测试'}
-        self.app._refresh_menu()
-        self.assertEqual(str(self.app.menu_deploy_btn['state']), 'normal')
-        self.assertEqual(str(self.app.menu_restore_btn['state']), 'disabled')
 
 if __name__ == '__main__':
     unittest.main()

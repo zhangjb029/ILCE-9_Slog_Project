@@ -203,9 +203,9 @@ Each of the two settings is guarded by its own packet allowlist, and neither gua
 
 The third tab writes a complete `/dev/nflasha15` image. **This is not a parameter change.** It replaces the partition that holds `/usr`, and a previous attempt with a different layout left the camera cold-starting with no menu at all (that build is withdrawn).
 
-The image is **not bundled in the exe** — it is 183 MB compressed and 300 MiB unpacked. Download `A9_600_MENU_INPLACE_SERVICE_20261113.zip` from this repository's Releases, unpack it, and point the tab at `nflasha15_menu_inplace_candidate.bin`.
+**No image is shipped or downloaded.** The tool reads the camera's own partition, checks it is byte-identical to the factory build, applies the 677 bytes that were confirmed on hardware, and verifies the result against the candidate SHA256 — all locally, before anything is written. Two hashes pin both ends: `ed835ff9…` going in, `4fa7bbe5…` coming out. A partition in any other state is refused, not overwritten.
 
-Only **one** image is accepted, by SHA256 `4fa7bbe5c9cc21661c334fa5640af59a5d725f2214ee877112230c123f2eafa4`. That is the build you deployed and confirmed: creative-style entry, PP, S-Log Display Assist, and the four aspect ratios.
+What that change contains: a creative-style entry, Picture Profile, S-Log Display Assist, and four aspect ratios.
 
 ### What the image does and does not carry
 
@@ -217,9 +217,10 @@ So the image is portable across ILCE-9 bodies at 6.00. **The features are not.**
 
 **Camera on, battery charged, USB stable. Close every other program that talks to the camera.**
 
-1. Open the **菜单移植** tab and click **选择镜像文件…**, pick `nflasha15_menu_inplace_candidate.bin`.
-2. The tab shows the label and SHA256 once the image validates. Anything else is refused before the camera is touched.
-3. Click **写入菜单镜像…** and confirm both dialogs.
+1. Open the **菜单移植** tab and click **读取分区并写入菜单修改…**.
+2. Confirm both dialogs.
+
+There is nothing to download or pick. The tab reads the partition first, and only if it matches the factory hash does it build the candidate and write.
 
 The tab then: reads the whole live partition to `sessions\menu\deploy_…\preimage.bin` (300 MiB, several minutes), refuses to continue if that read is short, writes the image once, and reads the partition back to verify. The first backup is also copied to `sessions\menu\baseline\` — that is what the restore button writes later.
 

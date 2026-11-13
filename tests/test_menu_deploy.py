@@ -1,5 +1,4 @@
 import hashlib
-import io
 import struct
 import tempfile
 import unittest
@@ -24,7 +23,6 @@ class FakeCamera:
         self.data = bytearray(data)
         self.reads = 0
         self.writes = 0
-        self.fail_write = False
         self.truncate_read = False
 
     def readFile(self, path, out):
@@ -39,8 +37,6 @@ class FakeCamera:
     def writeFile(self, path, data):
         assert path == md.PARTITION
         self.writes += 1
-        if self.fail_write:
-            raise IOError('simulated write failure')
         self.data = bytearray(data)
         return 0
 
@@ -49,13 +45,22 @@ class Base(unittest.TestCase):
     def setUp(self):
         self._tmp = tempfile.TemporaryDirectory()
         self.root = Path(self._tmp.name) / 'sessions'
-        self.image_bytes = fake_partition(0x22)
-        self.image_path = Path(self._tmp.name) / 'candidate.bin'
-        self.image_path.write_bytes(self.image_bytes)
-        self.sha = hashlib.sha256(self.image_bytes).hexdigest()
+
+        self.factory = fake_partition(0x11)
+        candidate = bytearray(self.factory)
+        candidate[200:202] = b'\xaa\xbb'
+        candidate[4000] = 0x5a
+        self.candidate = bytes(candidate)
+        self.patches = (
+            (200, self.factory[200:202].hex(), 'aabb'),
+            (4000, self.factory[4000:4001].hex(), '5a'),
+        )
+
         for patcher in (
             mock.patch.object(md, 'PARTITION_BYTES', SMALL),
-            mock.patch.dict(md.KNOWN_IMAGES, {self.sha: 'menu_inplace'}, clear=True),
+            mock.patch.object(md, 'FACTORY_SHA', hashlib.sha256(self.factory).hexdigest()),
+            mock.patch.object(md, 'CANDIDATE_SHA', hashlib.sha256(self.candidate).hexdigest()),
+            mock.patch.object(md, 'PATCHES', self.patches),
         ):
             patcher.start()
             self.addCleanup(patcher.stop)
@@ -72,7 +77,7 @@ class TestGuard(unittest.TestCase):
 
     def test_rejects_write_when_not_armed(self):
         guard = md.PartitionGuard(object())
-        payload = struct.pack('<hh', md.FILE_WRITE, len(md.PARTITION)) + md.PARTITION.encode() + bytes(SMALL)
+        payload = struct.pack('<hh', md.FILE_WRITE, len(md.PARTITION)) + md.PARTITION.encode() + bytes(md.PARTITION_BYTES)
         with self.assertRaises(ValueError):
             guard.sendSenserPacket(md.PFUNC_FILE_CONTROL, payload)
 
@@ -90,24 +95,24 @@ class TestGuard(unittest.TestCase):
             guard.sendSenserPacket(md.PFUNC_FILE_CONTROL, payload)
 
 
-class TestImageInspection(Base):
-    def test_known_image_is_identified(self):
-        info = md.inspect_image(self.image_path)
-        self.assertEqual(info['kind'], 'menu_inplace')
-        self.assertEqual(info['sha256'], self.sha)
+class TestBuildCandidate(Base):
+    def test_factory_partition_becomes_the_candidate(self):
+        self.assertEqual(md.build_candidate(self.factory), self.candidate)
 
-    def test_unknown_hash_is_refused(self):
+    def test_partition_already_at_target_is_refused(self):
+        with self.assertRaises(ValueError):
+            md.build_candidate(self.candidate)
+
+    def test_unknown_partition_is_refused(self):
         other = fake_partition(0x33)
-        path = Path(self._tmp.name) / 'other.bin'
-        path.write_bytes(other)
-        with self.assertRaises(ValueError):
-            md.inspect_image(path)
+        with self.assertRaises(ValueError) as ctx:
+            md.build_candidate(other)
+        self.assertIn('原厂', str(ctx.exception))
 
-    def test_wrong_size_is_refused(self):
-        path = Path(self._tmp.name) / 'short.bin'
-        path.write_bytes(b'\x00' * 100)
-        with self.assertRaises(ValueError):
-            md.inspect_image(path)
+    def test_patch_that_does_not_match_its_bytes_is_refused(self):
+        with mock.patch.object(md, 'PATCHES', ((200, 'dead', 'beef'),)):
+            with self.assertRaises(ValueError):
+                md.build_candidate(self.factory)
 
     def test_sanity_rejects_non_ext2(self):
         with self.assertRaises(ValueError):
@@ -115,56 +120,59 @@ class TestImageInspection(Base):
 
 
 class TestDeploy(Base):
-    def test_deploy_backs_up_then_writes(self):
-        original = fake_partition(0x11)
-        cam = FakeCamera(original)
-        result = md.deploy(cam, IDENTITY, self.image_path, self.root)
+    def test_deploy_backs_up_then_writes_the_patched_image(self):
+        cam = FakeCamera(self.factory)
+        result = md.deploy(cam, IDENTITY, self.root)
         self.assertEqual(result['state'], 'SAVED_AND_READBACK_VERIFIED')
         self.assertEqual(cam.writes, 1)
-        self.assertEqual((result['directory'] / 'preimage.bin').read_bytes(), original)
-        self.assertEqual(bytes(cam.data), self.image_bytes)
+        self.assertEqual(bytes(cam.data), self.candidate)
+        self.assertEqual((result['directory'] / 'preimage.bin').read_bytes(), self.factory)
 
     def test_baseline_is_the_first_preimage(self):
-        cam = FakeCamera(fake_partition(0x11))
-        md.deploy(cam, IDENTITY, self.image_path, self.root)
+        cam = FakeCamera(self.factory)
+        md.deploy(cam, IDENTITY, self.root)
         info = md.baseline_info(self.root)
         self.assertEqual(info['bytes'], SMALL)
-        self.assertEqual((self.root / 'baseline' / 'preimage.bin').read_bytes(), fake_partition(0x11))
+        self.assertEqual((self.root / 'baseline' / 'preimage.bin').read_bytes(), self.factory)
 
     def test_incomplete_backup_blocks_the_write(self):
-        cam = FakeCamera(fake_partition(0x11))
+        cam = FakeCamera(self.factory)
         cam.truncate_read = True
         with self.assertRaises(ValueError):
-            md.deploy(cam, IDENTITY, self.image_path, self.root)
+            md.deploy(cam, IDENTITY, self.root)
         self.assertEqual(cam.writes, 0)
 
     def test_already_at_target_writes_nothing(self):
-        cam = FakeCamera(self.image_bytes)
-        result = md.deploy(cam, IDENTITY, self.image_path, self.root)
+        cam = FakeCamera(self.candidate)
+        result = md.deploy(cam, IDENTITY, self.root)
         self.assertEqual(result['state'], 'ALREADY_AT_TARGET_NO_WRITE')
+        self.assertEqual(cam.writes, 0)
+
+    def test_partition_in_an_unknown_state_blocks_the_write(self):
+        cam = FakeCamera(fake_partition(0x33))
+        with self.assertRaises(ValueError):
+            md.deploy(cam, IDENTITY, self.root)
         self.assertEqual(cam.writes, 0)
 
 
 class TestRestore(Base):
     def test_restore_writes_the_baseline_back(self):
-        original = fake_partition(0x11)
-        cam = FakeCamera(original)
-        md.deploy(cam, IDENTITY, self.image_path, self.root)
+        cam = FakeCamera(self.factory)
+        md.deploy(cam, IDENTITY, self.root)
         result = md.restore(cam, IDENTITY, self.root)
         self.assertEqual(result['state'], 'SAVED_AND_READBACK_VERIFIED')
-        self.assertEqual(bytes(cam.data), original)
+        self.assertEqual(bytes(cam.data), self.factory)
 
     def test_restore_without_baseline_is_refused(self):
-        cam = FakeCamera(fake_partition(0x11))
+        cam = FakeCamera(self.factory)
         with self.assertRaises(ValueError):
             md.restore(cam, IDENTITY, self.root)
         self.assertEqual(cam.writes, 0)
 
     def test_corrupt_baseline_is_refused(self):
-        cam = FakeCamera(fake_partition(0x11))
-        md.deploy(cam, IDENTITY, self.image_path, self.root)
-        baseline = self.root / 'baseline' / 'preimage.bin'
-        baseline.write_bytes(b'\x00' * SMALL)
+        cam = FakeCamera(self.factory)
+        md.deploy(cam, IDENTITY, self.root)
+        (self.root / 'baseline' / 'preimage.bin').write_bytes(b'\x00' * SMALL)
         with self.assertRaises(ValueError):
             md.restore(cam, IDENTITY, self.root)
 

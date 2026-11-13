@@ -10,7 +10,7 @@ import queue
 import threading
 import tkinter as tk
 from pathlib import Path
-from tkinter import filedialog, messagebox, ttk
+from tkinter import messagebox, ttk
 
 from . import (core, errors, flash_av, flash_baseline, flash_service, fnmap, journal,
                menu_deploy, usbdev)
@@ -688,7 +688,6 @@ class App:
 
     # -- menu deployment tab ----------------------------------------------
     def _build_menu_tab(self, parent) -> None:
-        self.menu_image = None
         self.menu_root = journal.sessions_root() / 'menu'
 
         warn = ttk.LabelFrame(parent, text='使用前必读')
@@ -696,21 +695,14 @@ class App:
         ttk.Label(warn, justify='left', wraplength=720, text=(
             '这不是改参数，是把 /dev/nflasha15 整个 300 MiB 分区换掉。\n'
             '· 曾经有一个不同布局的版本让相机按 MENU 毫无反应并整机冷启动，那个版本已停用。\n'
-            '· 写入前会先完整读出当前分区并存档，恢复就是把它写回去。\n'
-            '· 写入后必须正常关机、完整断电、冷启动，再确认菜单。\n'
-            '· 全程约 10–20 分钟，本地至少需要 1.2 GB 空闲空间存两份 300 MiB 镜像。\n'
-            '· 刷写期间保持 USB 和电源稳定，不要拔线。'
+            '· 工具会先把相机分区完整读出来，确认它处于原厂状态，'
+            '再在本地用内置的 677 字节补丁生成目标镜像；不下载、不分发任何镜像文件。\n'
+            '· 写入前会存档当前分区，恢复就是把它写回去。\n'
+            '· 写入后必须正常关机、完整断电、冷启动。\n'
+            '· 全程约 10–20 分钟，本地至少需要 1.2 GB 空闲空间。'
         )).pack(anchor='w', padx=10, pady=8)
 
-        image = ttk.LabelFrame(parent, text='① 选择镜像')
-        image.pack(fill='x', padx=10, pady=8)
-        self.menu_image_var = tk.StringVar(value='尚未选择镜像文件')
-        ttk.Label(image, textvariable=self.menu_image_var, wraplength=720,
-                  justify='left').pack(anchor='w', padx=10, pady=(8, 4))
-        self.menu_pick_btn = ttk.Button(image, text='选择镜像文件…', command=self.on_menu_pick)
-        self.menu_pick_btn.pack(anchor='w', padx=10, pady=(0, 10))
-
-        backup = ttk.LabelFrame(parent, text='② 初始备份')
+        backup = ttk.LabelFrame(parent, text='① 初始备份')
         backup.pack(fill='x', padx=10, pady=8)
         self.menu_baseline_var = tk.StringVar()
         ttk.Label(backup, textvariable=self.menu_baseline_var, wraplength=720,
@@ -719,9 +711,10 @@ class App:
                                            command=self.on_menu_restore)
         self.menu_restore_btn.pack(anchor='w', padx=10, pady=(0, 10))
 
-        action = ttk.LabelFrame(parent, text='③ 写入')
+        action = ttk.LabelFrame(parent, text='② 写入')
         action.pack(fill='x', padx=10, pady=8)
-        self.menu_deploy_btn = ttk.Button(action, text='写入菜单镜像…', command=self.on_menu_deploy)
+        self.menu_deploy_btn = ttk.Button(action, text='读取分区并写入菜单修改…',
+                                          command=self.on_menu_deploy)
         self.menu_deploy_btn.pack(anchor='w', padx=10, pady=8)
         self._update_menu_baseline_text()
 
@@ -741,58 +734,32 @@ class App:
             return 'normal' if ok else 'disabled'
 
         busy = self.busy
-        has_image = self.menu_image is not None
         has_baseline = menu_deploy.baseline_info(self.menu_root) is not None
-        self.menu_pick_btn.configure(state=normal(not busy))
-        self.menu_deploy_btn.configure(state=normal(not busy and has_image))
+        self.menu_deploy_btn.configure(state=normal(not busy))
         self.menu_restore_btn.configure(state=normal(not busy and has_baseline))
 
     def _menu_progress(self, message: str) -> None:
         self._post(self.log, message)
 
-    def on_menu_pick(self) -> None:
-        if self.busy:
-            return
-        path = filedialog.askopenfilename(title='选择 nflasha15 镜像',
-                                          filetypes=[('镜像', '*.bin'), ('所有文件', '*.*')])
-        if not path:
-            return
-        try:
-            info = menu_deploy.inspect_image(Path(path))
-        except Exception as error:
-            self.menu_image = None
-            self.menu_image_var.set(f'镜像不可用：{error}')
-            self._refresh_menu()
-            return
-        self.menu_image = info
-        self.menu_image_var.set(
-            f'已选择：{Path(path).name}\n'
-            f'识别为：{info["label"]}\n'
-            f'SHA256：{info["sha256"]}')
-        self.log(f'镜像已通过校验：{info["label"]}')
-        self._refresh_menu()
-
     def on_menu_deploy(self) -> None:
-        if self.busy or self.menu_image is None:
+        if self.busy:
             return
         if not messagebox.askyesno(
                 '整分区写入',
-                '这会用所选镜像替换相机 /dev/nflasha15 的整个 300 MiB 分区。\n\n'
-                '写入前会先完整备份当前分区；备份不完整就不会写入。\n'
-                '写入后必须正常关机、完整断电、冷启动。\n\n'
+                '这会替换相机 /dev/nflasha15 的整个 300 MiB 分区。\n\n'
+                '工具会先完整读出当前分区并存档，确认是原厂状态后才在本地生成目标镜像；'
+                '分区不是原厂状态就不会写入。\n\n'
+                '写入后必须正常关机、完整断电、冷启动。\n'
                 '这个操作曾经导致过整机无法显示菜单。确定继续吗？',
                 default='no'):
             return
         if not messagebox.askyesno(
                 '最后确认',
-                f'镜像：{self.menu_image["label"]}\n'
-                f'SHA256：{self.menu_image["sha256"][:16]}…\n\n'
-                '确认相机型号是 ILCE-9、固件 6.00，且电池电量充足？',
+                '确认相机型号是 ILCE-9、固件 6.00，且电池电量充足、USB 连接稳定？',
                 default='no'):
             return
         self._set_busy(True)
         self._close_main_handle()
-        image_path = self.menu_image['path']
 
         def work():
             handle = usbdev.connect(
@@ -802,7 +769,7 @@ class App:
                 response_timeout=menu_deploy.TRANSFER_TIMEOUT_SECONDS)
             try:
                 usbdev.check_identity(handle.identity)
-                return menu_deploy.deploy(handle.camera, handle.identity, image_path,
+                return menu_deploy.deploy(handle.camera, handle.identity,
                                           self.menu_root, progress=self._menu_progress)
             finally:
                 handle.close()
