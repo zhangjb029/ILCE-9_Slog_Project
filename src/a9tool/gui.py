@@ -10,9 +10,10 @@ import queue
 import threading
 import tkinter as tk
 from pathlib import Path
-from tkinter import messagebox, ttk
+from tkinter import filedialog, messagebox, ttk
 
-from . import core, errors, flash_av, flash_baseline, flash_service, fnmap, journal, usbdev
+from . import (core, errors, flash_av, flash_baseline, flash_service, fnmap, journal,
+               menu_deploy, usbdev)
 
 PICTURE_PROFILE = 0x3A
 SLOG_DISPLAY_ASSIST = 0x36
@@ -87,8 +88,10 @@ class App:
         self.notebook.pack(fill='both', expand=True, padx=10, pady=(8, 0))
         self.tab_fn = ttk.Frame(self.notebook)
         self.tab_flash = ttk.Frame(self.notebook)
+        self.tab_menu = ttk.Frame(self.notebook)
         self.notebook.add(self.tab_fn, text='Fn 功能')
         self.notebook.add(self.tab_flash, text='电子快门引闪')
+        self.notebook.add(self.tab_menu, text='菜单移植')
 
         connect = ttk.LabelFrame(self.tab_fn, text='① 连接相机')
         connect.pack(fill='x', **pad)
@@ -158,6 +161,7 @@ class App:
         self.log_box.pack(fill='both', expand=True, padx=10, pady=8)
 
         self._build_flash_tab(self.tab_flash)
+        self._build_menu_tab(self.tab_menu)
         self.reload_sessions()
         self._refresh()
 
@@ -210,6 +214,7 @@ class App:
         self.baseline_btn.configure(state=normal(writable))
         self.refresh_btn.configure(state=normal(not self.busy))
         self._refresh_flash()
+        self._refresh_menu()
 
     def _show_status(self) -> None:
         identity = self.handle.identity
@@ -680,6 +685,171 @@ class App:
         self.flash_av_var.set('AV 偏移 AD：已请求恢复，请重启后重新读取')
         self._refresh_flash()
         self.log('请保持热靴空置，关机、拔 USB、再开机，然后重新读取状态核对。')
+
+    # -- menu deployment tab ----------------------------------------------
+    def _build_menu_tab(self, parent) -> None:
+        self.menu_image = None
+        self.menu_root = journal.sessions_root() / 'menu'
+
+        warn = ttk.LabelFrame(parent, text='使用前必读')
+        warn.pack(fill='x', padx=10, pady=8)
+        ttk.Label(warn, justify='left', wraplength=720, text=(
+            '这不是改参数，是把 /dev/nflasha15 整个 300 MiB 分区换掉。\n'
+            '· 曾经有一个不同布局的版本让相机按 MENU 毫无反应并整机冷启动，那个版本已停用。\n'
+            '· 写入前会先完整读出当前分区并存档，恢复就是把它写回去。\n'
+            '· 写入后必须正常关机、完整断电、冷启动，再确认菜单。\n'
+            '· 全程约 10–20 分钟，本地至少需要 1.2 GB 空闲空间存两份 300 MiB 镜像。\n'
+            '· 刷写期间保持 USB 和电源稳定，不要拔线。'
+        )).pack(anchor='w', padx=10, pady=8)
+
+        image = ttk.LabelFrame(parent, text='① 选择镜像')
+        image.pack(fill='x', padx=10, pady=8)
+        self.menu_image_var = tk.StringVar(value='尚未选择镜像文件')
+        ttk.Label(image, textvariable=self.menu_image_var, wraplength=720,
+                  justify='left').pack(anchor='w', padx=10, pady=(8, 4))
+        self.menu_pick_btn = ttk.Button(image, text='选择镜像文件…', command=self.on_menu_pick)
+        self.menu_pick_btn.pack(anchor='w', padx=10, pady=(0, 10))
+
+        backup = ttk.LabelFrame(parent, text='② 初始备份')
+        backup.pack(fill='x', padx=10, pady=8)
+        self.menu_baseline_var = tk.StringVar()
+        ttk.Label(backup, textvariable=self.menu_baseline_var, wraplength=720,
+                  justify='left').pack(anchor='w', padx=10, pady=(8, 4))
+        self.menu_restore_btn = ttk.Button(backup, text='恢复到初始备份',
+                                           command=self.on_menu_restore)
+        self.menu_restore_btn.pack(anchor='w', padx=10, pady=(0, 10))
+
+        action = ttk.LabelFrame(parent, text='③ 写入')
+        action.pack(fill='x', padx=10, pady=8)
+        self.menu_deploy_btn = ttk.Button(action, text='写入菜单镜像…', command=self.on_menu_deploy)
+        self.menu_deploy_btn.pack(anchor='w', padx=10, pady=8)
+        self._update_menu_baseline_text()
+
+    def _update_menu_baseline_text(self) -> None:
+        info = menu_deploy.baseline_info(self.menu_root)
+        if info is None:
+            self.menu_baseline_var.set(
+                '尚未保存。第一次写入时会自动完整读取当前分区并存成初始备份；'
+                '备份没读完整就不会写入。')
+            return
+        size = info.get('bytes', menu_deploy.PARTITION_BYTES)
+        self.menu_baseline_var.set(
+            f'已保存：{size:,} 字节，SHA256 {info.get("sha256", "")[:16]}…')
+
+    def _refresh_menu(self) -> None:
+        def normal(ok):
+            return 'normal' if ok else 'disabled'
+
+        busy = self.busy
+        has_image = self.menu_image is not None
+        has_baseline = menu_deploy.baseline_info(self.menu_root) is not None
+        self.menu_pick_btn.configure(state=normal(not busy))
+        self.menu_deploy_btn.configure(state=normal(not busy and has_image))
+        self.menu_restore_btn.configure(state=normal(not busy and has_baseline))
+
+    def _menu_progress(self, message: str) -> None:
+        self._post(self.log, message)
+
+    def on_menu_pick(self) -> None:
+        if self.busy:
+            return
+        path = filedialog.askopenfilename(title='选择 nflasha15 镜像',
+                                          filetypes=[('镜像', '*.bin'), ('所有文件', '*.*')])
+        if not path:
+            return
+        try:
+            info = menu_deploy.inspect_image(Path(path))
+        except Exception as error:
+            self.menu_image = None
+            self.menu_image_var.set(f'镜像不可用：{error}')
+            self._refresh_menu()
+            return
+        self.menu_image = info
+        self.menu_image_var.set(
+            f'已选择：{Path(path).name}\n'
+            f'识别为：{info["label"]}\n'
+            f'SHA256：{info["sha256"]}')
+        self.log(f'镜像已通过校验：{info["label"]}')
+        self._refresh_menu()
+
+    def on_menu_deploy(self) -> None:
+        if self.busy or self.menu_image is None:
+            return
+        if not messagebox.askyesno(
+                '整分区写入',
+                '这会用所选镜像替换相机 /dev/nflasha15 的整个 300 MiB 分区。\n\n'
+                '写入前会先完整备份当前分区；备份不完整就不会写入。\n'
+                '写入后必须正常关机、完整断电、冷启动。\n\n'
+                '这个操作曾经导致过整机无法显示菜单。确定继续吗？',
+                default='no'):
+            return
+        if not messagebox.askyesno(
+                '最后确认',
+                f'镜像：{self.menu_image["label"]}\n'
+                f'SHA256：{self.menu_image["sha256"][:16]}…\n\n'
+                '确认相机型号是 ILCE-9、固件 6.00，且电池电量充足？',
+                default='no'):
+            return
+        self._set_busy(True)
+        self._close_main_handle()
+        image_path = self.menu_image['path']
+
+        def work():
+            handle = usbdev.connect(
+                usbdev.load_current_receipt(),
+                progress=self._menu_progress,
+                guard_factory=lambda transport: menu_deploy.PartitionGuard(transport, allow_write=True),
+                response_timeout=menu_deploy.TRANSFER_TIMEOUT_SECONDS)
+            try:
+                usbdev.check_identity(handle.identity)
+                return menu_deploy.deploy(handle.camera, handle.identity, image_path,
+                                          self.menu_root, progress=self._menu_progress)
+            finally:
+                handle.close()
+
+        self._background(work, self._menu_done)
+
+    def on_menu_restore(self) -> None:
+        if self.busy:
+            return
+        if menu_deploy.baseline_info(self.menu_root) is None:
+            return
+        if not messagebox.askyesno(
+                '恢复初始备份',
+                '会把第一次写入前保存的整个 300 MiB 分区写回相机。\n\n'
+                '确认相机型号是 ILCE-9、固件 6.00，且电池电量充足？',
+                default='no'):
+            return
+        self._set_busy(True)
+        self._close_main_handle()
+
+        def work():
+            handle = usbdev.connect(
+                usbdev.load_current_receipt(),
+                progress=self._menu_progress,
+                guard_factory=lambda transport: menu_deploy.PartitionGuard(transport, allow_write=True),
+                response_timeout=menu_deploy.TRANSFER_TIMEOUT_SECONDS)
+            try:
+                usbdev.check_identity(handle.identity)
+                return menu_deploy.restore(handle.camera, handle.identity,
+                                           self.menu_root, progress=self._menu_progress)
+            finally:
+                handle.close()
+
+        self._background(work, self._menu_done)
+
+    def _menu_done(self, result, error) -> None:
+        self._set_busy(False)
+        if error is not None:
+            self.log(errors.user_message(error))
+            self._update_menu_baseline_text()
+            self._refresh_menu()
+            return
+        self.log(f'事务结果：{result["state"]}')
+        self.log(f'会话目录：{result["directory"]}')
+        self._update_menu_baseline_text()
+        self._refresh_menu()
+        self.log('请正常关机、完整断电、冷启动，然后再连接确认菜单。')
 
 def _slot_number(label: str) -> int:
     return int(label.replace('Fn', ''))

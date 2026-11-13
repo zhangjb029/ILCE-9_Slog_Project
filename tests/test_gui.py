@@ -100,9 +100,10 @@ class TestGui(unittest.TestCase):
             self.assertIn('✅', str(self.app.all_tree.item(str(value))['values']))
 
     # -- electronic-shutter flash tab --------------------------------------
-    def test_flash_tab_exists(self):
-        self.assertEqual(len(self.app.notebook.tabs()), 2)
+    def test_tabs_exist(self):
+        self.assertEqual(len(self.app.notebook.tabs()), 3)
         self.assertEqual(self.app.notebook.tab(1, 'text'), '电子快门引闪')
+        self.assertEqual(self.app.notebook.tab(2, 'text'), '菜单移植')
 
     def test_flash_buttons_disabled_before_reading(self):
         for button in (self.app.flash_menu_btn, self.app.flash_av_btn):
@@ -161,6 +162,20 @@ class TestGui(unittest.TestCase):
     def test_flash_restore_restores_the_baseline_without_a_file_picker(self):
         self._set_flash(0, 1)
         self.assertEqual(self.app.flash_restore_btn.cget('text'), '恢复到初始备份')
+
+    # -- menu deployment tab ----------------------------------------------
+    def test_menu_buttons_disabled_before_choices(self):
+        self.assertIsNone(self.app.menu_image)
+        self.assertEqual(str(self.app.menu_deploy_btn['state']), 'disabled')
+        self.assertEqual(str(self.app.menu_restore_btn['state']), 'disabled')
+        self.assertIn('尚未保存', self.app.menu_baseline_var.get())
+
+    def test_menu_deploy_enables_once_an_image_is_chosen(self):
+        self.app.menu_image = {'path': Path('x.bin'), 'sha256': 'a' * 64,
+                               'kind': 'menu_inplace', 'label': '测试'}
+        self.app._refresh_menu()
+        self.assertEqual(str(self.app.menu_deploy_btn['state']), 'normal')
+        self.assertEqual(str(self.app.menu_restore_btn['state']), 'disabled')
 
 if __name__ == '__main__':
     unittest.main()

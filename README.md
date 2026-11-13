@@ -199,6 +199,50 @@ Open the tab and click **恢复到初始备份**. It writes both properties back
 
 Each of the two settings is guarded by its own packet allowlist, and neither guard permits the other's property. The tab therefore opens a fresh connection per step, and closes the Fn session first. A read or a write takes about as long as the connect step in the Fn tab.
 
+## Menu transplant  ⚠ replaces a 300 MiB partition
+
+The third tab writes a complete `/dev/nflasha15` image. **This is not a parameter change.** It replaces the partition that holds `/usr`, and a previous attempt with a different layout left the camera cold-starting with no menu at all (that build is withdrawn).
+
+The image is **not bundled in the exe** — it is 183 MB compressed and 300 MiB unpacked. Download `A9_600_MENU_INPLACE_SERVICE_20261113.zip` from this repository's Releases, unpack it, and point the tab at `nflasha15_menu_inplace_candidate.bin`.
+
+Only **one** image is accepted, by SHA256 `4fa7bbe5c9cc21661c334fa5640af59a5d725f2214ee877112230c123f2eafa4`. That is the build you deployed and confirmed: creative-style entry, PP, S-Log Display Assist, and the four aspect ratios.
+
+### What the image does and does not carry
+
+The partition holds firmware, not camera identity. On the machine this was verified on, the live partition's first 221,609,984 bytes were **byte-identical to the official firmware's `nflasha15`** — no serial, no calibration, no per-body data lives there.
+
+So the image is portable across ILCE-9 bodies at 6.00. **The features are not.** Opening 4:3 and saving it also needs the companion parameters in `/setting/Backup.bin` (`nflasha2`), which are per-body. A transplanted menu on a body without those parameters will show the entries but not complete the save chain.
+
+### Step 1 — Write the image
+
+**Camera on, battery charged, USB stable. Close every other program that talks to the camera.**
+
+1. Open the **菜单移植** tab and click **选择镜像文件…**, pick `nflasha15_menu_inplace_candidate.bin`.
+2. The tab shows the label and SHA256 once the image validates. Anything else is refused before the camera is touched.
+3. Click **写入菜单镜像…** and confirm both dialogs.
+
+The tab then: reads the whole live partition to `sessions\menu\deploy_…\preimage.bin` (300 MiB, several minutes), refuses to continue if that read is short, writes the image once, and reads the partition back to verify. The first backup is also copied to `sessions\menu\baseline\` — that is what the restore button writes later.
+
+**Budget 1.2 GB of free space** for two 300 MiB images per operation.
+
+### Step 2 — Power cycle
+
+Normal shutdown, full power removal, cold start. A warm restart is not enough — the partition is re-read at boot.
+
+### Step 3 — Confirm
+
+Reconnect, press **MENU**. You should see Picture Profile and S-Log Display Assist where the old entries were, and four aspect ratios.
+
+### Undo
+
+**恢复到初始备份** writes the partition captured before the first deploy back to the camera. It refuses if that backup is missing or damaged.
+
+### Known limits
+
+- The menu entries are confirmed. **Per-item PP parameters, actual S-Log recording, and the display-assist curve are not separately verified.**
+- 4:3 RAW saves after the companion parameter set is applied; **4:3 JPEG does not** — the size submenu has no options and the free-frame count reads 0.
+- The ratio prototype is shared between the `0x4B` and `0x4C` menu trees; other consumers were not exhaustively checked.
+
 ## If something goes wrong
 
 | Log message | Meaning | What to do |

@@ -229,7 +229,8 @@ def _load_dependencies():
     return usb.core, usb.util, backend, sony, GenericUsbDriver, MscBbbDriver, MscCbiDriver, UsbBackend
 
 
-def _make_senser(sony, driver):
+def _make_senser(sony, driver, response_timeout=None):
+    budget = SERVICE_RESPONSE_SECONDS if response_timeout is None else response_timeout
     class BoundedSenser(sony.SonySenserDevice):
         def _tail_is_continuation_header(self):
             if self._declared_size is None or self._declared_size <= self.SenserMaxSize:
@@ -282,7 +283,7 @@ def _make_senser(sony, driver):
                 raise ValueError('Unsupported service request size')
             header = self.SenserPacketHeader.pack(size=len(data), pFunc=function, sequence=self._sequence,
                                                   version=0, miconType=0, offsetType=0, response=0)
-            self._deadline = time.monotonic() + SERVICE_RESPONSE_SECONDS
+            self._deadline = time.monotonic() + budget
             self._request_function = function
             self._read_calls = self._physical_received = self._payload_received = 0
             self._declared_size = self._response_code = None
@@ -346,7 +347,8 @@ def _wait_for_service(enumerate_devices, transient_error):
     return []
 
 
-def connect(receipt: Path | None = None, progress=None, *, guard_factory=None) -> CameraHandle:
+def connect(receipt: Path | None = None, progress=None, *, guard_factory=None,
+            response_timeout=None) -> CameraHandle:
     """Open exactly one ILCE-9 and switch it into service mode.
 
     With ``receipt`` (a fresh identity file written before the mode switch) the
@@ -465,7 +467,7 @@ def connect(receipt: Path | None = None, progress=None, *, guard_factory=None) -
         auth.start()
         auth.authenticate()
         say('服务模式已认证，正在读取机身参数')
-        guard = (guard_factory or ParameterGuard)(_make_senser(sony, driver))
+        guard = (guard_factory or ParameterGuard)(_make_senser(sony, driver, response_timeout))
         camera = sony.SonySenserCamera(guard)
         camera.readHasp()
         handle = CameraHandle(camera=camera, driver=driver, auth=auth,
