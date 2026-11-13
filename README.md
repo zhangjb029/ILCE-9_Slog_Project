@@ -213,12 +213,24 @@ The partition holds firmware, not camera identity. On the machine this was verif
 
 So the image is portable across ILCE-9 bodies at 6.00. **The features are not.** Opening 4:3 and saving it also needs the companion parameters in `/setting/Backup.bin` (`nflasha2`), which are per-body. A transplanted menu on a body without those parameters will show the entries but not complete the save chain.
 
-### Step 1 — Read, patch, write
+### Step 1 — Pick a target, then read, patch, write
+
+**Two targets:**
+
+| Target | Contents | Status |
+|---|---|---|
+| Menu | PP / S-Log / four aspects + creative-style entry | Confirmed on hardware, no known leftover |
+| Menu + Creative Look (FL) | All of the above, plus the Creative Look entry and 10 menu strings | Text confirmed **fully displayed**; whole-partition readback has a 9-byte filesystem count difference |
+
+**What those 9 bytes are:** in the ext2 superblock the free-block and free-inode counts disagree with the bitmaps (39 blocks and 1 inode over-counted), so `e2fsck -fn` reports an inconsistency. Every file's content, every directory entry, and every inode/mode/size matches the target, so it does not affect use. The cause and the fix are both still open.
+
+Going straight from a factory partition to FL applies both stages locally, each pinned by its own hash.
 
 **Camera on, battery charged, USB stable. Close every other program that talks to the camera.**
 
-1. Open the **菜单移植** tab and click **读取分区并写入菜单修改…**.
-2. Confirm both dialogs.
+1. Open the **菜单移植** tab and choose a target.
+2. Click **读取分区并写入…**.
+3. Confirm both dialogs.
 
 There is nothing to download or pick. The tab reads the partition first, and only if it matches the factory hash does it build the candidate and write.
 

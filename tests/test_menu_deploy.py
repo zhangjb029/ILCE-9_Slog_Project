@@ -48,19 +48,29 @@ class Base(unittest.TestCase):
 
         self.factory = fake_partition(0x11)
         candidate = bytearray(self.factory)
-        candidate[200:202] = b'\xaa\xbb'
-        candidate[4000] = 0x5a
+        candidate[2000:2002] = b'\xaa\xbb'
+        candidate[5000] = 0x5a
         self.candidate = bytes(candidate)
         self.patches = (
-            (200, self.factory[200:202].hex(), 'aabb'),
-            (4000, self.factory[4000:4001].hex(), '5a'),
+            (2000, self.factory[2000:2002].hex(), 'aabb'),
+            (5000, self.factory[5000:5001].hex(), '5a'),
         )
+        fl = bytearray(candidate)
+        fl[3000] = 0xcc
+        self.fl_candidate = bytes(fl)
+        self.fl_patch = ((3000, b'\xcc'),)
+        menu_sha = hashlib.sha256(self.candidate).hexdigest()
+        fl_sha = hashlib.sha256(self.fl_candidate).hexdigest()
 
         for patcher in (
             mock.patch.object(md, 'PARTITION_BYTES', SMALL),
             mock.patch.object(md, 'FACTORY_SHA', hashlib.sha256(self.factory).hexdigest()),
-            mock.patch.object(md, 'CANDIDATE_SHA', hashlib.sha256(self.candidate).hexdigest()),
+            mock.patch.object(md, 'CANDIDATE_SHA', menu_sha),
+            mock.patch.object(md, 'MENU_SHA', menu_sha),
+            mock.patch.object(md, 'FL_SHA', fl_sha),
+            mock.patch.object(md, 'TARGETS', {'menu': (menu_sha, '菜单'), 'fl': (fl_sha, 'FL')}),
             mock.patch.object(md, 'PATCHES', self.patches),
+            mock.patch.object(md, 'load_fl_patch', new=lambda: self.fl_patch),
         ):
             patcher.start()
             self.addCleanup(patcher.stop)
@@ -110,13 +120,51 @@ class TestBuildCandidate(Base):
         self.assertIn('原厂', str(ctx.exception))
 
     def test_patch_that_does_not_match_its_bytes_is_refused(self):
-        with mock.patch.object(md, 'PATCHES', ((200, 'dead', 'beef'),)):
+        with mock.patch.object(md, 'PATCHES', ((2000, 'dead', 'beef'),)):
             with self.assertRaises(ValueError):
                 md.build_candidate(self.factory)
 
     def test_sanity_rejects_non_ext2(self):
         with self.assertRaises(ValueError):
             md.sanity(bytes(SMALL))
+
+
+class TestFlTarget(Base):
+    def test_factory_can_go_straight_to_fl(self):
+        self.assertEqual(md.build_candidate(self.factory, 'fl'), self.fl_candidate)
+
+    def test_menu_can_be_upgraded_to_fl(self):
+        self.assertEqual(md.build_candidate(self.candidate, 'fl'), self.fl_candidate)
+
+    def test_menu_target_leaves_fl_out(self):
+        self.assertEqual(md.build_candidate(self.factory, 'menu'), self.candidate)
+
+    def test_unknown_target_is_refused(self):
+        with self.assertRaises(ValueError):
+            md.build_candidate(self.factory, 'nonsense')
+
+    def test_unknown_partition_is_refused_for_fl_too(self):
+        with self.assertRaises(ValueError):
+            md.build_candidate(fake_partition(0x33), 'fl')
+
+    def test_deploy_writes_the_fl_build(self):
+        cam = FakeCamera(self.factory)
+        result = md.deploy(cam, IDENTITY, self.root, target='fl')
+        self.assertEqual(result['state'], 'SAVED_AND_READBACK_VERIFIED')
+        self.assertEqual(bytes(cam.data), self.fl_candidate)
+
+    def test_deploy_of_fl_from_menu_writes_once(self):
+        cam = FakeCamera(self.candidate)
+        result = md.deploy(cam, IDENTITY, self.root, target='fl')
+        self.assertEqual(result['state'], 'SAVED_AND_READBACK_VERIFIED')
+        self.assertEqual(cam.writes, 1)
+        self.assertEqual(bytes(cam.data), self.fl_candidate)
+
+    def test_already_at_fl_writes_nothing(self):
+        cam = FakeCamera(self.fl_candidate)
+        result = md.deploy(cam, IDENTITY, self.root, target='fl')
+        self.assertEqual(result['state'], 'ALREADY_AT_TARGET_NO_WRITE')
+        self.assertEqual(cam.writes, 0)
 
 
 class TestDeploy(Base):

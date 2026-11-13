@@ -18,9 +18,11 @@ import os
 import struct
 import time
 import uuid
+import zlib
+from functools import lru_cache
 from pathlib import Path
 
-from . import journal
+from . import data, journal
 
 PARTITION = '/dev/nflasha15'
 PARTITION_BYTES = 314572800
@@ -34,9 +36,17 @@ TRANSFER_TIMEOUT_SECONDS = 900
 # the live partition was byte-identical to the official firmware's nflasha15,
 # and this hash is what the successful deployment recorded as its preimage.
 FACTORY_SHA = 'ed835ff938e5d9d816b611263d1e124c08eb907a883d08587170bdbd7c32f9d2'
-# The result the user deployed and confirmed: creative-style entry, PP, S-Log
-# Display Assist, four aspect ratios.
-CANDIDATE_SHA = '4fa7bbe5c9cc21661c334fa5640af59a5d725f2214ee877112230c123f2eafa4'
+# Creative-style entry, PP, S-Log Display Assist, four aspect ratios.
+MENU_SHA = '4fa7bbe5c9cc21661c334fa5640af59a5d725f2214ee877112230c123f2eafa4'
+CANDIDATE_SHA = MENU_SHA  # historical name kept for existing callers
+# The same menu plus the Creative Look (FL) module and its language resources.
+FL_SHA = 'cba78da44df413058f56db74b62305bda7d1de756d65ffd96b93d4e2659ef22e'
+FL_PATCH_FILE = 'fl_patch.bin'
+
+TARGETS = {
+    'menu': (MENU_SHA, '菜单修改（PP/S-Log/四比例 + 复古衣橱）'),
+    'fl': (FL_SHA, '菜单 + 创意外观 FL（实验）'),
+}
 
 # (offset, factory bytes, candidate bytes) — 29 runs, 677 bytes total.
 PATCHES = (
@@ -71,7 +81,34 @@ PATCHES = (
     (192980996, '14', '28'),
 )
 
-LABEL = 'PP / S-Log / 四比例菜单 + 复古衣橱'
+LABEL = TARGETS['menu'][1]
+
+
+@lru_cache(maxsize=1)
+def load_fl_patch() -> tuple:
+    """The 26322 runs between the verified menu image and the FL image.
+
+    Applied on top of an already-verified menu build, so the input is pinned by
+    hash and the runs carry only replacement bytes.
+    """
+    raw = zlib.decompress((data.data_root() / FL_PATCH_FILE).read_bytes())
+    if raw[:4] != b'FLP1':
+        raise ValueError('内置 FL 补丁格式不正确')
+    count, = struct.unpack_from('<I', raw, 4)
+    pos, runs = 8, []
+    for _ in range(count):
+        offset, length = struct.unpack_from('<II', raw, pos)
+        pos += 8
+        runs.append((offset, raw[pos:pos + length]))
+        pos += length
+    return tuple(runs)
+
+
+def _apply(blob: bytes, patches) -> bytes:
+    out = bytearray(blob)
+    for offset, after in patches:
+        out[offset:offset + len(after)] = after
+    return bytes(out)
 
 
 class PartitionGuard:
@@ -126,31 +163,49 @@ def sanity(blob: bytes) -> None:
         raise ValueError('ext2 引导块非零，这可能不是预期分区')
 
 
-def build_candidate(dump: bytes) -> bytes:
-    """Turn a factory partition into the confirmed candidate, in memory.
+def build_candidate(dump: bytes, target: str = 'menu') -> bytes:
+    """Turn a partition into the requested build, in memory.
 
-    Both the input and the output are pinned by SHA256, so an unexpected
-    partition never reaches the camera.
+    Accepted inputs are only the factory partition or an already-verified menu
+    build. Every stage is pinned by SHA256, so an unexpected partition never
+    reaches the camera.
     """
     sanity(dump)
+    if target not in TARGETS:
+        raise ValueError('未知的目标版本')
+    want_sha = TARGETS[target][0]
     actual = hashlib.sha256(dump).hexdigest()
-    if actual == CANDIDATE_SHA:
+    if actual == want_sha:
         raise ValueError('分区已经是目标版本，不需要修改')
-    if actual != FACTORY_SHA:
+
+    blob = dump
+    if actual == FACTORY_SHA:
+        patched = bytearray(blob)
+        for offset, before_hex, after_hex in PATCHES:
+            before, after = bytes.fromhex(before_hex), bytes.fromhex(after_hex)
+            if len(before) != len(after):
+                raise ValueError('内置补丁长度不一致')
+            if patched[offset:offset + len(before)] != before:
+                raise ValueError(f'偏移 {offset} 的原始字节与预期不符，补丁不适用')
+            patched[offset:offset + len(after)] = after
+        blob = bytes(patched)
+        if hashlib.sha256(blob).hexdigest() != MENU_SHA:
+            raise ValueError('打补丁后的哈希与已验证的菜单镜像不符，已停止')
+    elif actual != MENU_SHA:
         raise ValueError(
-            '相机上的分区不是原厂状态（SHA256 %s…），本工具只处理原厂分区，已停止' % actual[:16])
-    patched = bytearray(dump)
-    for offset, before_hex, after_hex in PATCHES:
-        before, after = bytes.fromhex(before_hex), bytes.fromhex(after_hex)
-        if len(before) != len(after):
-            raise ValueError('内置补丁长度不一致')
-        if patched[offset:offset + len(before)] != before:
-            raise ValueError(f'偏移 {offset} 的原始字节与预期不符，补丁不适用')
-        patched[offset:offset + len(after)] = after
-    result = bytes(patched)
-    if hashlib.sha256(result).hexdigest() != CANDIDATE_SHA:
-        raise ValueError('打补丁后的哈希与已验证的候选镜像不符，已停止')
-    return result
+            '相机上的分区既不是原厂状态、也不是已验证的菜单版本（SHA256 %s…），'
+            '本工具只处理这两种，已停止' % actual[:16])
+
+    if target == 'fl':
+        if hashlib.sha256(blob).hexdigest() != MENU_SHA:
+            raise ValueError('内部错误：FL 补丁只能叠加在已验证的菜单版本上')
+        blob = _apply(blob, load_fl_patch())
+        if hashlib.sha256(blob).hexdigest() != FL_SHA:
+            raise ValueError('叠加 FL 补丁后的哈希与已验证镜像不符，已停止')
+
+    if hashlib.sha256(blob).hexdigest() != want_sha:
+        raise ValueError('结果哈希与目标版本不符，已停止')
+    return blob
 
 
 def read_partition(camera, path: Path) -> dict:
@@ -206,14 +261,17 @@ def _save_baseline_once(root: Path, session: Path) -> Path:
     return target
 
 
-def deploy(camera, identity: dict, root: Path, progress=None) -> dict:
+def deploy(camera, identity: dict, root: Path, progress=None, target: str = 'menu') -> dict:
     """Back up completely, derive the candidate from it, write once, verify."""
     say = progress or (lambda _message: None)
+    if target not in TARGETS:
+        raise ValueError('未知的目标版本')
+    want_sha, want_label = TARGETS[target]
 
-    session = _new_session(root, 'deploy')
+    session = _new_session(root, 'deploy_' + target)
     _write_json(session / 'request.json', dict(
-        partition=PARTITION, factory_sha256=FACTORY_SHA, candidate_sha256=CANDIDATE_SHA,
-        identity=identity, created_epoch=time.time()))
+        partition=PARTITION, factory_sha256=FACTORY_SHA, target=target,
+        candidate_sha256=want_sha, identity=identity, created_epoch=time.time()))
 
     say('正在完整读取当前分区（约 300 MB，需要几分钟）…')
     snapshot = read_partition(camera, session / 'preimage.bin')
@@ -225,33 +283,33 @@ def deploy(camera, identity: dict, root: Path, progress=None) -> dict:
         raise ValueError(f'分区读取不完整（{snapshot["bytes"]:,} 字节），已停止，没有写入')
 
     _write_json(session / 'intent.json', dict(
-        partition=PARTITION, preimage_sha256=snapshot['sha256'],
-        target_sha256=CANDIDATE_SHA, identity=identity, created_epoch=time.time()))
+        partition=PARTITION, preimage_sha256=snapshot['sha256'], target=target,
+        target_sha256=want_sha, identity=identity, created_epoch=time.time()))
     _save_baseline_once(Path(root), session)
     say(f'原分区已保存：{session / "preimage.bin"}')
 
-    if snapshot['sha256'] == CANDIDATE_SHA:
+    if snapshot['sha256'] == want_sha:
         _write_json(session / 'result.json', dict(
             pass_=True, write_attempted=False, already_at_target=True,
-            target_sha256=CANDIDATE_SHA, completed_epoch=time.time()))
+            target_sha256=want_sha, completed_epoch=time.time()))
         return dict(directory=session, state='ALREADY_AT_TARGET_NO_WRITE')
 
-    say('正在本地打补丁并校验…')
-    candidate = build_candidate((session / 'preimage.bin').read_bytes())
+    say(f'正在本地生成目标镜像：{want_label}…')
+    candidate = build_candidate((session / 'preimage.bin').read_bytes(), target)
     _write_json(session / 'candidate.json', dict(
-        sha256=hashlib.sha256(candidate).hexdigest(), patches=len(PATCHES)))
+        sha256=hashlib.sha256(candidate).hexdigest(), target=target))
 
     say('正在写入整分区…')
     _write_json(session / 'write_attempt.json', dict(
-        target_sha256=CANDIDATE_SHA, started_epoch=time.time()))
+        target_sha256=want_sha, started_epoch=time.time()))
     camera.writeFile(PARTITION, candidate)
     del candidate
 
     say('正在回读校验…')
     back = read_partition(camera, session / 'readback.bin')
-    ok = back['bytes'] == PARTITION_BYTES and back['sha256'] == CANDIDATE_SHA
+    ok = back['bytes'] == PARTITION_BYTES and back['sha256'] == want_sha
     _write_json(session / 'result.json', dict(
-        pass_=ok, write_attempted=True, target_sha256=CANDIDATE_SHA,
+        pass_=ok, write_attempted=True, target_sha256=want_sha,
         readback_sha256=back['sha256'], readback_bytes=back['bytes'],
         completed_epoch=time.time()))
     if not ok:

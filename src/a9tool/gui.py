@@ -713,9 +713,21 @@ class App:
 
         action = ttk.LabelFrame(parent, text='② 写入')
         action.pack(fill='x', padx=10, pady=8)
-        self.menu_deploy_btn = ttk.Button(action, text='读取分区并写入菜单修改…',
+        ttk.Label(action, text='目标版本：').pack(anchor='w', padx=10, pady=(8, 2))
+        self.menu_target_var = tk.StringVar(value='menu')
+        ttk.Radiobutton(action, text='菜单修改（PP / S-Log / 四比例 + 复古衣橱）',
+                        value='menu', variable=self.menu_target_var).pack(anchor='w', padx=24)
+        ttk.Radiobutton(action, text='菜单 + 创意外观 FL（实验版）',
+                        value='fl', variable=self.menu_target_var).pack(anchor='w', padx=24)
+        ttk.Label(action, justify='left', wraplength=700, text=(
+            '· 菜单版：已实机确认，无已知遗留问题。\n'
+            '· FL 版：新增创意外观入口与 10 条菜单文字，用户已确认全部正常显示；'
+            '但整分区回读有 9 字节文件系统计数差异（空闲块/inode 计数与位图不一致），'
+            '不影响使用，尚未修复。'
+        )).pack(anchor='w', padx=24, pady=(2, 6))
+        self.menu_deploy_btn = ttk.Button(action, text='读取分区并写入…',
                                           command=self.on_menu_deploy)
-        self.menu_deploy_btn.pack(anchor='w', padx=10, pady=8)
+        self.menu_deploy_btn.pack(anchor='w', padx=10, pady=(0, 10))
         self._update_menu_baseline_text()
 
     def _update_menu_baseline_text(self) -> None:
@@ -770,7 +782,8 @@ class App:
             try:
                 usbdev.check_identity(handle.identity)
                 return menu_deploy.deploy(handle.camera, handle.identity,
-                                          self.menu_root, progress=self._menu_progress)
+                                          self.menu_root, progress=self._menu_progress,
+                                          target=target)
             finally:
                 handle.close()
 

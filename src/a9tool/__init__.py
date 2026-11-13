@@ -6,4 +6,4 @@ VENDOR = Path(__file__).resolve().parent.parent / 'vendor'
 if str(VENDOR) not in sys.path:
     sys.path.insert(0, str(VENDOR))
 
-__version__ = '1.2.0'
+__version__ = '1.3.0'
