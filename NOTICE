@@ -40,3 +40,14 @@ unpacked firmware artifact is distributed with this project.
 
 Sony, ILCE-9, Picture Profile and S-Log are trademarks of Sony Group
 Corporation. This project is not affiliated with or endorsed by Sony.
+
+Reference project
+=================
+
+robinshie/Sony_A7M3
+  https://github.com/robinshie/Sony_A7M3
+  License: MIT
+  Pinned at commit e6bbfafb55570a5de34e75c195e7e1c780d03340.
+  The menu-transplant technique (attaching the change to the real menu-creation
+  call) originates here. No upstream binary or address table is redistributed;
+  the addresses used by this project were re-derived from the ILCE-9 firmware.

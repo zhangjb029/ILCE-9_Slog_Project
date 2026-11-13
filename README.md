@@ -317,6 +317,14 @@ The saved byte in an Fn slot is resolved by `viewUnified4.so`'s switch table int
 
 The PP feature-override property (`0x00880000`, five offsets set to `0x02`) must be enabled first, or the PP-dependent entries resolve to nothing.
 
+## Acknowledgements
+
+The menu-transplant approach follows **[robinshie/Sony_A7M3](https://github.com/robinshie/Sony_A7M3)** (MIT), pinned at commit `e6bbfafb55570a5de34e75c195e7e1c780d03340`.
+
+Its key insight is what made the transplant work here: attach the change to the **real menu-creation call**, not to `DT_INIT`. An earlier attempt that patched at init time wrote and read back correctly, yet the menu after a restart was unchanged. Everything else — function addresses, property record lengths, the layout of the new entry, the sector-level storage plan — was re-located and re-verified against this camera's own firmware rather than copied, because the A7 III reference differs on every one of those points.
+
+The electronic-shutter flash gates and the PP/Fn slot path come from the research in this repository's `analysis/` tree; their reports are cited in the delivery notes.
+
 ## Licence
 
 MIT — see [LICENSE](LICENSE). Third-party components and the origin of the firmware-derived tables are listed in [NOTICE](NOTICE).
