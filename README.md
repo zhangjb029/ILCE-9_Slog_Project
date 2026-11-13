@@ -201,7 +201,7 @@ Each of the two settings is guarded by its own packet allowlist, and neither gua
 
 ## Menu transplant  ⚠ replaces a 300 MiB partition
 
-The third tab writes a complete `/dev/nflasha15` image. **This is not a parameter change.** It replaces the partition that holds `/usr`, and a previous attempt with a different layout left the camera cold-starting with no menu at all (that build is withdrawn).
+The third tab replaces the whole `/dev/nflasha15` partition. **This is not a parameter change.** It replaces the partition that holds `/usr`, and a previous attempt with a different layout left the camera cold-starting with no menu at all (that build is withdrawn).
 
 **No image is shipped or downloaded.** The tool reads the camera's own partition, checks it is byte-identical to the factory build, applies the 677 bytes that were confirmed on hardware, and verifies the result against the candidate SHA256 — all locally, before anything is written. Two hashes pin both ends: `ed835ff9…` going in, `4fa7bbe5…` coming out. A partition in any other state is refused, not overwritten.
 
@@ -213,7 +213,7 @@ The partition holds firmware, not camera identity. On the machine this was verif
 
 So the image is portable across ILCE-9 bodies at 6.00. **The features are not.** Opening 4:3 and saving it also needs the companion parameters in `/setting/Backup.bin` (`nflasha2`), which are per-body. A transplanted menu on a body without those parameters will show the entries but not complete the save chain.
 
-### Step 1 — Write the image
+### Step 1 — Read, patch, write
 
 **Camera on, battery charged, USB stable. Close every other program that talks to the camera.**
 
@@ -222,9 +222,9 @@ So the image is portable across ILCE-9 bodies at 6.00. **The features are not.**
 
 There is nothing to download or pick. The tab reads the partition first, and only if it matches the factory hash does it build the candidate and write.
 
-The tab then: reads the whole live partition to `sessions\menu\deploy_…\preimage.bin` (300 MiB, several minutes), refuses to continue if that read is short, writes the image once, and reads the partition back to verify. The first backup is also copied to `sessions\menu\baseline\` — that is what the restore button writes later.
+The tab then: reads the whole live partition to `sessions\menu\deploy_…\preimage.bin` (300 MiB, several minutes), refuses to continue if that read is short, patches it in memory, writes it once, and reads the partition back to verify. The first backup is also copied to `sessions\menu\baseline\` — that is what the restore button writes later.
 
-**Budget 1.2 GB of free space** for two 300 MiB images per operation.
+**Budget 1.2 GB of free space** per operation: one archive of the current partition, one readback.
 
 ### Step 2 — Power cycle
 
