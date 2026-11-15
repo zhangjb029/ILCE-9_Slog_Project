@@ -286,6 +286,7 @@ exe 没有数字签名（证书一年几百美元）。杀毒软件也可能报�
 | 找到多台相机 | 插了不止一台 | 拔掉其他的 |
 | `Camera busy during identity request` | 相机一直回「忙」 | 重启相机、关掉 Imaging Edge 之类占用相机的软件、重连 |
 | 只支持 ILCE-9 固件 6.00 | 机型或版本不符 | 无解，程序按设计拒绝 |
+| `Pipe error`（读机身参数时） | USB 传输中途断了，相机可能已经掉线 | 关机再开机、重新插线。**每次都断在同一处就别再重试**，把日志贴到 Issues |
 | `sessions/…/journal.json` 里出现 `FAILED_REVIEW_REQUIRED` | 写入中途失败 | **保留 `sessions` 文件夹**，相机可能有部分改动。先在程序里恢复，再重试 |
 
 每次写入都会在 exe 旁边的 `sessions/<时间戳>/` 留下事务记录。求助时请提供该文件的 `state` 和 `error` 字段，加上窗口底部的日志——**不要**提供整份 `Backup-original.bin`，里面有相机配置数据。

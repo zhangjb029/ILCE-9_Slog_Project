@@ -281,6 +281,7 @@ If you also wrote the 4:3 parameters, restore them separately from the record th
 | 找到多台相机 | More than one camera plugged in | Unplug the others |
 | `Camera busy during identity request` | Camera reported busy | Power-cycle the camera, close Imaging Edge and similar software, reconnect |
 | 只支持 ILCE-9 固件 6.00 | Wrong model or firmware | Nothing to do — the app refuses by design |
+| `Pipe error` while reading the camera | The transfer broke part-way; the camera may have dropped off USB | Power-cycle, replug. **If it breaks at the same byte every time, stop retrying** and post the log in Issues |
 | `FAILED_REVIEW_REQUIRED` (inside `sessions/…/journal.json`) | A write failed part-way | Keep the `sessions` folder; the camera may have a partial change. Restore from the app before retrying |
 
 Every write records a journal in `sessions/<timestamp>/` next to the exe. If you ask for help, include that file's `state` and `error` fields plus the log from the bottom of the window — **not** the whole `Backup-original.bin`, which contains camera configuration data.
