@@ -1,10 +1,10 @@
-"""Whole-partition menu deployment: dump the live partition, patch it in memory, write it back.
+"""Whole-partition deployment of the Creative Look (LUT) build.
 
 No image is shipped. The tool reads the camera's own /dev/nflasha15, checks it
-is byte-identical to the factory build, applies the 677 bytes that were
-confirmed working on hardware, verifies the result against the known candidate
-hash, and only then writes. Both ends of the change are pinned by SHA256, so a
-partition in any other state is refused rather than overwritten.
+is byte-identical to the factory build, applies the R11 patch, verifies the
+result against the hash the author accepted on hardware, and only then writes.
+Both ends of the change are pinned by SHA256, so a partition in any other state
+is refused rather than overwritten.
 
 This is still not a parameter write. It replaces a 300 MiB partition in one
 transfer; a previous attempt with a different layout left the camera
@@ -18,7 +18,7 @@ import os
 import struct
 import time
 import uuid
-import zlib
+import lzma
 from functools import lru_cache
 from pathlib import Path
 
@@ -33,74 +33,52 @@ READ_EXTRA = frozenset({'/setting/updater/dat4', '/setting/updater/COMP'})
 TRANSFER_TIMEOUT_SECONDS = 900
 
 # The state every ILCE-9 at 6.00 leaves the factory in. Verified on hardware:
-# the live partition was byte-identical to the official firmware's nflasha15,
-# and this hash is what the successful deployment recorded as its preimage.
+# the live partition was byte-identical to the official firmware's nflasha15
+# padded with zeros to the full partition size, and this hash is what the
+# successful deployment recorded as its preimage.
 FACTORY_SHA = 'ed835ff938e5d9d816b611263d1e124c08eb907a883d08587170bdbd7c32f9d2'
-# Creative-style entry, PP, S-Log Display Assist, four aspect ratios.
-MENU_SHA = '4fa7bbe5c9cc21661c334fa5640af59a5d725f2214ee877112230c123f2eafa4'
-CANDIDATE_SHA = MENU_SHA  # historical name kept for existing callers
-# The same menu plus the Creative Look (FL) module and its language resources.
-FL_SHA = 'cba78da44df413058f56db74b62305bda7d1de756d65ffd96b93d4e2659ef22e'
-FL_PATCH_FILE = 'fl_patch.bin'
+# R11: 20 Creative Looks, plus PP and Gamma Display Assist moved onto page 14
+# of Shooting Assist, with 照片效果 and 演示模式 restored to their own places.
+LUT_SHA = '0676e29917bf3ef555df9c876eecc46e8e781d9a7e8f1c4b06c5ab225ef06a35'
+PATCH_FILE = 'r11_patch.bin'
 
-TARGETS = {
-    'menu': (MENU_SHA, '菜单修改（PP/S-Log/四比例 + 复古衣橱）'),
-    'fl': (FL_SHA, '菜单 + 创意外观 FL（实验）'),
+# Superseded builds this tool no longer produces. Recognising them lets the
+# error message say what to do instead of only that the partition is unknown.
+LEGACY_SHAS = {
+    '4fa7bbe5c9cc21661c334fa5640af59a5d725f2214ee877112230c123f2eafa4':
+        '旧版「菜单修改」（PP/S-Log/四比例 + 复古衣橱）',
+    'cba78da44df413058f56db74b62305bda7d1de756d65ffd96b93d4e2659ef22e':
+        '旧版「创意外观 FL」（实验）',
 }
 
-# (offset, factory bytes, candidate bytes) — 29 runs, 677 bytes total.
-PATCHES = (
-    (36611128, '87e0', '56fc'),
-    (70594444, 'f7f71afd', '38f01cf7'),
-    (75038752, '80b500af', '622909d0'),
-    (75038758, '00f24281dfe811f0610063006500670069006b006d006f0071007300750077', '0ad80ff2180303eb410318785b78136070470320106070471420704700bf01'),
-    (75038790, '79', '02'),
-    (75038792, '7b', '03'),
-    (75038794, '97', '04'),
-    (75038796, 'b3', '05'),
-    (75038798, 'cf', '06'),
-    (75038800, 'eb', '07'),
-    (75038802, '09017d', '080009'),
-    (75038806, '7f', '0a'),
-    (75038808, '81', '0b'),
-    (75038810, '83', '0c'),
-    (75038812, '85', '0d'),
-    (75038814, '870089008b008d008f009100930095009b009d009f00a100a300a500a700a900ab00ad00af00b1009900b900bb00bd00bf00c100c300c500c700c900cb00cd00b500b700dd00df00e100e300e500e700e900d100d300d500d700d900db00fd00ff000101030105010701ed00ef00f100f300f500f700fb0038013c010d011101150119011d012101240128012c01300134010023aae00023ace00023aee00023b0e00023b2e000238ae00023b5e00023b7e00023b9e00023bbe00023bde00023bfe00023c1e001238ce00120a2e0012390e0012392e0012394e0012396e001236ee0012399e001239be001239de001239fe00123a1e00123a3e00123a5e0022370e0022372e0022084e0022376e0022378e002237ae0022352e002237de002237fe0022381e0022383e0022385e0022387', '0001000200030004000500060101020103010401050106010701080109010a010b010c010d01020203020402050206020702080209020a020b020c020d02010203030403050306030703080309030a030b030c030d03010302030704080409040a040b040c040d04010402040304040405040604080509050a050b050c050d0501050205030504050505060507050c060d060106020603060406050606060706080609060a060b0600bf2de9ff50164696b3706813282fd1b06861282cd1306850b3c02700204ff48051032222234ff0ff34002500df10f5805f1dd2e0b105463168be2251f8043b40f8043b013af9d1316850310a2251f8043b40f8043b013af9d16221c5f800130649c5f804133560bff35b8f14217160bde8ff50c5f5a7ba00bf56fc04022de90f50d4f8580105f796'),
-    (75039120, '022389e0032354e0032356e0032358e0032066e003235ce003235ee0', '622805d10120b8604ff0ff3078603860bde80f50bb68214600f0abba'),
-    (75039149, '2336e0', '2909d1'),
-    (75039153, '2361e0032363e0032365e0032367e0032369e003236be003236de0042338e004233ae004233ce004233ee0042048e0042342e004231ae0042345e0042347e0042349e004234be004234de004234fe0042351e005231ce005231ee0052320e0052322e0052324e005202ae005231360062080bd052327e0052329e005232be005232de005232fe0052331e0052333e0062313', '2a07d108b5d0f85801612104f736e2622008bd00f076b8f0b581b0bef7faf5054600a41e4be41a1e4b1b199d4240f03380bef741f578b30746d7f8f063d7f8d4744eb347b369680a685268d36a5b681869b04240f00f8008694068806840680068b84240f007801068406800698068042800f011801e610b695b689b685b681f60126852681269074be35845f26c601b1853'),
-    (75039300, '002080bd06231360012080bd06231360022080bd06231360032080bd06231360042080bd06231360052080bd0620106080bd06231360072080bd06231360082080bd06231360092080bd062313600a2080bd062313600b2080bd062313600c2080bd062313600d2080bd142080bd', '04239360284601b0f0bd00bfd42965001c1da700ac3b950000bf00bf00bf00bf00bf00bf00bf00bf00bf00bf00bf00bf00bf00bf00bf00bf00bf00bf00bf00bf00bf00bf00bf00bf00bf00bf00bf00bf00bf00bf00bf00bf00bf00bf00bf00bf00bf00bf00bf00bf00bf00bf00bf'),
-    (75039411, '00', 'bf'),
-    (75040510, 'bb682146', 'fff741bd'),
-    (75045076, 'ef', '6b'),
-    (75045292, '01', 'fe'),
-    (75045294, '44e7', 'acfb'),
-    (75047248, 'b1', '2d'),
-    (141296518, 'ffff0000', '0180f93d'),
-    (141625620, '00000000000000000000000000000000', '56fc041ee5a48de58fa4e8a1a3e6a9b1'),
-    (192980996, '14', '28'),
-)
+TARGETS = {
+    'lut': (LUT_SHA, '创意外观 LUT（20 款 + 图片配置文件 + 伽玛显示辅助）'),
+}
 
-LABEL = TARGETS['menu'][1]
+LABEL = TARGETS['lut'][1]
 
 
 @lru_cache(maxsize=1)
-def load_fl_patch() -> tuple:
-    """The 26322 runs between the verified menu image and the FL image.
+def load_patch() -> tuple:
+    """The 51,005 runs between the factory partition and the R11 build.
 
-    Applied on top of an already-verified menu build, so the input is pinned by
-    hash and the runs carry only replacement bytes.
+    Each run stores the replacement bytes and the distance from the previous
+    run's offset. The input partition is pinned by SHA256, so the bytes being
+    replaced never have to be carried in the program.
     """
-    raw = zlib.decompress((data.data_root() / FL_PATCH_FILE).read_bytes())
-    if raw[:4] != b'FLP1':
-        raise ValueError('内置 FL 补丁格式不正确')
+    raw = lzma.decompress((data.data_root() / PATCH_FILE).read_bytes())
+    if raw[:4] != b'R11P':
+        raise ValueError('内置补丁格式不正确')
     count, = struct.unpack_from('<I', raw, 4)
-    pos, runs = 8, []
+    pos, offset, runs = 8, 0, []
     for _ in range(count):
-        offset, length = struct.unpack_from('<II', raw, pos)
+        delta, length = struct.unpack_from('<II', raw, pos)
         pos += 8
+        offset += delta
         runs.append((offset, raw[pos:pos + length]))
         pos += length
+    if pos != len(raw):
+        raise ValueError('内置补丁长度与声明不符')
     return tuple(runs)
 
 
@@ -163,12 +141,11 @@ def sanity(blob: bytes) -> None:
         raise ValueError('ext2 引导块非零，这可能不是预期分区')
 
 
-def build_candidate(dump: bytes, target: str = 'menu') -> bytes:
-    """Turn a partition into the requested build, in memory.
+def build_candidate(dump: bytes, target: str = 'lut') -> bytes:
+    """Turn a factory partition into the requested build, in memory.
 
-    Accepted inputs are only the factory partition or an already-verified menu
-    build. Every stage is pinned by SHA256, so an unexpected partition never
-    reaches the camera.
+    The only accepted input is the untouched factory partition. Anything else
+    is refused by hash, so an unexpected partition never reaches the camera.
     """
     sanity(dump)
     if target not in TARGETS:
@@ -177,34 +154,18 @@ def build_candidate(dump: bytes, target: str = 'menu') -> bytes:
     actual = hashlib.sha256(dump).hexdigest()
     if actual == want_sha:
         raise ValueError('分区已经是目标版本，不需要修改')
-
-    blob = dump
-    if actual == FACTORY_SHA:
-        patched = bytearray(blob)
-        for offset, before_hex, after_hex in PATCHES:
-            before, after = bytes.fromhex(before_hex), bytes.fromhex(after_hex)
-            if len(before) != len(after):
-                raise ValueError('内置补丁长度不一致')
-            if patched[offset:offset + len(before)] != before:
-                raise ValueError(f'偏移 {offset} 的原始字节与预期不符，补丁不适用')
-            patched[offset:offset + len(after)] = after
-        blob = bytes(patched)
-        if hashlib.sha256(blob).hexdigest() != MENU_SHA:
-            raise ValueError('打补丁后的哈希与已验证的菜单镜像不符，已停止')
-    elif actual != MENU_SHA:
+    if actual in LEGACY_SHAS:
         raise ValueError(
-            '相机上的分区既不是原厂状态、也不是已验证的菜单版本（SHA256 %s…），'
-            '本工具只处理这两种，已停止' % actual[:16])
+            f'相机上是{LEGACY_SHAS[actual]}，这个版本本工具不再生成。'
+            '请先用「⑤ 回退」把初始备份写回相机（恢复原厂），再重新修补。')
+    if actual != FACTORY_SHA:
+        raise ValueError(
+            '相机上的分区既不是原厂 6.00 状态、也不是本工具生成过的版本'
+            '（SHA256 %s…），本工具只处理原厂状态，已停止' % actual[:16])
 
-    if target == 'fl':
-        if hashlib.sha256(blob).hexdigest() != MENU_SHA:
-            raise ValueError('内部错误：FL 补丁只能叠加在已验证的菜单版本上')
-        blob = _apply(blob, load_fl_patch())
-        if hashlib.sha256(blob).hexdigest() != FL_SHA:
-            raise ValueError('叠加 FL 补丁后的哈希与已验证镜像不符，已停止')
-
+    blob = _apply(dump, load_patch())
     if hashlib.sha256(blob).hexdigest() != want_sha:
-        raise ValueError('结果哈希与目标版本不符，已停止')
+        raise ValueError('打补丁后的哈希与已验证镜像不符，已停止')
     return blob
 
 
@@ -283,7 +244,7 @@ def backup(camera, identity: dict, root: Path, progress=None) -> dict:
     return meta
 
 
-def patch_from_baseline(root: Path, target: str, progress=None) -> dict:
+def patch_from_baseline(root: Path, target: str = 'lut', progress=None) -> dict:
     """Step 2: build the target image from the baseline, locally. No camera."""
     say = progress or (lambda _message: None)
     baseline = baseline_path(root)

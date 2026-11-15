@@ -9,6 +9,7 @@ from a9tool import menu_deploy as md
 
 SMALL = 8192
 IDENTITY = {'model': 'ILCE-9', 'firmware': '6.00', 'serial_sha256': 'a' * 64}
+LEGACY_SHA = 'f' * 64
 
 
 def fake_partition(fill: int = 0x11, size: int = SMALL) -> bytes:
@@ -51,26 +52,16 @@ class Base(unittest.TestCase):
         candidate[2000:2002] = b'\xaa\xbb'
         candidate[5000] = 0x5a
         self.candidate = bytes(candidate)
-        self.patches = (
-            (2000, self.factory[2000:2002].hex(), 'aabb'),
-            (5000, self.factory[5000:5001].hex(), '5a'),
-        )
-        fl = bytearray(candidate)
-        fl[3000] = 0xcc
-        self.fl_candidate = bytes(fl)
-        self.fl_patch = ((3000, b'\xcc'),)
-        menu_sha = hashlib.sha256(self.candidate).hexdigest()
-        fl_sha = hashlib.sha256(self.fl_candidate).hexdigest()
+        self.patch = ((2000, b'\xaa\xbb'), (5000, b'\x5a'))
+        lut_sha = hashlib.sha256(self.candidate).hexdigest()
 
         for patcher in (
             mock.patch.object(md, 'PARTITION_BYTES', SMALL),
             mock.patch.object(md, 'FACTORY_SHA', hashlib.sha256(self.factory).hexdigest()),
-            mock.patch.object(md, 'CANDIDATE_SHA', menu_sha),
-            mock.patch.object(md, 'MENU_SHA', menu_sha),
-            mock.patch.object(md, 'FL_SHA', fl_sha),
-            mock.patch.object(md, 'TARGETS', {'menu': (menu_sha, '菜单'), 'fl': (fl_sha, 'FL')}),
-            mock.patch.object(md, 'PATCHES', self.patches),
-            mock.patch.object(md, 'load_fl_patch', new=lambda: self.fl_patch),
+            mock.patch.object(md, 'LUT_SHA', lut_sha),
+            mock.patch.object(md, 'TARGETS', {'lut': (lut_sha, 'LUT')}),
+            mock.patch.object(md, 'LEGACY_SHAS', {LEGACY_SHA: '旧版「菜单修改」'}),
+            mock.patch.object(md, 'load_patch', new=lambda: self.patch),
         ):
             patcher.start()
             self.addCleanup(patcher.stop)
@@ -113,38 +104,33 @@ class TestBuildCandidate(Base):
         with self.assertRaises(ValueError):
             md.build_candidate(self.candidate)
 
+    def test_legacy_build_is_refused_with_a_way_forward(self):
+        legacy = fake_partition(0x22)
+        with mock.patch.object(md, 'LEGACY_SHAS',
+                               {hashlib.sha256(legacy).hexdigest(): '旧版「菜单修改」'}):
+            with self.assertRaises(ValueError) as ctx:
+                md.build_candidate(legacy)
+        self.assertIn('旧版', str(ctx.exception))
+        self.assertIn('回退', str(ctx.exception))
+
     def test_unknown_partition_is_refused(self):
         with self.assertRaises(ValueError) as ctx:
             md.build_candidate(fake_partition(0x33))
         self.assertIn('原厂', str(ctx.exception))
 
-    def test_patch_that_does_not_match_its_bytes_is_refused(self):
-        with mock.patch.object(md, 'PATCHES', ((2000, 'dead', 'beef'),)):
-            with self.assertRaises(ValueError):
-                md.build_candidate(self.factory)
-
-    def test_sanity_rejects_non_ext2(self):
-        with self.assertRaises(ValueError):
-            md.sanity(bytes(SMALL))
-
-
-class TestFlTarget(Base):
-    def test_factory_can_go_straight_to_fl(self):
-        self.assertEqual(md.build_candidate(self.factory, 'fl'), self.fl_candidate)
-
-    def test_menu_can_be_upgraded_to_fl(self):
-        self.assertEqual(md.build_candidate(self.candidate, 'fl'), self.fl_candidate)
-
-    def test_menu_target_leaves_fl_out(self):
-        self.assertEqual(md.build_candidate(self.factory, 'menu'), self.candidate)
-
     def test_unknown_target_is_refused(self):
         with self.assertRaises(ValueError):
             md.build_candidate(self.factory, 'nonsense')
 
-    def test_unknown_partition_is_refused_for_fl_too(self):
+    def test_a_patch_that_misses_the_target_hash_is_refused(self):
+        with mock.patch.object(md, 'load_patch', new=lambda: ((2000, b'\xaa\xbb'),)):
+            with self.assertRaises(ValueError) as ctx:
+                md.build_candidate(self.factory)
+        self.assertIn('哈希', str(ctx.exception))
+
+    def test_sanity_rejects_non_ext2(self):
         with self.assertRaises(ValueError):
-            md.build_candidate(fake_partition(0x33), 'fl')
+            md.sanity(bytes(SMALL))
 
 
 class TestBackup(Base):
@@ -173,27 +159,22 @@ class TestPatch(Base):
         super().setUp()
         md.backup(FakeCamera(self.factory), IDENTITY, self.root)
 
-    def test_patch_menu_from_baseline(self):
-        meta = md.patch_from_baseline(self.root, 'menu')
-        self.assertEqual(meta['sha256'], md.TARGETS['menu'][0])
+    def test_patch_from_baseline(self):
+        meta = md.patch_from_baseline(self.root)
+        self.assertEqual(meta['sha256'], md.TARGETS['lut'][0])
         self.assertEqual((md.pending_dir(self.root) / 'candidate.bin').read_bytes(), self.candidate)
-
-    def test_patch_fl_from_baseline(self):
-        meta = md.patch_from_baseline(self.root, 'fl')
-        self.assertEqual(meta['sha256'], md.TARGETS['fl'][0])
-        self.assertEqual((md.pending_dir(self.root) / 'candidate.bin').read_bytes(), self.fl_candidate)
 
     def test_patch_requires_a_baseline(self):
         empty = Path(self._tmp.name) / 'no-baseline'
         with self.assertRaises(ValueError):
-            md.patch_from_baseline(empty, 'menu')
+            md.patch_from_baseline(empty, 'lut')
 
 
 class TestWrite(Base):
     def setUp(self):
         super().setUp()
         md.backup(FakeCamera(self.factory), IDENTITY, self.root)
-        md.patch_from_baseline(self.root, 'menu')
+        md.patch_from_baseline(self.root, 'lut')
 
     def test_write_sends_the_patched_image(self):
         cam = FakeCamera(self.factory)
@@ -225,7 +206,7 @@ class TestRestore(Base):
     def test_restore_writes_the_baseline_back(self):
         cam = FakeCamera(self.factory)
         md.backup(cam, IDENTITY, self.root)
-        md.patch_from_baseline(self.root, 'fl')
+        md.patch_from_baseline(self.root, 'lut')
         md.write_candidate(cam, IDENTITY, self.root)
         result = md.restore(cam, IDENTITY, self.root)
         self.assertEqual(result['state'], 'SAVED_AND_READBACK_VERIFIED')
@@ -243,6 +224,21 @@ class TestRestore(Base):
         (self.root / 'baseline' / 'preimage.bin').write_bytes(b'\x00' * SMALL)
         with self.assertRaises(ValueError):
             md.restore(cam, IDENTITY, self.root)
+
+
+class TestShippedPatch(unittest.TestCase):
+    """The packed patch itself: real file, real format, real size."""
+
+    def test_the_bundled_patch_parses(self):
+        runs = md.load_patch()
+        self.assertEqual(len(runs), 51005)
+        offsets = [offset for offset, _ in runs]
+        self.assertEqual(offsets, sorted(offsets))
+        self.assertTrue(all(len(data) for _, data in runs))
+
+    def test_every_run_lands_inside_the_partition(self):
+        for offset, data in md.load_patch():
+            self.assertLessEqual(offset + len(data), md.PARTITION_BYTES)
 
 
 if __name__ == '__main__':

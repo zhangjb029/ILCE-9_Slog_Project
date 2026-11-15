@@ -12,3 +12,5 @@ baseline/
 dist-debug/
 .venv-ci/
 dist-ci/
+build/a9tool/
+build/entry-*

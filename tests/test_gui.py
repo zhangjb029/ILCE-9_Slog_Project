@@ -103,7 +103,7 @@ class TestGui(unittest.TestCase):
     def test_tabs_exist(self):
         self.assertEqual(len(self.app.notebook.tabs()), 3)
         self.assertEqual(self.app.notebook.tab(1, 'text'), '电子快门引闪')
-        self.assertEqual(self.app.notebook.tab(2, 'text'), '菜单移植与创意外观')
+        self.assertEqual(self.app.notebook.tab(2, 'text'), '创意外观 LUT')
 
     def test_flash_buttons_disabled_before_reading(self):
         for button in (self.app.flash_menu_btn, self.app.flash_av_btn):
@@ -172,13 +172,12 @@ class TestGui(unittest.TestCase):
         self.assertEqual(str(self.app.menu_restore_btn['state']), 'disabled')
         self.assertIn('尚未备份', self.app.menu_baseline_var.get())
 
-    def test_menu_preview_switches_with_the_target(self):
-        self.app.menu_target_var.set('fl')
-        self.app._refresh_menu_preview()
+    def test_menu_tab_shows_the_r11_captures(self):
         self.assertEqual(len(self.app.menu_preview), 3)
-        self.app.menu_target_var.set('menu')
-        self.app._refresh_menu_preview()
-        self.assertEqual(len(self.app.menu_preview), 2)
+
+    def test_every_tab_scrolls_so_the_log_keeps_its_rows(self):
+        self.assertEqual(len(self.app._scroll_canvases), 3)
+        self.assertGreaterEqual(int(self.app.log_box.cget('height')), 5)
 
 if __name__ == '__main__':
     unittest.main()

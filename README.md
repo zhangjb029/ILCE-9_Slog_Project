@@ -6,6 +6,8 @@ Put Picture Profile and S-Log Display Assist into the Fn menu of a Sony A9 (ILCE
 
 **The window now has an "electronic-shutter flash" tab**: read the current state, open the upper-layer rule and the AV eligibility gate as two separate steps, and restore from either journal. The same operations remain available as `python -m a9tool.flash` and `python -m a9tool.flash_av` (read-only by default). As of 2026-11-11 the user confirmed that with both settings open, single-frame electronic shutter actually fires a flash; electronic burst still fires only the first frame, and hardware safety is not verified. Procedure, restore and limits: [delivery notes](docs/FLASH_DELIVERY.zh-CN.md) (Chinese).
 
+**The "Creative Look LUT" tab** puts 20 Creative Looks on page 14 of Shooting Assist, moving Picture Profile and Gamma Display Assist there too and letting 照片效果 and 演示模式 return to their own slots. That one replaces a whole partition; it was accepted on hardware on 2026-11-15. It still ships no image and downloads none — the patch lives in the program and applies to a partition you read from your own camera and hash-check. See [the full steps](#creative-look-lut--replaces-a-300-mib-partition).
+
 ---
 
 ## What it does
@@ -199,13 +201,13 @@ Open the tab and click **恢复到初始备份**. It writes both properties back
 
 Each of the two settings is guarded by its own packet allowlist, and neither guard permits the other's property. The tab therefore opens a fresh connection per step, and closes the Fn session first. A read or a write takes about as long as the connect step in the Fn tab.
 
-## Menu transplant  ⚠ replaces a 300 MiB partition
+## Creative Look LUT  ⚠ replaces a 300 MiB partition
 
 The third tab replaces the whole `/dev/nflasha15` partition. **This is not a parameter change.** It replaces the partition that holds `/usr`, and a previous attempt with a different layout left the camera cold-starting with no menu at all (that build is withdrawn).
 
-**No image is shipped or downloaded.** The tool reads the camera's own partition, checks it is byte-identical to the factory build, applies the 677 bytes that were confirmed on hardware, and verifies the result against the candidate SHA256 — all locally, before anything is written. Two hashes pin both ends: `ed835ff9…` going in, `4fa7bbe5…` coming out. A partition in any other state is refused, not overwritten.
+**No image is shipped or downloaded.** The tool reads the camera's own partition, checks it is byte-identical to the factory build, applies the built-in patch, and verifies the result against the candidate SHA256 — all locally, before anything is written. Two hashes pin both ends: `ed835ff9…` going in, `0676e299…` coming out. A partition in any other state is refused, not overwritten.
 
-What that change contains: a creative-style entry, Picture Profile, S-Log Display Assist, and four aspect ratios.
+That build (called R11 internally, accepted on hardware) contains: **20 Creative Looks**, plus Picture Profile and Gamma Display Assist moved onto page 14 of Shooting Assist, alongside the existing four aspect ratios and creative-style entry. 照片效果 and 演示模式 return to the slots PP and the display assist had been occupying.
 
 ### What the image does and does not carry
 
@@ -213,30 +215,23 @@ The partition holds firmware, not camera identity. On the machine this was verif
 
 So the image is portable across ILCE-9 bodies at 6.00. **The features are not.** Opening 4:3 and saving it also needs the companion parameters in `/setting/Backup.bin` (`nflasha2`), which are per-body. A transplanted menu on a body without those parameters will show the entries but not complete the save chain.
 
-### Step 1 — Pick a target, then read, patch, write
+### Step 1 — Back up, patch, write — in that order
 
-**Two targets:**
+The tab is five numbered steps. **Each button stays disabled until the step before it is done.**
 
-| Target | Contents | Status |
-|---|---|---|
-| Menu | PP / S-Log / four aspects + creative-style entry | Confirmed on hardware, no known leftover |
-| Menu + Creative Look (FL) | All of the above, plus the Creative Look entry and 10 menu strings | Text confirmed **fully displayed**; whole-partition readback has a 9-byte filesystem count difference |
+1. **① 初始备份** — read the whole partition and archive it. Read-only; nothing is written. **Without this backup the other four steps are unavailable**, so there is no way to end up half-applied.
+2. **② 修补** — build the target image locally from that backup. The result must hash to `0676e299…` or it stops. The camera is not touched.
+3. **③ 写入相机** — read the live partition once more for the record, write the whole partition in one transfer, read it back to verify.
+4. **④ 写入 4:3 保存参数** — see the note below.
+5. **⑤ 回退到初始备份** — write the step-1 backup back at any time.
 
-**What those 9 bytes are:** in the ext2 superblock the free-block and free-inode counts disagree with the bitmaps (39 blocks and 1 inode over-counted), so `e2fsck -fn` reports an inconsistency. Every file's content, every directory entry, and every inode/mode/size matches the target, so it does not affect use. The cause and the fix are both still open.
-
-Going straight from a factory partition to FL applies both stages locally, each pinned by its own hash.
-
-**Camera on, battery charged, USB stable. Close every other program that talks to the camera.**
-
-1. Open the **菜单移植** tab and choose a target.
-2. Click **读取分区并写入…**.
-3. Confirm both dialogs.
-
-There is nothing to download or pick. The tab reads the partition first, and only if it matches the factory hash does it build the candidate and write.
-
-The tab then: reads the whole live partition to `sessions\menu\deploy_…\preimage.bin` (300 MiB, several minutes), refuses to continue if that read is short, patches it in memory, writes it once, and reads the partition back to verify. The first backup is also copied to `sessions\menu\baseline\` — that is what the restore button writes later.
+**There is nothing to download or pick.** The patch (51,005 runs, ~1.4 MB) ships inside the program and applies to the partition you read out of your own camera.
 
 **Budget 1.2 GB of free space** per operation: one archive of the current partition, one readback.
+
+> This build does not upgrade from the older "Menu" or "Creative Look FL" images. If your camera is still on one, the tool says so and points you at **⑤ 回退** first.
+
+**Camera on, battery charged, USB stable. Close every other program that talks to the camera.**
 
 ### Step 2 — Power cycle
 
@@ -244,31 +239,38 @@ Normal shutdown, full power removal, cold start. A warm restart is not enough �
 
 ### Step 3 — Confirm
 
-Reconnect, press **MENU**. You should see Picture Profile and S-Log Display Assist where the old entries were, and four aspect ratios.
+Reconnect, press **MENU** → shooting menu → Shooting Assist, and page to 14/14. Five entries (screenshots from the camera):
 
-**After the menu target** (screenshots from the camera):
+![Shooting Assist page 14: face registration, registered face priority, creative look, picture profile, gamma display assist](docs/assets/img/lut-1.png)
 
-![Picture Profile appears in the Colour/WB menu](docs/assets/img/menu-1.png)
+Open **Creative Look**, page 1:
 
-![Four aspect ratios: 3:2, 16:9, 4:3, 1:1](docs/assets/img/menu-2.png)
+![Creative Look page 1: look, contrast, highlight, shadow, fade, saturation](docs/assets/img/lut-2.png)
 
-**The FL target** adds these:
+Page 3, with **Save** at the bottom:
 
-![Creative Look appears in the Shooting Assist menu](docs/assets/img/fl-1.png)
+![Creative Look page 3: highlight, white point, save](docs/assets/img/lut-3.png)
 
-![Creative Look page 1: contrast, highlight, shadow, fade, saturation](docs/assets/img/fl-2.png)
+照片效果 should be back at Shooting 1 page 12, and 演示模式 back in the Setup menu — both had been displaced by PP and the display assist.
 
-![Creative Look page 2: sharpness, sharpness range, clarity, save](docs/assets/img/fl-3.png)
+### Step 4 — 4:3 save parameters
+
+The four ratio entries live in the partition, but the menu alone is not enough. Selecting 4:3 and actually saving also needs 51 output-size, pixel-count and JPEG-capacity parameters written to `/setting/Backup.bin` on `nflasha2` — that file is per-body and not part of the partition.
+
+**This step is a parameter write, not a partition swap.** It records the current values first, and can be restored on its own.
 
 ### Undo
 
-**恢复到初始备份** writes the partition captured before the first deploy back to the camera. It refuses if that backup is missing or damaged.
+**回退到初始备份** writes the partition captured before the first deploy back to the camera. It refuses if that backup is missing or damaged.
+
+If you also wrote the 4:3 parameters, restore them separately from the record that step left behind — it is an independent change.
 
 ### Known limits
 
-- The menu entries are confirmed. **Per-item PP parameters, actual S-Log recording, and the display-assist curve are not separately verified.**
-- 4:3 RAW saves after the companion parameter set is applied; **4:3 JPEG does not** — the size submenu has no options and the free-frame count reads 0.
-- The ratio prototype is shared between the `0x4B` and `0x4C` menu trees; other consumers were not exhaustively checked.
+- The 20 looks and the menu layout are accepted on hardware; **the colours are not equivalent to Sony, Fujifilm or Ricoh originals** — the 17 new ones are experimental fits.
+- **4:3 JPEG does not work** — the size submenu has no options and the free-frame count reads 0. 4:3 RAW saves once the companion parameters are applied.
+- The new menu entries target the `0x4B` layout; `0x4C` keeps its existing organisation.
+- A strict whole-partition readback after cold start was not re-run for R11, so this document does not claim it passes.
 
 ## If something goes wrong
 
@@ -335,7 +337,7 @@ To publish a build you made locally instead: GitHub → **Releases** → **Draft
 python -m unittest discover -s tests -t .
 ```
 
-All tests are offline: a `FakeCamera` stands in for the real device, so no camera and no USB backend is needed. 87 tests, including Tk widget-state checks and a subprocess check that the vendored stack imports with site-packages disabled.
+All tests are offline: a `FakeCamera` stands in for the real device, so no camera and no USB backend is needed. 187 tests, including Tk widget-state checks and a subprocess check that the vendored stack imports with site-packages disabled.
 
 ## How it works
 
@@ -344,6 +346,8 @@ The saved byte in an Fn slot is resolved by `viewUnified4.so`'s switch table int
 The PP feature-override property (`0x00880000`, five offsets set to `0x02`) must be enabled first, or the PP-dependent entries resolve to nothing.
 
 ## Acknowledgements
+
+**The 17 new Creative Looks are colour-matched from [Erlla/sony-a7m4-custom-firmware](https://github.com/Erlla/sony-a7m4-custom-firmware).** Its LUT and look definitions are what this project fitted against. The implementation on the A9 is a re-adapted dual-source property scheme, not a copy of their files.
 
 The menu-transplant approach follows **[robinshie/Sony_A7M3](https://github.com/robinshie/Sony_A7M3)** (MIT), pinned at commit `e6bbfafb55570a5de34e75c195e7e1c780d03340`.
 

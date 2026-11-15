@@ -29,8 +29,9 @@ class App:
     def __init__(self, root: tk.Tk):
         self.root = root
         self.root.title('ILCE-9 功能槽位工具')
-        self.root.geometry('820x780')
-        self.root.minsize(760, 640)
+        self.root.geometry('960x680')
+        self.root.minsize(820, 560)
+        self._scroll_canvases: list = []
         self.queue: queue.Queue = queue.Queue()
         self.handle = None
         self.state = None
@@ -38,6 +39,7 @@ class App:
         self.locked = False
         self.selected_session = None
         self._build()
+        self.root.bind_all('<MouseWheel>', self._on_wheel)
         self.root.protocol('WM_DELETE_WINDOW', self.on_close)
         self.root.after(100, self._drain)
         self.log('尚未连接相机。请用 USB 线连接相机，把 USB 连接模式设为「大容量存储」，然后点「连接并检查」。')
@@ -91,9 +93,15 @@ class App:
         self.tab_menu = ttk.Frame(self.notebook)
         self.notebook.add(self.tab_fn, text='Fn 功能')
         self.notebook.add(self.tab_flash, text='电子快门引闪')
-        self.notebook.add(self.tab_menu, text='菜单移植与创意外观')
+        self.notebook.add(self.tab_menu, text='创意外观 LUT')
 
-        connect = ttk.LabelFrame(self.tab_fn, text='① 连接相机')
+        # Each tab scrolls on its own and reports a small requested height, so
+        # the log pane below always gets its rows even on a 1024x768 screen.
+        body_fn = self._scroll_body(self.tab_fn)
+        body_flash = self._scroll_body(self.tab_flash)
+        body_menu = self._scroll_body(self.tab_menu)
+
+        connect = ttk.LabelFrame(body_fn, text='① 连接相机')
         connect.pack(fill='x', **pad)
         ttk.Label(connect, text='相机 USB 连接模式设为「大容量存储」，只连这一台相机。').pack(anchor='w', padx=10, pady=(8, 4))
         row = ttk.Frame(connect)
@@ -104,7 +112,7 @@ class App:
         self.retry_btn.pack(side='left', padx=8)
         self.retry_btn.pack_forget()
 
-        status = ttk.LabelFrame(self.tab_fn, text='② 检测结果')
+        status = ttk.LabelFrame(body_fn, text='② 检测结果')
         status.pack(fill='x', **pad)
         self.status_var = tk.StringVar(value='尚未连接')
         self.override_var = tk.StringVar(value='')
@@ -113,7 +121,7 @@ class App:
         self.override_btn = ttk.Button(status, text='开启 PP 放行', command=self.on_enable_override)
         self.override_btn.pack(anchor='w', padx=10, pady=(6, 10))
 
-        cards = ttk.LabelFrame(self.tab_fn, text='③ 选择功能')
+        cards = ttk.LabelFrame(body_fn, text='③ 选择功能')
         cards.pack(fill='x', **pad)
         row = ttk.Frame(cards)
         row.pack(fill='x', padx=10, pady=(8, 4))
@@ -138,7 +146,7 @@ class App:
         self.all_row.pack(anchor='w', padx=10, pady=(0, 10))
         self.all_row.pack_forget()
 
-        restore = ttk.LabelFrame(self.tab_fn, text='④ 恢复')
+        restore = ttk.LabelFrame(body_fn, text='④ 恢复')
         restore.pack(fill='both', expand=False, **pad)
         self.sessions_tree = ttk.Treeview(restore, columns=('time', 'what', 'note'), show='headings', height=4)
         for column, title, width in (('time', '时间', 150), ('what', '做了什么', 320), ('note', '备注', 240)):
@@ -157,13 +165,50 @@ class App:
 
         log_frame = ttk.LabelFrame(self.root, text='日志')
         log_frame.pack(fill='x', expand=False, padx=10, pady=6)
-        self.log_box = tk.Text(log_frame, height=8, wrap='word', state='disabled')
+        self.log_box = tk.Text(log_frame, height=6, wrap='word', state='disabled')
         self.log_box.pack(fill='both', expand=True, padx=10, pady=8)
 
-        self._build_flash_tab(self.tab_flash)
-        self._build_menu_tab(self.tab_menu)
+        self._build_flash_tab(body_flash)
+        self._build_menu_tab(body_menu)
         self.reload_sessions()
         self._refresh()
+
+    def _scroll_body(self, tab) -> ttk.Frame:
+        """Give a tab its own scroll area with a deliberately small request height.
+
+        Tk asks the notebook for the tallest tab's height. Without this the
+        menu tab alone would push the log pane off the bottom of a 768-pixel
+        screen; with it, the tabs scroll and the log keeps its rows.
+        """
+        outer = ttk.Frame(tab)
+        outer.pack(fill='both', expand=True)
+        canvas = tk.Canvas(outer, highlightthickness=0, borderwidth=0, height=120)
+        bar = ttk.Scrollbar(outer, orient='vertical', command=canvas.yview)
+        canvas.configure(yscrollcommand=bar.set)
+        canvas.pack(side='left', fill='both', expand=True)
+        bar.pack(side='right', fill='y')
+        body = ttk.Frame(canvas)
+        window = canvas.create_window((0, 0), window=body, anchor='nw')
+
+        def fit(_event=None):
+            canvas.configure(scrollregion=canvas.bbox('all'))
+            canvas.itemconfigure(window, width=canvas.winfo_width())
+
+        body.bind('<Configure>', fit)
+        canvas.bind('<Configure>', fit)
+        self._scroll_canvases.append(canvas)
+        return body
+
+    def _on_wheel(self, event):
+        widget = event.widget
+        for _ in range(16):
+            if widget is None:
+                return None
+            if widget in self._scroll_canvases:
+                widget.yview_scroll(-1 if event.delta > 0 else 1, 'units')
+                return 'break'
+            widget = getattr(widget, 'master', None)
+        return None
 
     def _build_card(self, parent, symbol: str, chinese: str, value: int, default_slot: str) -> None:
         card = ttk.LabelFrame(parent, text=symbol)
@@ -687,10 +732,11 @@ class App:
         self.log('请保持热靴空置，关机、拔 USB、再开机，然后重新读取状态核对。')
 
     # -- menu deployment tab ----------------------------------------------
-    PREVIEW = {
-        'menu': ('menu-1.png', 'menu-2.png'),
-        'fl': ('fl-1.png', 'fl-2.png', 'fl-3.png'),
-    }
+    PREVIEW = (
+        ('lut-1.png', '拍摄 1 · 第 14 页'),
+        ('lut-2.png', '创意外观 · 第 1 页'),
+        ('lut-3.png', '创意外观 · 第 3 页'),
+    )
 
     def _build_menu_tab(self, parent) -> None:
         self.menu_root = journal.sessions_root() / 'menu'
@@ -698,11 +744,11 @@ class App:
 
         warn = ttk.LabelFrame(parent, text='使用前必读')
         warn.pack(fill='x', padx=10, pady=8)
-        ttk.Label(warn, justify='left', wraplength=720, text=(
+        ttk.Label(warn, justify='left', wraplength=860, text=(
             '这不是改参数，是把 /dev/nflasha15 整个 300 MiB 分区换掉。\n'
             '· 曾经有一个不同布局的版本让相机按 MENU 毫无反应并整机冷启动，那个版本已停用。\n'
-            '· 分四步：先做一次初始备份，再在本地修补出目标镜像，然后才写入；回退只在有初始备份时可用。\n'
-            '· 不下载、不分发任何镜像文件：修补用的补丁内置在程序里。\n'
+            '· 分五步：初始备份 → 本地修补 → 写入 → 4:3 参数 → 回退。没有初始备份不能做后面任何一步。\n'
+            '· 不下载、不分发任何镜像文件：修补用的补丁内置在程序里，从你自己的分区算出来。\n'
             '· 写入后必须正常关机、完整断电、冷启动。\n'
             '· 本地至少需要 1.2 GB 空闲空间。'
         )).pack(anchor='w', padx=10, pady=8)
@@ -710,29 +756,32 @@ class App:
         backup = ttk.LabelFrame(parent, text='① 初始备份')
         backup.pack(fill='x', padx=10, pady=8)
         self.menu_baseline_var = tk.StringVar()
-        ttk.Label(backup, textvariable=self.menu_baseline_var, wraplength=720,
+        ttk.Label(backup, textvariable=self.menu_baseline_var, wraplength=860,
                   justify='left').pack(anchor='w', padx=10, pady=(8, 4))
         self.menu_backup_btn = ttk.Button(backup, text='执行初始备份', command=self.on_menu_backup)
         self.menu_backup_btn.pack(anchor='w', padx=10, pady=(0, 10))
 
-        patch = ttk.LabelFrame(parent, text='② 修改')
+        patch = ttk.LabelFrame(parent, text='② 修补')
         patch.pack(fill='x', padx=10, pady=8)
-        self.menu_target_var = tk.StringVar(value='menu')
-        row = ttk.Frame(patch)
-        row.pack(anchor='w', padx=10, pady=(8, 4))
-        ttk.Radiobutton(row, text='菜单修改', value='menu', variable=self.menu_target_var,
-                        command=self._refresh_menu_preview).pack(side='left')
-        ttk.Radiobutton(row, text='创意外观 FL（实验版）', value='fl', variable=self.menu_target_var,
-                        command=self._refresh_menu_preview).pack(side='left', padx=12)
+        ttk.Label(patch, justify='left', wraplength=860, text=(
+            '创意外观 LUT：保留 20 款创意外观，并把图片配置文件（PP）和伽玛显示辅助'
+            '移到拍摄辅助第 14 页；照片效果、演示模式回到原来的位置。\n'
+            '下面是改完之后相机上实际的样子。'
+        )).pack(anchor='w', padx=10, pady=(8, 4))
         self.menu_preview_frame = ttk.Frame(patch)
-        self.menu_preview_frame.pack(anchor='w', padx=10, pady=(0, 4))
-        ttk.Label(patch, justify='left', wraplength=720, text=(
-            '菜单修改：PP / S-Log / 四比例 + 复古衣橱，已实机确认。\n'
-            '创意外观 FL：在上面基础上增加创意外观入口和 10 条菜单文字，'
-            '文字已实机确认全部显示；整分区回读有 9 字节文件系统计数差异，不影响使用，尚未修复。'
-        )).pack(anchor='w', padx=10, pady=(0, 4))
+        self.menu_preview_frame.pack(anchor='w', padx=10, pady=(0, 6))
+        for name, caption in self.PREVIEW:
+            cell = ttk.Frame(self.menu_preview_frame)
+            cell.pack(side='left', padx=4, anchor='n')
+            try:
+                image = tk.PhotoImage(file=str(data.data_root() / 'preview' / name)).subsample(3)
+            except Exception:
+                continue
+            self.menu_preview.append(image)
+            ttk.Label(cell, image=image).pack()
+            ttk.Label(cell, text=caption).pack(pady=(2, 0))
         self.menu_pending_var = tk.StringVar(value='尚未修补')
-        ttk.Label(patch, textvariable=self.menu_pending_var, wraplength=720,
+        ttk.Label(patch, textvariable=self.menu_pending_var, wraplength=860,
                   justify='left').pack(anchor='w', padx=10, pady=(0, 4))
         self.menu_patch_btn = ttk.Button(patch, text='修补', command=self.on_menu_patch)
         self.menu_patch_btn.pack(anchor='w', padx=10, pady=(0, 10))
@@ -744,7 +793,7 @@ class App:
 
         aspect = ttk.LabelFrame(parent, text='④ 4:3 保存参数')
         aspect.pack(fill='x', padx=10, pady=8)
-        ttk.Label(aspect, justify='left', wraplength=720, text=(
+        ttk.Label(aspect, justify='left', wraplength=860, text=(
             '四项比例菜单在分区里，但选 4:3 要真的能保存，还需要写 51 项出图尺寸／像素数／'
             'JPEG 容量参数到 /setting/Backup.bin（nflasha2）。\n'
             '这一步是参数写入，不替换分区；写前会记录当前值。'
@@ -760,21 +809,7 @@ class App:
         self.menu_restore_btn.pack(anchor='w', padx=10, pady=8)
 
         self._update_menu_texts()
-        self._refresh_menu_preview()
         self._refresh_menu()
-
-    def _refresh_menu_preview(self) -> None:
-        for widget in self.menu_preview_frame.winfo_children():
-            widget.destroy()
-        self.menu_preview = []
-        for name in self.PREVIEW.get(self.menu_target_var.get(), ()):
-            path = data.data_root() / 'preview' / name
-            try:
-                image = tk.PhotoImage(file=str(path)).subsample(3)
-            except Exception:
-                continue
-            self.menu_preview.append(image)
-            ttk.Label(self.menu_preview_frame, image=image).pack(side='left', padx=4)
 
     def _update_menu_texts(self) -> None:
         info = menu_deploy.baseline_info(self.menu_root)
@@ -786,7 +821,7 @@ class App:
                 f'{info.get("created", "")}，SHA256 {info.get("sha256", "")[:16]}…')
         pending = menu_deploy.pending_info(self.menu_root)
         if pending is None:
-            self.menu_pending_var.set('尚未修补。选好目标后点「修补」，会在本地生成目标镜像。')
+            self.menu_pending_var.set('尚未修补。点「修补」会在本地从初始备份算出目标镜像，相机不参与。')
         else:
             self.menu_pending_var.set(
                 f'已修补：{pending["label"]}，{pending["bytes"]:,} 字节，'
@@ -842,11 +877,10 @@ class App:
     def on_menu_patch(self) -> None:
         if self.busy or menu_deploy.baseline_info(self.menu_root) is None:
             return
-        target = self.menu_target_var.get()
         self._set_busy(True)
 
         def work():
-            return menu_deploy.patch_from_baseline(self.menu_root, target,
+            return menu_deploy.patch_from_baseline(self.menu_root, 'lut',
                                                    progress=self._menu_progress)
 
         self._background(work, self._menu_done)

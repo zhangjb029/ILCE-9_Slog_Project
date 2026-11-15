@@ -39,7 +39,7 @@ def tree(src, prefix):
 datas = [
     (os.path.join(SRC, 'data', 'a9_fn_functions.json'), 'data'),
     (os.path.join(SRC, 'data', 'a9_fn_chinese_names.json'), 'data'),
-    (os.path.join(SRC, 'data', 'fl_patch.bin'), 'data'),
+    (os.path.join(SRC, 'data', 'r11_patch.bin'), 'data'),
 ] + tree(os.path.join(SRC, 'data', 'preview'), 'data/preview') + tree(VENDOR, 'vendor')
 
 binaries = [

@@ -41,8 +41,15 @@ unpacked firmware artifact is distributed with this project.
 Sony, ILCE-9, Picture Profile and S-Log are trademarks of Sony Group
 Corporation. This project is not affiliated with or endorsed by Sony.
 
-Reference project
-=================
+Reference projects
+==================
+
+Erlla/sony-a7m4-custom-firmware
+  https://github.com/Erlla/sony-a7m4-custom-firmware
+  The 17 additional Creative Looks shipped by the R11 build are colour-fitted
+  from the LUT and look definitions in this project. No file from it is
+  redistributed: the A9 uses its own dual-source property records, generated
+  here from that fitting, and only the numeric results travel in the patch.
 
 robinshie/Sony_A7M3
   https://github.com/robinshie/Sony_A7M3
