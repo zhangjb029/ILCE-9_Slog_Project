@@ -321,9 +321,15 @@ def _make_senser(sony, driver, response_timeout=None):
                     self._read_phase = 'payload'
                     output.extend(self._readAll(amount))
                     done += amount
-                    if not (amount & (self.SenserMinSize - 1)):
+                    # minimum is 0 on the 0x0336 service interface, which sends
+                    # payload back-to-back with no 512-byte block padding. The
+                    # upstream code derived minimum once and then ignored it
+                    # here, draining 512 bytes this device never sends: a 1 KiB
+                    # read blocked until timeout, and a 1 MiB read ate the next
+                    # payload block and ended in EPIPE.
+                    if minimum and not (amount & (minimum - 1)):
                         self._read_phase = 'padding drain'
-                        self._read_bounded(self.SenserMinSize)
+                        self._read_bounded(minimum)
                     chunk_size = self.SenserChunkSize
                 remaining -= length
                 if h.size <= self.SenserMaxSize:
@@ -466,7 +472,10 @@ def connect(receipt: Path | None = None, progress=None, *, guard_factory=None,
         auth = sony.SonySenserAuthDevice(driver)
         auth.start()
         auth.authenticate()
-        say('服务模式已认证，正在读取机身参数')
+        # The product ID decides how this device frames service replies, so it
+        # belongs in the log: two ILCE-9 bodies at 6.00 have been seen on
+        # 0x02a9 and on 0x0336, and only the second one runs unpadded.
+        say(f'服务模式已认证（USB 0x{device.idProduct:04x}），正在读取机身参数')
         guard = (guard_factory or ParameterGuard)(_make_senser(sony, driver, response_timeout))
         camera = sony.SonySenserCamera(guard)
         camera.readHasp()
