@@ -14,3 +14,6 @@ dist-debug/
 dist-ci/
 build/a9tool/
 build/entry-*
+build/shots/
+build/capture_tabs.py
+build/make_colorcard.py

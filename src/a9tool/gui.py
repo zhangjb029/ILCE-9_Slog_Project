@@ -87,6 +87,9 @@ class App:
     def _build(self) -> None:
         pad = dict(padx=10, pady=6)
 
+        # Without explicit padding the four Chinese tab labels run together,
+        # because the default theme sizes them for latin text.
+        ttk.Style().configure('TNotebook.Tab', padding=(16, 6))
         self.notebook = ttk.Notebook(self.root)
         self.notebook.pack(fill='both', expand=True, padx=10, pady=(8, 0))
         self.tab_fn = ttk.Frame(self.notebook)
