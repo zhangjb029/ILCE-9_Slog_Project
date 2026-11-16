@@ -54,7 +54,7 @@ def selfcheck() -> int:
     except Exception as error:
         print(f'GUI_FAIL: {type(error).__name__}: {error}')
         return 3 if strict_gui else 0
-    print('gui: 77-row table, 3 tabs' if rows == 77 and len(tabs) == 3
+    print('gui: 77-row table, 4 tabs' if rows == 77 and len(tabs) == 4
           else f'gui: UNEXPECTED rows={rows} tabs={tabs}')
 
     print('SELFCHECK_OK')

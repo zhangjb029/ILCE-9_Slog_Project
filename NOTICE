@@ -44,6 +44,13 @@ Corporation. This project is not affiliated with or endorsed by Sony.
 Reference projects
 ==================
 
+dino2048/ZV-E10-5GHz-WiFi-Unlock
+  https://github.com/dino2048/ZV-E10-5GHz-WiFi-Unlock
+  The 5 GHz unlock approach is cross-checked against this project. Nothing is
+  redistributed from it: the ZV-E10 targets a different configuration number,
+  menu library and configuration set, and the A9 change was derived from the
+  camera's own firmware and verified on hardware here.
+
 Erlla/sony-a7m4-custom-firmware
   https://github.com/Erlla/sony-a7m4-custom-firmware
   The 17 additional Creative Looks shipped by the R11 build are colour-fitted

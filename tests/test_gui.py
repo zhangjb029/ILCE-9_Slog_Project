@@ -101,9 +101,10 @@ class TestGui(unittest.TestCase):
 
     # -- electronic-shutter flash tab --------------------------------------
     def test_tabs_exist(self):
-        self.assertEqual(len(self.app.notebook.tabs()), 3)
+        self.assertEqual(len(self.app.notebook.tabs()), 4)
         self.assertEqual(self.app.notebook.tab(1, 'text'), '电子快门引闪')
         self.assertEqual(self.app.notebook.tab(2, 'text'), '创意外观 LUT')
+        self.assertEqual(self.app.notebook.tab(3, 'text'), '解锁 5GHz WiFi')
 
     def test_flash_buttons_disabled_before_reading(self):
         for button in (self.app.flash_menu_btn, self.app.flash_av_btn):
@@ -176,7 +177,7 @@ class TestGui(unittest.TestCase):
         self.assertEqual(len(self.app.menu_preview), 3)
 
     def test_every_tab_scrolls_so_the_log_keeps_its_rows(self):
-        self.assertEqual(len(self.app._scroll_canvases), 3)
+        self.assertEqual(len(self.app._scroll_canvases), 4)
         self.assertGreaterEqual(int(self.app.log_box.cget('height')), 5)
 
 if __name__ == '__main__':

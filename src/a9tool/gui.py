@@ -13,7 +13,7 @@ from pathlib import Path
 from tkinter import messagebox, ttk
 
 from . import (aspect_params, core, data, errors, flash_av, flash_baseline, flash_service,
-               fnmap, journal, menu_deploy, usbdev)
+               fnmap, journal, menu_deploy, usbdev, wifi_5ghz)
 
 PICTURE_PROFILE = 0x3A
 SLOG_DISPLAY_ASSIST = 0x36
@@ -91,15 +91,18 @@ class App:
         self.tab_fn = ttk.Frame(self.notebook)
         self.tab_flash = ttk.Frame(self.notebook)
         self.tab_menu = ttk.Frame(self.notebook)
+        self.tab_wifi = ttk.Frame(self.notebook)
         self.notebook.add(self.tab_fn, text='Fn 功能')
         self.notebook.add(self.tab_flash, text='电子快门引闪')
         self.notebook.add(self.tab_menu, text='创意外观 LUT')
+        self.notebook.add(self.tab_wifi, text='解锁 5GHz WiFi')
 
         # Each tab scrolls on its own and reports a small requested height, so
         # the log pane below always gets its rows even on a 1024x768 screen.
         body_fn = self._scroll_body(self.tab_fn)
         body_flash = self._scroll_body(self.tab_flash)
         body_menu = self._scroll_body(self.tab_menu)
+        body_wifi = self._scroll_body(self.tab_wifi)
 
         connect = ttk.LabelFrame(body_fn, text='① 连接相机')
         connect.pack(fill='x', **pad)
@@ -170,6 +173,7 @@ class App:
 
         self._build_flash_tab(body_flash)
         self._build_menu_tab(body_menu)
+        self._build_wifi_tab(body_wifi)
         self.reload_sessions()
         self._refresh()
 
@@ -260,6 +264,7 @@ class App:
         self.refresh_btn.configure(state=normal(not self.busy))
         self._refresh_flash()
         self._refresh_menu()
+        self._refresh_wifi()
 
     def _show_status(self) -> None:
         identity = self.handle.identity
@@ -977,6 +982,148 @@ class App:
             self.log(f'初始备份完成：{result["bytes"]:,} 字节，SHA256 {result["sha256"]}')
         self._update_menu_texts()
         self._refresh_menu()
+
+    # -- 5 GHz Wi-Fi tab ---------------------------------------------------
+    def _build_wifi_tab(self, parent) -> None:
+        self.wifi_root = journal.sessions_root() / 'wifi'
+        self.wifi_value = None
+
+        warn = ttk.LabelFrame(parent, text='使用前必读')
+        warn.pack(fill='x', padx=10, pady=8)
+        ttk.Label(warn, justify='left', wraplength=860, text=(
+            '这不是刷固件，也不动发射功率。只改相机备份里的一个字节：00A5000C 由 09 改为 03。\n'
+            '· A9 出厂就带一套能用的 5 GHz 配置（XR77，24 个信道），但默认选中的是另一套（XR83，5 GHz 信道表是空的）。\n'
+            '· 改完重启，「访问点手动设置」里就能扫到 5 GHz 的网络。\n'
+            '· 不换驱动、不碰分区、不改功率。保存走相机自己的正常保存流程。\n'
+            '· 改完必须正常关机、拔 USB、取下电池等约 10 秒，再装回开机。\n'
+            '· 用哪个信道、允许多大功率，按你所在地的法规来——这个工具不改变功率。'
+        )).pack(anchor='w', padx=10, pady=8)
+
+        read = ttk.LabelFrame(parent, text='① 读取当前状态')
+        read.pack(fill='x', padx=10, pady=8)
+        self.wifi_status_var = tk.StringVar(value='尚未读取。先读一次，确认相机处于可修改的状态。')
+        ttk.Label(read, textvariable=self.wifi_status_var, wraplength=860,
+                  justify='left').pack(anchor='w', padx=10, pady=(8, 4))
+        self.wifi_status_btn = ttk.Button(read, text='读取状态', command=self.on_wifi_status)
+        self.wifi_status_btn.pack(anchor='w', padx=10, pady=(0, 10))
+
+        unlock = ttk.LabelFrame(parent, text='② 解锁 5 GHz')
+        unlock.pack(fill='x', padx=10, pady=8)
+        self.wifi_apply_btn = ttk.Button(unlock, text='解锁 5 GHz', command=self.on_wifi_apply)
+        self.wifi_apply_btn.pack(anchor='w', padx=10, pady=8)
+
+        rollback = ttk.LabelFrame(parent, text='③ 恢复')
+        rollback.pack(fill='x', padx=10, pady=8)
+        self.wifi_restore_btn = ttk.Button(rollback, text='恢复成只支持 2.4 GHz',
+                                           command=self.on_wifi_restore)
+        self.wifi_restore_btn.pack(anchor='w', padx=10, pady=8)
+
+        self._refresh_wifi()
+
+    def _refresh_wifi(self) -> None:
+        def normal(ok):
+            return 'normal' if ok else 'disabled'
+
+        busy = self.busy
+        value = self.wifi_value
+        self.wifi_status_btn.configure(state=normal(not busy))
+        self.wifi_apply_btn.configure(state=normal(not busy and value == wifi_5ghz.ORIGINAL))
+        self.wifi_restore_btn.configure(state=normal(not busy and value == wifi_5ghz.TARGET))
+
+    def _wifi_connect(self, work):
+        handle = usbdev.connect(
+            usbdev.load_current_receipt(),
+            progress=self._menu_progress,
+            guard_factory=lambda transport: wifi_5ghz.WifiGuard(transport))
+        try:
+            usbdev.check_identity(handle.identity)
+            return work(handle)
+        finally:
+            handle.close()
+
+    def on_wifi_status(self) -> None:
+        if self.busy:
+            return
+        self._set_busy(True)
+        self._close_main_handle()
+
+        def work():
+            return self._wifi_connect(
+                lambda handle: wifi_5ghz.status(handle.camera, handle.identity, self.wifi_root))
+
+        self._background(work, self._wifi_done)
+
+    def on_wifi_apply(self) -> None:
+        if self.busy or self.wifi_value != wifi_5ghz.ORIGINAL:
+            return
+        if not messagebox.askyesno(
+                '解锁 5 GHz',
+                '会把相机备份里的 00A5000C 由 09 改成 03，然后按相机的正常流程保存。\n\n'
+                '· 只改这一个字节，其他设置不动\n'
+                '· 不改发射功率\n'
+                '· 改完需要完整断电再开机\n\n确定继续吗？', default='no'):
+            return
+        self._set_busy(True)
+        self._close_main_handle()
+
+        def work():
+            return self._wifi_connect(
+                lambda handle: wifi_5ghz.apply(handle.camera, handle.guard, handle.identity,
+                                               self.wifi_root, progress=self._menu_progress))
+
+        self._background(work, self._wifi_done)
+
+    def on_wifi_restore(self) -> None:
+        if self.busy or self.wifi_value != wifi_5ghz.TARGET:
+            return
+        if not messagebox.askyesno(
+                '恢复成只支持 2.4 GHz',
+                '会把 00A5000C 由 03 改回 09，然后保存。\n\n'
+                '其他设置（包括 PP、S-Log、创意外观）都不受影响。\n\n确定继续吗？', default='no'):
+            return
+        self._set_busy(True)
+        self._close_main_handle()
+
+        def work():
+            return self._wifi_connect(
+                lambda handle: wifi_5ghz.restore_to_original(
+                    handle.camera, handle.guard, handle.identity, self.wifi_root,
+                    progress=self._menu_progress))
+
+        self._background(work, self._wifi_done)
+
+    def _wifi_done(self, result, error) -> None:
+        self._set_busy(False)
+        if error is not None:
+            self.log(errors.user_message(error))
+        elif isinstance(result, journal.Session):
+            self.log(f'事务结果：{result.state}')
+            self.log(f'日志：{result.directory}')
+            if result.state in ('ALREADY_AT_TARGET_NO_SAVE', 'SAVED_AND_READBACK_VERIFIED'):
+                self.wifi_value = bytes.fromhex(result.payload['target_hex'])
+            elif result.state == 'ALREADY_AT_ORIGINAL_NO_SAVE':
+                self.wifi_value = wifi_5ghz.ORIGINAL
+            elif result.action == 'wifi_status':
+                self.wifi_value = bytes.fromhex(result.payload['values']['00A5000C'])
+            self.log('请正常关机、拔 USB、取下电池等约 10 秒，再装回开机。')
+        self._update_wifi_text()
+        self._refresh_wifi()
+
+    def _update_wifi_text(self) -> None:
+        value = self.wifi_value
+        if value is None:
+            self.wifi_status_var.set('尚未读取。先读一次，确认相机处于可修改的状态。')
+        elif value == wifi_5ghz.ORIGINAL:
+            self.wifi_status_var.set(
+                '当前 00A5000C = 09：这是原厂状态，只能连 2.4 GHz。可以解锁。')
+        elif value == wifi_5ghz.TARGET:
+            self.wifi_status_var.set(
+                '当前 00A5000C = 03：已解锁，重启后在访问点设置里可以看到 5 GHz 网络。')
+        else:
+            self.wifi_status_var.set(
+                f'当前 00A5000C = {value.hex()}：既不是原厂 09 也不是 03，'
+                '这个工具不处理这种状态，不会做任何写入。')
+
 
 def _slot_number(label: str) -> int:
     return int(label.replace('Fn', ''))

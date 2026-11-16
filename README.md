@@ -6,6 +6,8 @@ Put Picture Profile and S-Log Display Assist into the Fn menu of a Sony A9 (ILCE
 
 **The window now has an "electronic-shutter flash" tab**: read the current state, open the upper-layer rule and the AV eligibility gate as two separate steps, and restore from either journal. The same operations remain available as `python -m a9tool.flash` and `python -m a9tool.flash_av` (read-only by default). As of 2026-11-11 the user confirmed that with both settings open, single-frame electronic shutter actually fires a flash; electronic burst still fires only the first frame, and hardware safety is not verified. Procedure, restore and limits: [delivery notes](docs/FLASH_DELIVERY.zh-CN.md) (Chinese).
 
+**The "Unlock 5 GHz Wi-Fi" tab** makes the camera able to join a 5 GHz router: it changes one byte of the backup (`00A5000C`, `09` → `03`) so the camera uses the 5 GHz regulatory configuration it already ships with. No firmware, no power change. Confirmed on hardware on 2026-11-16: 5 GHz association, FTP transfer, and reconnect after a power cycle.
+
 **The "Creative Look LUT" tab** puts 20 Creative Looks on page 14 of Shooting Assist, moving Picture Profile and Gamma Display Assist there too and letting 照片效果 and 演示模式 return to their own slots. That one replaces a whole partition; it was accepted on hardware on 2026-11-15. It still ships no image and downloads none — the patch lives in the program and applies to a partition you read from your own camera and hash-check. See [the full steps](#creative-look-lut--replaces-a-300-mib-partition).
 
 ---
@@ -274,6 +276,35 @@ If you also wrote the 4:3 parameters, restore them separately from the record th
 - The new menu entries target the `0x4B` layout; `0x4C` keeps its existing organisation.
 - A strict whole-partition readback after cold start was not re-run for R11, so this document does not claim it passes.
 
+## Unlock 5 GHz Wi-Fi  ⚠ writes to the camera's configuration
+
+The fourth tab lets the camera join a **5 GHz** access point. It changes one byte in the camera's backup — not firmware.
+
+**Why one byte is enough.** The A9 ships with two radio-regulatory configurations. The one it selects by default (XR83) has an **empty** 5 GHz channel list, so the camera never offers 5 GHz to an ordinary router. The other (XR77) is already on the camera with 24 usable channels (36–64, 100–140 step 4, and 149/153/157/161/165). Moving the selector from `09` to `03` makes the camera use the configuration it already carries.
+
+**Nothing is downloaded or replaced**: no partition image, no driver, no menu library. The change goes through Sony's own Backup service and is persisted with the camera's normal save path.
+
+### Doing it
+
+1. Camera on, USB in Mass Storage, this camera only. **Set up a 5 GHz-only test SSID** (different name from the 2.4 GHz one) on a channel your region allows; 20 MHz, WPA2-PSK/AES is the least fiddly.
+2. Open the **「解锁 5GHz WiFi」** tab → **「① 读取状态」**. It reads six properties and keeps a full backup. You need to see `00A5000C = 09` before going on.
+3. Press **「② 解锁 5 GHz」** and confirm.
+4. Shut down normally, unplug USB, **take the battery out for about 10 seconds**, put it back and power on.
+5. Camera → Network → Wi-Fi Settings → Access Point Manual Setting, and scan. The 5 GHz SSID should appear.
+
+**Seeing the SSID is not the test.** Register it, run the FTP entry that already worked on 2.4 GHz, then check on the router that the camera is actually associated at 5 GHz, on which channel, with which IP — and transfer a small file. Finally power-cycle completely and reconnect via FTP without opening the settings page first.
+
+### Undoing it
+
+**「③ 恢复成只支持 2.4 GHz」** writes `00A5000C` back to `09`, again through the normal save. Nothing else changes — PP, S-Log and Creative Look settings are untouched, because only this one byte moves.
+
+### Known limits
+
+- **Power is unchanged.** This selects a configuration; it does not raise transmit power or touch calibration. Which channels and how much power are legal is a question about where you are.
+- Verified on one body: 5 GHz association, FTP over channel 161, reconnect after a full power cycle, and a 2.4 GHz regression. Channel 44 association, Direct / TV / multi-camera modes and long-run stress were **not** tested.
+- A normal save may also update the backup file's own counters and checksums, so do not expect the file to differ in exactly one byte.
+- The change requires `00A5000B=09`, `013E0061=0000`, `01071563=00`, `00A50009=00` and `00A5000A=00` to still hold their factory values. If any has moved, the tool refuses and tells you which.
+
 ## If something goes wrong
 
 | Log message | Meaning | What to do |
@@ -340,7 +371,7 @@ To publish a build you made locally instead: GitHub → **Releases** → **Draft
 python -m unittest discover -s tests -t .
 ```
 
-All tests are offline: a `FakeCamera` stands in for the real device, so no camera and no USB backend is needed. 187 tests, including Tk widget-state checks and a subprocess check that the vendored stack imports with site-packages disabled.
+All tests are offline: a `FakeCamera` stands in for the real device, so no camera and no USB backend is needed. 225 tests, including Tk widget-state checks and a subprocess check that the vendored stack imports with site-packages disabled.
 
 ## How it works
 
@@ -349,6 +380,8 @@ The saved byte in an Fn slot is resolved by `viewUnified4.so`'s switch table int
 The PP feature-override property (`0x00880000`, five offsets set to `0x02`) must be enabled first, or the PP-dependent entries resolve to nothing.
 
 ## Acknowledgements
+
+The 5 GHz unlock follows — and is cross-checked against — **[dino2048/ZV-E10-5GHz-WiFi-Unlock](https://github.com/dino2048/ZV-E10-5GHz-WiFi-Unlock)**. That project targets the ZV-E10; none of its menu-library offsets or property values were copied, because the two cameras differ in configuration numbering, menu-library size and available configurations. The A9 uses its own selection mechanism (`00A5000C` → XR77).
 
 **The 17 new Creative Looks are colour-matched from [Erlla/sony-a7m4-custom-firmware](https://github.com/Erlla/sony-a7m4-custom-firmware).** Its LUT and look definitions are what this project fitted against. The implementation on the A9 is a re-adapted dual-source property scheme, not a copy of their files.
 
