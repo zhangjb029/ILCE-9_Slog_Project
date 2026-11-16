@@ -506,6 +506,8 @@ git push origin v1.0.0
 
 `.github/workflows/release.yml` 会跑测试、构建、自检打包产物，然后把 `ILCE-9_Slog_Project.exe` 和 `SHA256SUMS.txt` 挂到对应的 Release 上。同一个 tag 重跑会覆盖附件。
 
+**写发布说明**：在 `docs/releases/<tag>.md` 放一份说明，工作流会拿它的第一行标题当 Release 标题、用整个文件当正文；没有这个文件就退回 GitHub 自动生成的提交列表。
+
 如果你想发布本地构建出来的那个：GitHub → **Releases** → **Draft a new release** → 上传 `dist/ILCE-9_Slog_Project.exe`。
 
 ## 测试

@@ -505,6 +505,8 @@ git push origin v1.0.0
 
 `.github/workflows/release.yml` then runs the tests, builds, self-checks the bundle, and attaches `ILCE-9_Slog_Project.exe` plus `SHA256SUMS.txt` to the Release. Re-running the workflow for the same tag replaces the attached files.
 
+**Release notes**: drop a file at `docs/releases/<tag>.md`. The workflow takes its first heading as the Release title and the whole file as the body; without one it falls back to GitHub's generated commit list.
+
 To publish a build you made locally instead: GitHub → **Releases** → **Draft a new release** → upload `dist/ILCE-9_Slog_Project.exe`.
 
 ## Tests
