@@ -203,6 +203,8 @@ Each of the two settings is guarded by its own packet allowlist, and neither gua
 
 ## Creative Look LUT  ⚠ replaces a 300 MiB partition
 
+> **Status (2026-11-16): not verified end to end on hardware.** The R11 build itself was accepted on a real body, but that was done with a separate deployment script outside this repository. **This program's partition read/write channel** had three implementation gaps ([issue #2](https://github.com/zhangjb029/ILCE-9_Slog_Project/issues/2)); they are fixed in v1.5.2 with offline regression coverage, but nobody has yet run the whole flow on a camera. Know your rollback before the first real deploy.
+
 The third tab replaces the whole `/dev/nflasha15` partition. **This is not a parameter change.** It replaces the partition that holds `/usr`, and a previous attempt with a different layout left the camera cold-starting with no menu at all (that build is withdrawn).
 
 **No image is shipped or downloaded.** The tool reads the camera's own partition, checks it is byte-identical to the factory build, applies the built-in patch, and verifies the result against the candidate SHA256 — all locally, before anything is written. Two hashes pin both ends: `ed835ff9…` going in, `0676e299…` coming out. A partition in any other state is refused, not overwritten.

@@ -100,6 +100,10 @@ class PartitionGuard:
     def sendSenserPacket(self, function, data, oData=None):
         if function == 0x10 and data == struct.pack('<HHB', 0, 0x1f, 0):
             return self.transport.sendSenserPacket(function, data)
+        # oData is the sink PMCA hands over for FileControl reads. Dropping it
+        # here discarded every partition byte and left the caller with an empty
+        # file, so it has to travel through untouched.
+
         if function != PFUNC_FILE_CONTROL:
             raise ValueError('只允许文件控制通道')
         if len(data) < 4:
@@ -123,7 +127,7 @@ class PartitionGuard:
                 raise ValueError('同一会话拒绝第二次写入')
         else:
             raise ValueError(f'文件控制命令 {cmd} 被拒绝')
-        return self.transport.sendSenserPacket(function, data)
+        return self.transport.sendSenserPacket(function, data, oData)
 
 
 def file_sha256(path: Path) -> str:
@@ -178,7 +182,12 @@ def read_partition(camera, path: Path) -> dict:
         finally:
             stream.flush()
             os.fsync(stream.fileno())
-    return dict(sha256=file_sha256(path), bytes=path.stat().st_size)
+    written = path.stat().st_size
+    if written == 0:
+        # A zero-byte file means the sink never received anything — the read
+        # did not happen at all. Say that, rather than "the read was short".
+        raise ValueError('文件通道没有收到任何字节：分区读取没有真正开始')
+    return dict(sha256=file_sha256(path), bytes=written)
 
 
 def _write_json(path: Path, payload: dict) -> None:

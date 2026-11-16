@@ -17,6 +17,10 @@ from . import fnmap
 from .journal import digest
 
 MAX_SERVICE_REPLY = 2 * 1024 * 1024  # the A9 snapshot handler's own limit
+# A reply that is streamed straight to a sink never sits in memory, so the
+# memory cap above does not apply to it. 300 MiB partitions need far more.
+MAX_STREAMED_REPLY = 512 * 1024 * 1024
+MAX_RESPONSE_FRAMES = 1024           # 1 MiB per frame, so 1 GiB of reply
 SERVICE_RESPONSE_SECONDS = 30
 RECEIPT_SCHEMA = 'a9tool-identity-v1'
 RECEIPT_FILENAME = '_receipt.json'
@@ -278,11 +282,34 @@ def _make_senser(sony, driver, response_timeout=None):
                 self._payload_received += len(chunk)
             return b''.join(chunks)
 
+        def _write_request(self, function, data):
+            """Send a request, splitting it into 1 MiB packets like upstream.
+
+            The size field of every packet is the number of bytes still to come,
+            not the size of that packet.
+            """
+            offset = 0
+            while True:
+                header = self.SenserPacketHeader.pack(
+                    size=len(data) - offset, pFunc=function, sequence=self._sequence,
+                    version=0, miconType=0, offsetType=0, response=0)
+                self.driver.write(header + data[offset:offset + self.SenserMaxSize])
+                offset += self.SenserMaxSize
+                if offset >= len(data):
+                    return
+
         def sendSenserPacket(self, function, data, oData=None):
-            if oData is not None or not 0 < len(data) <= self.SenserMaxSize:
+            """One request, one reply.
+
+            ``oData`` is a sink: PMCA passes a file object here for FileControl
+            reads, and expects the bytes to land in it while the return value's
+            second element stays None. Without that, a whole-partition read has
+            nowhere to go but memory — which is why 300 MiB never fit.
+            """
+            if not 0 < len(data):
                 raise ValueError('Unsupported service request size')
-            header = self.SenserPacketHeader.pack(size=len(data), pFunc=function, sequence=self._sequence,
-                                                  version=0, miconType=0, offsetType=0, response=0)
+            sink = oData
+            limit = MAX_SERVICE_REPLY if sink is None else MAX_STREAMED_REPLY
             self._deadline = time.monotonic() + budget
             self._request_function = function
             self._read_calls = self._physical_received = self._payload_received = 0
@@ -290,19 +317,23 @@ def _make_senser(sony, driver, response_timeout=None):
             self._drain_reads = self._drain_nonempty = self._drain_bytes = self._drain_all_zero = 0
             self._wire_tail = b''
             self._usb_product = self.driver.getId()[1]
-            self.driver.write(header + data)
-            output = bytearray()
+            self._write_request(function, data)
+            output = bytearray() if sink is None else None
             minimum = 0 if self._usb_product == 0x0336 else self.SenserMinSize
             remaining = None
             response = None
-            for frame in range(1, 4):
+            frame = 0
+            while True:
+                frame += 1
+                if frame > MAX_RESPONSE_FRAMES:
+                    raise ValueError('Service response exceeds frame limit')
                 self._frame_index = frame
                 self._read_phase = 'response header'
                 padding = max(minimum - self.SenserPacketHeader.size, 0)
                 packet = self._read_bounded(self.SenserPacketHeader.size + padding)
                 h = self.SenserPacketHeader.unpack(packet)
                 self._declared_size, self._response_code = h.size, h.response
-                if h.sequence != self._sequence or h.pFunc != function or h.size > MAX_SERVICE_REPLY:
+                if h.sequence != self._sequence or h.pFunc != function or h.size > limit:
                     raise ValueError('Unexpected service framing or size')
                 if remaining is None:
                     remaining, response = h.size, h.response
@@ -312,14 +343,22 @@ def _make_senser(sony, driver, response_timeout=None):
                 if len(payload) != padding:
                     raise ValueError('Truncated service packet')
                 length = min(h.size, self.SenserMaxSize)
-                output.extend(payload[:length])
-                self._payload_received += min(len(payload), length)
-                done = padding
+                first = payload[:length]
+                self._payload_received += len(first)
+                if sink is None:
+                    output.extend(first)
+                else:
+                    sink.write(first)
+                done = len(first)
                 chunk_size = self.SenserChunkSize - minimum
                 while done < length:
                     amount = min(length - done, chunk_size)
                     self._read_phase = 'payload'
-                    output.extend(self._readAll(amount))
+                    chunk = self._readAll(amount)
+                    if sink is None:
+                        output.extend(chunk)
+                    else:
+                        sink.write(chunk)
                     done += amount
                     # minimum is 0 on the 0x0336 service interface, which sends
                     # payload back-to-back with no 512-byte block padding. The
@@ -332,10 +371,9 @@ def _make_senser(sony, driver, response_timeout=None):
                         self._read_bounded(minimum)
                     chunk_size = self.SenserChunkSize
                 remaining -= length
-                if h.size <= self.SenserMaxSize:
+                if remaining <= 0:
                     self._sequence += 1
-                    return h.response, bytes(output)
-            raise ValueError('Service response exceeds chunk limit')
+                    return h.response, (bytes(output) if sink is None else None)
     return BoundedSenser(driver)
 
 

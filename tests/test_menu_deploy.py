@@ -153,6 +153,16 @@ class TestBackup(Base):
             md.backup(cam, IDENTITY, self.root)
         self.assertFalse((self.root / 'baseline' / 'preimage.bin').exists())
 
+    def test_a_sink_that_received_nothing_is_reported_as_such(self):
+        """Zero bytes means the file channel never worked, not a short read."""
+        class SilentCamera(FakeCamera):
+            def readFile(self, path, out):
+                return 0          # the bytes went to the return value instead
+        target = Path(self._tmp.name) / 'silent.bin'
+        with self.assertRaises(ValueError) as ctx:
+            md.read_partition(SilentCamera(self.factory), target)
+        self.assertIn('没有收到任何字节', str(ctx.exception))
+
 
 class TestPatch(Base):
     def setUp(self):
