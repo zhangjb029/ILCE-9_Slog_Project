@@ -12,6 +12,41 @@ Put Picture Profile and S-Log Display Assist into the Fn menu of a Sony A9 (ILCE
 
 ---
 
+## Change log
+
+### v1.7.0 (2026-11-17)
+
+**New**
+
+- **The Creative Look LUT target is now R12**: 23 looks, FL4–FL6 adding grain, halo and vignette. Menu layout unchanged.
+- **The backup names its build** (new step ②): compares the look module, the menu library and both language resources, and reports whether the camera is on 原厂 6.00 / R8 / R9.1 / R10 / R11 / R12. A whole-partition hash cannot do this — the camera rewrites ext2 mount counters and timestamps at every boot.
+- **The tab is six steps**: backup → identify → patch → write → 4:3 parameters → roll back.
+- **The first backup can be retaken**, with a warning that the new one captures the current state rather than the factory one.
+- Version number in the title bar and on the first tab.
+
+**Fixed**
+
+- **The 300 MiB partition channel**: `oData` was dropped by an intermediate layer, replies were capped at 2 MiB and three frames, and requests were never split and capped at 1 MiB. The tab could not complete its first read. Replies now stream straight to the file, requests leave as 1 MiB packets, and the frame loop runs until the declared total is exhausted. Verified on hardware: the dump matched the release image block for block.
+- **Hashing slowed the UI**: every refresh recomputed SHA256 over 300 MiB, which became noticeable once a backup existed. Cached against file size and mtime.
+
+### v1.6.1 (2026-11-17)
+
+**Fixed**
+
+- **Reverted a regression from v1.5.1**: it decided from the product ID whether reply blocks carry a 512-byte separator. Right for one class of 0x0336 body, disastrous for the other — **every** Fn-slot and flash read/write failed, and a 300 MiB read stopped at the first 32 KB block. Always draining is back (the v1.5.0 behaviour, which the tested hardware needs); bodies that need the other framing set `A9TOOL_UNPADDED=1`.
+
+### v1.6.0 (2026-11-17)
+
+**New**
+
+- **"Unlock 5 GHz Wi-Fi" tab**: changes one byte of the backup, `00A5000C` (09 → 03), so the camera uses the XR77 radio-regulatory configuration it already carries — the default XR83 has an empty 5 GHz channel list. No firmware, no driver, no change to transmit power.
+- Confirmed on hardware: 5 GHz association, channel 161 confirmed on the router with an assigned IP, FTP transfer, reconnect after a full power cycle, and a clean 2.4 GHz regression.
+
+**Fixed**
+
+- A mid-read `Pipe error` no longer says "try another cable" — it says the camera may have dropped off USB and that repeating the attempt will not help.
+- The connect log prints the service-mode product ID.
+
 ## What it does
 
 The A9 has Picture Profile and S-Log Display Assist compiled in, but no menu entry to reach them. This tool writes a one-byte saved value into one of the twelve Fn slots through Sony's own service-mode parameter interface. The camera resolves that byte through its own function table, so the entry appears in the Fn menu. **No firmware is modified.**
