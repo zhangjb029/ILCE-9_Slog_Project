@@ -229,7 +229,7 @@ The tab is five numbered steps. **Each button stays disabled until the step befo
 
 **There is nothing to download or pick.** The patch (51,005 runs, ~1.4 MB) ships inside the program and applies to the partition you read out of your own camera.
 
-**Budget 1.2 GB of free space** per operation: one archive of the current partition, one readback.
+**Budget 1.2 GB of free space** per operation: one archive of the current partition, one readback. Allow 2 GB of RAM too — the patch step holds the partition in memory while it rewrites it.
 
 > This build does not upgrade from the older "Menu" or "Creative Look FL" images. If your camera is still on one, the tool says so and points you at **⑤ 回退** first.
 
