@@ -4,7 +4,7 @@ import unittest
 from pathlib import Path
 from unittest import mock
 
-from a9tool import core, fnmap, gui, journal
+from a9tool import core, firmware_reset, fnmap, gui, journal
 from tests.fakecamera import FakeCamera
 
 
@@ -101,10 +101,11 @@ class TestGui(unittest.TestCase):
 
     # -- electronic-shutter flash tab --------------------------------------
     def test_tabs_exist(self):
-        self.assertEqual(len(self.app.notebook.tabs()), 4)
+        self.assertEqual(len(self.app.notebook.tabs()), 5)
         self.assertEqual(self.app.notebook.tab(1, 'text'), '电子快门引闪')
         self.assertEqual(self.app.notebook.tab(2, 'text'), '创意外观 LUT')
         self.assertEqual(self.app.notebook.tab(3, 'text'), '解锁 5GHz WiFi')
+        self.assertEqual(self.app.notebook.tab(4, 'text'), '强制回退')
 
     def test_flash_buttons_disabled_before_reading(self):
         for button in (self.app.flash_menu_btn, self.app.flash_av_btn):
@@ -177,8 +178,54 @@ class TestGui(unittest.TestCase):
         self.assertEqual(len(self.app.menu_preview), 3)
 
     def test_every_tab_scrolls_so_the_log_keeps_its_rows(self):
-        self.assertEqual(len(self.app._scroll_canvases), 4)
+        self.assertEqual(len(self.app._scroll_canvases), 5)
         self.assertGreaterEqual(int(self.app.log_box.cget('height')), 5)
+
+    # -- force rollback tab -----------------------------------------------
+    def test_reset_buttons_follow_the_reported_version(self):
+        self.app.reset_value = None
+        self.app._refresh_reset()
+        self.assertEqual(str(self.app.reset_open_btn['state']), 'disabled')
+        self.assertEqual(str(self.app.reset_close_btn['state']), 'disabled')
+
+        self.app.reset_value = firmware_reset.V600
+        self.app._refresh_reset()
+        self.assertEqual(str(self.app.reset_open_btn['state']), 'normal')
+        self.assertEqual(str(self.app.reset_close_btn['state']), 'disabled')
+
+        self.app.reset_value = firmware_reset.V500
+        self.app._refresh_reset()
+        self.assertEqual(str(self.app.reset_open_btn['state']), 'disabled')
+        self.assertEqual(str(self.app.reset_close_btn['state']), 'normal')
+
+    def test_reset_tab_explains_the_version_page_check(self):
+        """The user is told to look at the camera's own version page."""
+        texts = []
+        stack = [self.app.tab_reset]
+        while stack:
+            widget = stack.pop()
+            try:
+                texts.append(str(widget.cget('text')))
+            except Exception:
+                pass
+            stack.extend(widget.winfo_children())
+        joined = '\n'.join(texts)
+        self.assertIn('设置 → 版本', joined)
+
+    def test_reset_tab_reminds_about_the_driver_before_the_updater(self):
+        """libusb-win32 has to go before the official updater can see the body."""
+        texts = []
+        stack = [self.app.tab_reset]
+        while stack:
+            widget = stack.pop()
+            try:
+                texts.append(str(widget.cget('text')))
+            except Exception:
+                pass
+            stack.extend(widget.winfo_children())
+        joined = '\n'.join(texts)
+        self.assertIn('libusb', joined)
+        self.assertIn('大容量存储', joined)
 
 if __name__ == '__main__':
     unittest.main()

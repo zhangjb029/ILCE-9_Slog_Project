@@ -88,7 +88,9 @@ def save_receipt(identity: dict, usb_port: dict, root=None) -> Path:
     return path
 
 
-def load_current_receipt(root=None) -> Path | None:
+def load_current_receipt(root=None, identity_check=check_identity) -> Path | None:
+    """``identity_check`` exists for the one tab that has to reach a body whose
+    reported firmware is no longer 6.00; every other caller keeps the default."""
     path = _receipt_root(root) / RECEIPT_FILENAME
     if not path.exists():
         return None
@@ -100,7 +102,7 @@ def load_current_receipt(root=None) -> Path | None:
         return None
     if not 0 <= time.time() - record.get('created_epoch', 0) <= RECEIPT_TTL_SECONDS:
         return None
-    check_identity(record.get('identity', {}))
+    identity_check(record.get('identity', {}))
     return path
 
 
@@ -118,13 +120,13 @@ def discard_receipt(root=None) -> None:
         pass
 
 
-def read_receipt(path: Path) -> dict:
+def read_receipt(path: Path, identity_check=check_identity) -> dict:
     record = json.loads(Path(path).read_text(encoding='utf-8'))
     if record.get('schema') != RECEIPT_SCHEMA:
         raise ValueError('Resume receipt was not written by this tool')
     if not 0 <= time.time() - record.get('created_epoch', 0) <= RECEIPT_TTL_SECONDS:
         raise ValueError('Resume receipt must be less than one hour old')
-    check_identity(record.get('identity', {}))
+    identity_check(record.get('identity', {}))
     return record
 
 
@@ -397,7 +399,7 @@ def _wait_for_service(enumerate_devices, transient_error):
 
 
 def connect(receipt: Path | None = None, progress=None, *, guard_factory=None,
-            response_timeout=None) -> CameraHandle:
+            response_timeout=None, identity_check=check_identity) -> CameraHandle:
     """Open exactly one ILCE-9 and switch it into service mode.
 
     With ``receipt`` (a fresh identity file written before the mode switch) the
@@ -406,6 +408,10 @@ def connect(receipt: Path | None = None, progress=None, *, guard_factory=None,
 
     ``guard_factory`` may supply an operation-specific, more restricted guard;
     leaving it unset preserves the PP/Fn parameter guard.
+
+    ``identity_check`` defaults to the strict model-and-6.00 test. Only the
+    force-rollback tab passes a looser one, because it must be able to reach a
+    body whose reported version it has itself just changed.
     """
     say = progress or (lambda _msg: None)
     usb, util, backend, sony, Generic, BBB, CBI, UsbBackend = _load_dependencies()
@@ -449,9 +455,9 @@ def connect(receipt: Path | None = None, progress=None, *, guard_factory=None,
         expected_port = None
         identity = None
         if receipt is not None:
-            record = read_receipt(receipt)
+            record = read_receipt(receipt, identity_check)
             identity = record['identity']
-            check_identity(identity)
+            identity_check(identity)
             expected_port = record['usb_port']
             if candidates(True):
                 say('使用上次的凭据继续')
@@ -488,7 +494,7 @@ def connect(receipt: Path | None = None, progress=None, *, guard_factory=None,
             version, _ = updater.getFirmwareVersion()
             identity = dict(model=info.modelName, firmware=version,
                             serial_sha256=digest(info.serial.encode()))
-            check_identity(identity)
+            identity_check(identity)
             expected_port = port(device)
             if not expected_port['ports']:
                 raise RuntimeError('USB port path unavailable; cannot bind the service device to this camera')

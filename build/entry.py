@@ -47,6 +47,13 @@ def selfcheck() -> int:
         print(f'PATCH_UNEXPECTED: {runs}')
         return 4
 
+    from a9tool import firmware_reset
+    if (firmware_reset.describe(firmware_reset.V600) != '6.00'
+            or firmware_reset.describe(firmware_reset.V500) != '5.00'):
+        print('RESET_UNEXPECTED: dat4 encoding')
+        return 4
+    print('force rollback: dat4 6.00 <-> 5.00')
+
     # GUI construction needs a desktop. A CI runner may not have one, so a
     # failure here is fatal only when A9TOOL_SELFCHECK_GUI=1 (which is what you
     # should set when verifying a build by hand).
@@ -64,7 +71,7 @@ def selfcheck() -> int:
     except Exception as error:
         print(f'GUI_FAIL: {type(error).__name__}: {error}')
         return 3 if strict_gui else 0
-    print('gui: 77-row table, 4 tabs' if rows == 77 and len(tabs) == 4
+    print('gui: 77-row table, 5 tabs' if rows == 77 and len(tabs) == 5
           else f'gui: UNEXPECTED rows={rows} tabs={tabs}')
 
     print('SELFCHECK_OK')

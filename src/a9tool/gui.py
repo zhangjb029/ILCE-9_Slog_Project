@@ -13,8 +13,8 @@ from pathlib import Path
 from tkinter import messagebox, ttk
 
 from . import __version__
-from . import (aspect_params, core, data, errors, flash_av, flash_baseline, flash_service,
-               fnmap, journal, menu_deploy, usbdev, wifi_5ghz)
+from . import (aspect_params, core, data, errors, firmware_reset, flash_av, flash_baseline,
+               flash_service, fnmap, journal, menu_deploy, usbdev, wifi_5ghz)
 
 PICTURE_PROFILE = 0x3A
 SLOG_DISPLAY_ASSIST = 0x36
@@ -96,10 +96,12 @@ class App:
         self.tab_flash = ttk.Frame(self.notebook)
         self.tab_menu = ttk.Frame(self.notebook)
         self.tab_wifi = ttk.Frame(self.notebook)
+        self.tab_reset = ttk.Frame(self.notebook)
         self.notebook.add(self.tab_fn, text='Fn 功能')
         self.notebook.add(self.tab_flash, text='电子快门引闪')
         self.notebook.add(self.tab_menu, text='创意外观 LUT')
         self.notebook.add(self.tab_wifi, text='解锁 5GHz WiFi')
+        self.notebook.add(self.tab_reset, text='强制回退')
 
         # Each tab scrolls on its own and reports a small requested height, so
         # the log pane below always gets its rows even on a 1024x768 screen.
@@ -107,6 +109,7 @@ class App:
         body_flash = self._scroll_body(self.tab_flash)
         body_menu = self._scroll_body(self.tab_menu)
         body_wifi = self._scroll_body(self.tab_wifi)
+        body_reset = self._scroll_body(self.tab_reset)
 
         connect = ttk.LabelFrame(body_fn, text='① 连接相机')
         connect.pack(fill='x', **pad)
@@ -180,6 +183,7 @@ class App:
         self._build_flash_tab(body_flash)
         self._build_menu_tab(body_menu)
         self._build_wifi_tab(body_wifi)
+        self._build_reset_tab(body_reset)
         self.reload_sessions()
         self._refresh()
 
@@ -271,6 +275,7 @@ class App:
         self._refresh_flash()
         self._refresh_menu()
         self._refresh_wifi()
+        self._refresh_reset()
 
     def _show_status(self) -> None:
         identity = self.handle.identity
@@ -1215,6 +1220,191 @@ class App:
             self.wifi_status_var.set(
                 f'当前 00A5000C = {value.hex()}：既不是原厂 09 也不是 03，'
                 '这个工具不处理这种状态，不会做任何写入。')
+
+
+    # -- force rollback tab ------------------------------------------------
+    def _build_reset_tab(self, parent) -> None:
+        self.reset_root = journal.sessions_root() / 'firmware'
+        self.reset_value = None
+
+        warn = ttk.LabelFrame(parent, text='使用前必读')
+        warn.pack(fill='x', padx=10, pady=8)
+        ttk.Label(warn, justify='left', wraplength=860, text=(
+            '这一步不改固件内容，只改相机自己报告的版本号（/setting/updater/dat4，2 个字节）。\n'
+            '· 官方更新器只肯刷"包版本高于机身自报版本"的相机。把机身写成 5.00，6.00 更新包就又能装了。\n'
+            '· 更新包会把 /usr 等整个固件分区换回原厂——创意外观 LUT 和其它分区改动就此消失。\n'
+            '· 更新会自己把版本号写回 6.00，不需要你手动改回来。已在实机上跑完验证。\n'
+            '· 跑官方更新程序之前，要在设备管理器里把相机的驱动从 libusb-win32 换回 Windows 的「USB 大容量存储设备」。\n'
+            '· 更新期间请接电源或保证电量充足，中途绝不能拔线。'
+        )).pack(anchor='w', padx=10, pady=8)
+
+        read = ttk.LabelFrame(parent, text='① 读取当前版本')
+        read.pack(fill='x', padx=10, pady=8)
+        self.reset_status_var = tk.StringVar(value='尚未读取。先读一次，确认相机现在报告什么版本。')
+        ttk.Label(read, textvariable=self.reset_status_var, wraplength=860,
+                  justify='left').pack(anchor='w', padx=10, pady=(8, 4))
+        self.reset_status_btn = ttk.Button(read, text='读取版本', command=self.on_reset_status)
+        self.reset_status_btn.pack(anchor='w', padx=10, pady=(0, 10))
+
+        open_gate = ttk.LabelFrame(parent, text='② 打开更新门（把机身改成 5.00）')
+        open_gate.pack(fill='x', padx=10, pady=8)
+        ttk.Label(open_gate, justify='left', wraplength=860, text=(
+            '写入后必须完整断电重启，再去相机菜单 → 设置 → 版本 里确认显示的已经是 5.00。\n'
+            '跑官方更新程序之前，还要在设备管理器里把相机的驱动从 libusb-win32 换回 Windows 的'
+            '「USB 大容量存储设备」——官方更新程序认不出 libusb 那一套。'
+        )).pack(anchor='w', padx=10, pady=(8, 4))
+        self.reset_open_btn = ttk.Button(open_gate, text='写入 5.00', command=self.on_reset_open)
+        self.reset_open_btn.pack(anchor='w', padx=10, pady=(0, 10))
+
+        close_gate = ttk.LabelFrame(parent, text='③ 关闭更新门（把机身改回 6.00）')
+        close_gate.pack(fill='x', padx=10, pady=8)
+        ttk.Label(close_gate, justify='left', wraplength=860, text=(
+            '只在两种情况下用：改了 5.00 又不打算更新了，或者更新一直失败想先恢复原样。\n'
+            '更新成功的话，更新器已经写回 6.00，不需要这一步。'
+        )).pack(anchor='w', padx=10, pady=(8, 4))
+        self.reset_close_btn = ttk.Button(close_gate, text='写回 6.00', command=self.on_reset_close)
+        self.reset_close_btn.pack(anchor='w', padx=10, pady=(0, 10))
+
+        guide = ttk.LabelFrame(parent, text='④ 之后怎么做')
+        guide.pack(fill='x', padx=10, pady=8)
+        ttk.Label(guide, justify='left', wraplength=860, text=(
+            '1. 点「写入 5.00」，等日志出现「事务结果：WRITE_VERIFIED」。\n'
+            '2. 正常关机，拔掉 USB，取下电池等约 10 秒，再装回开机。\n'
+            '3. 相机菜单 → 设置 → 版本：确认显示的是 5.00。\n'
+            '   如果仍然显示 6.00，说明没写进去——回来点「读取版本」看 dat4 的实际值，不要直接去更新。\n'
+            '4. 把相机的驱动换回 Windows 自带的「USB 大容量存储设备」（官方更新程序认不出 libusb）：\n'
+            '   设备管理器 → 展开「libusb-win32 devices」→ 右键 ILCE-9 → 更新驱动程序\n'
+            '   → 浏览我的电脑以查找驱动程序 → 让我从计算机上的可用驱动程序列表中选取\n'
+            '   → 勾选「显示兼容硬件」→ 在列表里选中「USB 大容量存储设备」→ 下一步，等它装完。\n'
+            '   资源管理器里重新出现存储卡，就说明换回来了。\n'
+            '5. 用 USB 线把相机连到电脑（连接模式选「大容量存储」），运行原厂 6.00 更新程序，按提示走完。\n'
+            '6. 更新结束后相机自报版本会回到 6.00，创意外观 LUT 等分区改动全部消失。\n\n'
+            '关于设置：更新包里带着一份工厂 Backup.bin，更新脚本会把它覆盖到 /setting，'
+            '所以 Fn 槽位、5GHz 那个字节、4:3 参数很可能也一起回到默认。'
+            '这一点还没有在机身上逐项核对过；如果更新后发现某项没变，'
+            '用「Fn 功能」和「解锁 5GHz WiFi」各自的恢复按钮处理即可。'
+        )).pack(anchor='w', padx=10, pady=8)
+
+        self._update_reset_text()
+        self._refresh_reset()
+
+    def _refresh_reset(self) -> None:
+        def normal(ok):
+            return 'normal' if ok else 'disabled'
+
+        busy = self.busy
+        value = self.reset_value
+        self.reset_status_btn.configure(state=normal(not busy))
+        self.reset_open_btn.configure(state=normal(not busy and value == firmware_reset.V600))
+        self.reset_close_btn.configure(state=normal(not busy and value == firmware_reset.V500))
+
+    def _reset_connect(self, work):
+        """Relaxed identity: this tab must reach a body it has just set to 5.00."""
+        handle = usbdev.connect(
+            usbdev.load_current_receipt(identity_check=firmware_reset.check_identity),
+            progress=self._menu_progress,
+            guard_factory=lambda transport: firmware_reset.Dat4Guard(transport, allow_write=True),
+            identity_check=firmware_reset.check_identity)
+        try:
+            firmware_reset.check_identity(handle.identity)
+            return work(handle)
+        finally:
+            handle.close()
+
+    def on_reset_status(self) -> None:
+        if self.busy:
+            return
+        self._set_busy(True)
+        self._close_main_handle()
+
+        def work():
+            return self._reset_connect(
+                lambda handle: firmware_reset.status(handle.camera, handle.identity,
+                                                    self.reset_root, progress=self._menu_progress))
+
+        self._background(work, self._reset_done)
+
+    def on_reset_open(self) -> None:
+        if self.busy or self.reset_value != firmware_reset.V600:
+            return
+        if not messagebox.askyesno(
+                '把机身版本改成 5.00',
+                '会把相机自报的固件版本由 6.00 改成 5.00。\n\n'
+                '· 固件内容不变，只改版本号\n'
+                '· 改完相机菜单里的版本会显示 5.00\n'
+                '· 之后必须用原厂 6.00 更新包刷一次，否则版本号会一直停在 5.00\n'
+                '· 刷完版本号会由更新器自动写回 6.00\n\n确定继续吗？', default='no'):
+            return
+        self._set_busy(True)
+        self._close_main_handle()
+
+        def work():
+            return self._reset_connect(
+                lambda handle: firmware_reset.open_gate(handle.camera, handle.guard,
+                                                        handle.identity, self.reset_root,
+                                                        progress=self._menu_progress))
+
+        self._background(work, self._reset_done)
+
+    def on_reset_close(self) -> None:
+        if self.busy or self.reset_value != firmware_reset.V500:
+            return
+        if not messagebox.askyesno(
+                '把机身版本改回 6.00',
+                '会把相机自报的固件版本由 5.00 改回 6.00。\n\n'
+                '如果你其实打算更新，请直接去跑原厂更新包，不需要这一步。\n\n确定继续吗？',
+                default='no'):
+            return
+        self._set_busy(True)
+        self._close_main_handle()
+
+        def work():
+            return self._reset_connect(
+                lambda handle: firmware_reset.close_gate(handle.camera, handle.guard,
+                                                         handle.identity, self.reset_root,
+                                                         progress=self._menu_progress))
+
+        self._background(work, self._reset_done)
+
+    def _reset_done(self, result, error) -> None:
+        self._set_busy(False)
+        if error is not None:
+            self.log(errors.user_message(error))
+        elif isinstance(result, journal.Session):
+            self.log(f'事务结果：{result.state}')
+            self.log(f'日志：{result.directory}')
+            if result.action == 'firmware_status':
+                self.reset_value = bytes.fromhex(result.payload['dat4'])
+            elif result.state in ('WRITE_VERIFIED', 'ALREADY_AT_TARGET_NO_WRITE'):
+                self.reset_value = bytes.fromhex(result.payload['target'])
+            if result.action == 'firmware_open_gate' and self.reset_value == firmware_reset.V500:
+                self.log('已改成 5.00。请关机、拔 USB、取下电池约 10 秒再开机，'
+                         '然后到相机菜单 → 设置 → 版本 确认显示 5.00。')
+                self.log('跑官方更新程序之前，记得先把相机的驱动换回去：设备管理器 → '
+                         'libusb-win32 devices → 右键 ILCE-9 → 更新驱动程序 → 浏览我的电脑 → '
+                         '从列表中选取 → 显示兼容硬件 → USB 大容量存储设备 → 下一步。')
+            elif result.action == 'firmware_close_gate' and self.reset_value == firmware_reset.V600:
+                self.log('已改回 6.00。请关机、拔 USB、取下电池约 10 秒再开机，'
+                         '然后在相机菜单 → 设置 → 版本 确认显示 6.00。')
+        self._update_reset_text()
+        self._refresh_reset()
+
+    def _update_reset_text(self) -> None:
+        value = self.reset_value
+        if value is None:
+            self.reset_status_var.set('尚未读取。先读一次，确认相机现在报告什么版本。')
+        elif value == firmware_reset.V600:
+            self.reset_status_var.set(
+                '当前机身自报版本 6.00（dat4 = 00 06）：这是原厂状态。'
+                '要整机回退，可以把它改成 5.00，再用原厂 6.00 更新包刷一次。')
+        elif value == firmware_reset.V500:
+            self.reset_status_var.set(
+                '当前机身自报版本 5.00（dat4 = 00 05）：更新门已打开。'
+                '请去跑原厂 6.00 更新包；更新成功后版本会自动回到 6.00。')
+        else:
+            self.reset_status_var.set(
+                f'当前 dat4 = {value.hex()}（版本 {firmware_reset.describe(value)}）：'
+                '既不是原厂的 6.00 也不是 5.00，这个工具不处理这种状态，不会做任何写入。')
 
 
 def _slot_number(label: str) -> int:

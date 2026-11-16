@@ -12,9 +12,19 @@ Put Picture Profile and S-Log Display Assist into the Fn menu of a Sony A9 (ILCE
 
 **The "Creative Look LUT" tab** puts 23 Creative Looks on page 14 of Shooting Assist, moving Picture Profile and Gamma Display Assist there too and letting 照片效果 and 演示模式 return to their own slots. FL4–FL6 add grain, halo and vignette. That one replaces a whole partition. It still ships no image and downloads none — the patch lives in the program and applies to a partition you read from your own camera and hash-check. See [the full steps](#creative-look-lut--replaces-a-300-mib-partition).
 
+**The "Force rollback" tab** puts the whole camera back to factory using Sony's own 6.00 package: it first changes the version the body reports to 5.00 (two bytes in `/setting/updater/dat4`, nothing in the firmware itself), which makes the updater willing to install 6.00 again. The update rewrites `/usr` and the other firmware partitions, so the Creative Look LUT and every other partition change is gone; when it finishes, the updater writes 6.00 back on its own. See [the full steps](#force-rollback--the-official-package-rewrites-the-firmware).
+
 ---
 
 ## Change log
+
+### v1.8.0 (2026-11-17)
+
+**New**
+
+- **A "force rollback" tab**: changes the version the body reports from 6.00 to 5.00 so Sony's official 6.00 package will install again. That update rewrites `/usr` and the other firmware partitions, so the Creative Look LUT and every other partition change disappears; the updater writes 6.00 back when it finishes.
+- It writes only the two bytes in `/setting/updater/dat4` — no firmware content. The old value reaches disk first, the write is read back byte for byte, one session allows exactly one write, and both the path and the length are pinned in an allowlist.
+- The tab also connects while the body reports 5.00 (every other tab still requires 6.00), so a version that was opened but not updated can be put back.
 
 ### v1.7.0 (2026-11-17)
 
@@ -187,15 +197,16 @@ Each row's "original" value is the value *before that particular write*. If you 
 
 ### Restoring the camera to Windows
 
-When you are done:
+When you are done with this tool, or when the official updater and Explorer need to see the camera again:
 
 1. Close the app.
 2. Right-click Start → **Device Manager**.
-3. Find the camera under **libusb-win32 devices** (or similar).
-4. Right-click → **Uninstall device**, tick **Delete the driver software for this device**.
-5. Unplug and replug the USB cable. Windows reinstalls its own driver; the memory card returns.
+3. Expand **libusb-win32 devices** and right-click the `ILCE-9` entry under it.
+4. **Update driver** → **Browse my computer for drivers** → **Let me pick from a list of available drivers on my computer**.
+5. Tick **Show compatible hardware**, select **USB Mass Storage Device**, click **Next** and wait for it to finish.
+6. The memory card reappears in Explorer when the switch is done.
 
-Uninstall only the camera entry. Leave every other USB device alone.
+Change only the camera entry. Leave every other USB device alone.
 
 ---
 
@@ -401,6 +412,40 @@ The fourth tab lets the camera join a **5 GHz** access point. It changes one byt
 - Verified on one body: 5 GHz association, FTP over channel 161, reconnect after a full power cycle, and a 2.4 GHz regression. Channel 44 association, Direct / TV / multi-camera modes and long-run stress were **not** tested.
 - A normal save may also update the backup file's own counters and checksums, so do not expect the file to differ in exactly one byte.
 - The change requires `00A5000B=09`, `013E0061=0000`, `01071563=00`, `00A50009=00` and `00A5000A=00` to still hold their factory values. If any has moved, the tool refuses and tells you which.
+
+## Force rollback  ⚠ the official package rewrites the firmware
+
+![The tool's "Force rollback" tab](docs/assets/img/tool-reset.png)
+
+The fifth tab takes the camera back to factory **as a whole** — not one partition restored from a backup, but Sony's own updater rewriting the firmware.
+
+**Why it is needed**: the Creative Look LUT replaces a whole partition, and rolling back writes back "the copy you read out at the start". If that copy was not factory to begin with (you switched builds in between), or if what you want is a clean, factory-identical firmware, the only reliable route is to let the official package install over it.
+
+**What it changes**: `/setting/updater/dat4`, two bytes, a little-endian BCD version string. It is not a copy of anything — it is where the value in the camera's own MENU → Setup → Version comes from. Checked on hardware: with it set to 5.00, every service-mode connection that requires 6.00 was refused, which proves this is the source.
+
+The official updater only installs when the package version is higher than the version the body reports, so writing 5.00 makes the 6.00 package installable again. That update rewrites `nflasha15` (/usr), `nflasha3`, `nflasha5` and `nflasha7` back to factory.
+
+### Doing it
+
+1. Open the **Force rollback** tab → **Read version**. Only continue if it says `6.00` (`dat4 = 00 06`).
+2. Click **Write 5.00** and confirm.
+3. Power off normally, unplug USB, **remove the battery for about 10 seconds**, then power on.
+4. **On the camera: MENU → Setup → Version must now say 5.00.** If it still says 6.00, the write did not take — come back, click Read version, and check what `dat4` actually holds. **Do not go on to the update.**
+5. **Put the camera back on Windows' own "USB Mass Storage Device" driver.** The official updater cannot see a libusb device. Device Manager → expand **libusb-win32 devices** → right-click `ILCE-9` → **Update driver** → **Browse my computer for drivers** → **Let me pick from a list of available drivers on my computer** → tick **Show compatible hardware** → select **USB Mass Storage Device** → Next and wait for it to finish. When the memory card reappears in Explorer, the switch is done. This is the same procedure as [restoring the camera to Windows](#restoring-the-camera-to-windows).
+6. Connect the camera by USB in Mass Storage mode and run Sony's official 6.00 updater to completion.
+7. When it finishes the body reports 6.00 again (the updater writes it back), and the Creative Look LUT and every other partition change is gone.
+
+**Use mains power or a full battery, and never unplug during the update.**
+
+### Undoing it
+
+If you write 5.00 and change your mind, or the update keeps failing, **Write 6.00** puts the version back. A successful update does not need this.
+
+### Known limits
+
+- **Settings are very likely reset too.** The official package carries a factory `Backup.bin` (1,090,266 bytes, `0110_backup/…/CX79900_UC2.bin`) and `endupdate.sh` copies it over `/setting/Backup.bin` as it finishes. Fn slots, the 5 GHz byte and the 4:3 parameters therefore probably return to their defaults — **that has not been checked property by property on a body.** If something turns out not to have moved, the Fn and 5 GHz tabs have their own restore buttons.
+- **Exactly one full path is verified**: on 2026-11-17, on this project's own camera, writing 5.00 → the official 6.00 package ran to completion → the version returned to 6.00 by itself. An update that fails part-way, a power cut, or unplugging mid-flash have never been tried.
+- ILCE-9 only. The `dat4` encoding looks identical on the A7R IV A from static inspection, but **nothing there has been tested on hardware**, and this tool does not support that model.
 
 ## If something goes wrong
 
