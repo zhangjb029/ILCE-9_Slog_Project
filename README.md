@@ -1,5 +1,7 @@
 # ILCE-9_Slog_Project
 
+![A9 Creative Look colour chart: the factory baseline against all 23 looks](docs/assets/img/r12-all-looks.png)
+
 Put Picture Profile and S-Log Display Assist into the Fn menu of a Sony A9 (ILCE-9, firmware 6.00) — plus 75 other functions the camera ships with but never exposes.
 
 [简体中文](README.zh-CN.md)
@@ -339,23 +341,28 @@ The four ratio entries live in the partition, but the menu alone is not enough. 
 
 If you also wrote the 4:3 parameters, restore them separately from the record that step left behind — it is an independent change.
 
-### Colour character of the 23 looks
+### Colour chart for the 23 looks
 
-These four pages show how each look moves the stock colours. The six swatches are
-the camera's own colour regions (red/yellow/green, cyan/blue/purple); hue is
-rotated as measured, density follows the measured chroma change, and lightness
-uses the mid-tone dL*. **This is the size of the grade, not a rendering** - the
-picture still depends on what you shoot and how the camera processes it.
+R12's real colour tables rendered outside the camera: one set of 24 standard
+patches through the factory baseline and through each of the 23 looks. Every
+patch is computed per pixel with the reconstruction in upstream
+`classic_look_preview.py::sample` — Rec.709-style RGB/YCC interpretation, a
+5x9x9 grid with trilinear interpolation, gamut clipping, 8-bit output. It is
+**not** one averaged filter applied to the whole card, and no Lab average is
+pasted into HSV. The factory column goes through the same model and the real
+stock tables rather than an untreated input card.
 
-The differences are deliberately small: ACROS drops chroma by 36% and Ricoh
-positive by 21%, which reads at a glance; Velvia drops 1%, almost identical to
-stock. The data covers IDs 0-20 (stock, the old three, and the first 17); R12's
-FL4-FL6 are not included.
+**This is a colour-table preview, not a shot JPEG.** Actual output also depends
+on white balance, exposure, creative style and colour management; passing on
+hardware does not make this RGB simulation chromatically calibrated.
+
+The full 24-panel chart is at the top of this page. Below, the same thing
+in four pages of six:
 
 | | |
 |---|---|
-| ![Colour character 1/4](docs/assets/img/colorcard-1.png) | ![Colour character 2/4](docs/assets/img/colorcard-2.png) |
-| ![Colour character 3/4](docs/assets/img/colorcard-3.png) | ![Colour character 4/4](docs/assets/img/colorcard-4.png) |
+| ![Chart 1/4](docs/assets/img/r12-looks-1.png) | ![Chart 2/4](docs/assets/img/r12-looks-2.png) |
+| ![Chart 3/4](docs/assets/img/r12-looks-3.png) | ![Chart 4/4](docs/assets/img/r12-looks-4.png) |
 
 ### Known limits
 
