@@ -67,10 +67,27 @@ jobs:
           TAG: ${{ github.event.inputs.tag || github.ref_name }}
         run: |
           $files = 'dist\ILCE-9_Slog_Project.exe', 'dist\SHA256SUMS.txt'
+
+          # A hand-written note in docs/releases/<tag>.md is what readers see;
+          # its first heading becomes the release title. Without one the release
+          # falls back to GitHub's generated commit list.
+          $notes = Join-Path 'docs\releases' "$env:TAG.md"
+          $title = $env:TAG
+          if (Test-Path $notes) {
+            $first = Get-Content $notes -TotalCount 1
+            if ($first -match '^#\s+(.+)$') { $title = $Matches[1].Trim() }
+            Write-Output "using notes: $notes"
+          }
+
           gh release view $env:TAG --repo $env:GITHUB_REPOSITORY *> $null
           if ($LASTEXITCODE -ne 0) {
-            gh release create $env:TAG --repo $env:GITHUB_REPOSITORY --title $env:TAG `
-              --generate-notes $files
+            if (Test-Path $notes) {
+              gh release create $env:TAG --repo $env:GITHUB_REPOSITORY --title $title `
+                --notes-file $notes $files
+            } else {
+              gh release create $env:TAG --repo $env:GITHUB_REPOSITORY --title $title `
+                --generate-notes $files
+            }
           } else {
             gh release upload $env:TAG --repo $env:GITHUB_REPOSITORY --clobber $files
           }
