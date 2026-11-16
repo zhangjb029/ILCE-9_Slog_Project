@@ -1,443 +1,441 @@
 # ILCE-9_Slog_Project
 
-![A9 Creative Look colour chart: the factory baseline against all 23 looks](docs/assets/img/r12-all-looks.png)
+![A9 创意外观色卡：原厂基线与 23 款外观的色彩对照](docs/assets/img/r12-all-looks.png)
 
-Put Picture Profile and S-Log Display Assist into the Fn menu of a Sony A9 (ILCE-9, firmware 6.00) — plus 75 other functions the camera ships with but never exposes.
+把 Picture Profile（图片配置文件）和 SLog 显示辅助放进 Sony A9（ILCE-9，固件 6.00）的 Fn 菜单——顺带还有相机里本来就有、但官方界面没给入口的另外 75 个功能。
 
-[简体中文](README.zh-CN.md)
+[English](README.en.md)
 
-**The window now has an "electronic-shutter flash" tab**: read the current state, open the upper-layer rule and the AV eligibility gate as two separate steps, and restore from either journal. The same operations remain available as `python -m a9tool.flash` and `python -m a9tool.flash_av` (read-only by default). As of 2026-11-11 the user confirmed that with both settings open, single-frame electronic shutter actually fires a flash; electronic burst still fires only the first frame, and hardware safety is not verified. Procedure, restore and limits: [delivery notes](docs/FLASH_DELIVERY.zh-CN.md) (Chinese).
+**图形界面新增「电子快门引闪」选项卡**：分两步开放上层规则和 AV 资格，
+读取状态、执行和恢复都在窗口里完成。同样的功能也保留两个源码入口
+`python -m a9tool.flash` 和 `python -m a9tool.flash_av`（默认只读）。
+2026-11-11 用户确认两项配置合用后电子单张可实际引闪；电子连拍仍仅首张，
+硬件安全尚未验证。步骤、恢复及限制见[交付说明](docs/FLASH_DELIVERY.zh-CN.md)。
 
-**The "Unlock 5 GHz Wi-Fi" tab** makes the camera able to join a 5 GHz router: it changes one byte of the backup (`00A5000C`, `09` → `03`) so the camera uses the 5 GHz regulatory configuration it already ships with. No firmware, no power change. Confirmed on hardware on 2026-11-16: 5 GHz association, FTP transfer, and reconnect after a power cycle.
+**「解锁 5GHz WiFi」选项卡**让相机连得上 5 GHz 路由器：只改备份里的一个字节
+（`00A5000C` 由 09 改为 03），让相机用它自己本来就带着的那套 5 GHz 法规配置。
+不刷固件、不改功率。2026-11-16 实机确认 5 GHz 关联、FTP 传输和断电重连正常。
 
-**The "Creative Look LUT" tab** puts 23 Creative Looks on page 14 of Shooting Assist, moving Picture Profile and Gamma Display Assist there too and letting 照片效果 and 演示模式 return to their own slots. FL4–FL6 add grain, halo and vignette. That one replaces a whole partition. It still ships no image and downloads none — the patch lives in the program and applies to a partition you read from your own camera and hash-check. See [the full steps](#creative-look-lut--replaces-a-300-mib-partition).
+**「创意外观 LUT」选项卡**把 23 款创意外观装进拍摄辅助第 14 页（新增 FL4–FL6 和颗粒、
+光晕、暗角），同时把图片配置文件和伽玛显示辅助也移到那里，让照片效果、演示模式回到原位。
+这一版是整分区替换。它仍然不下载、不分发任何镜像：补丁在程序里，
+作用在你从自己相机读出、哈希核对过的分区上。见[下面的完整步骤](#创意外观-lut--会替换整个-300-mib-分区)。
 
 ---
 
-## Change log
+## 更新记录
 
-### v1.7.0 (2026-11-17)
+### v1.7.0（2026-11-17）
 
-**New**
+**新功能**
 
-- **The Creative Look LUT target is now R12**: 23 looks, FL4–FL6 adding grain, halo and vignette. Menu layout unchanged.
-- **The backup names its build** (new step ②): compares the look module, the menu library and both language resources, and reports whether the camera is on 原厂 6.00 / R8 / R9.1 / R10 / R11 / R12. A whole-partition hash cannot do this — the camera rewrites ext2 mount counters and timestamps at every boot.
-- **The tab is six steps**: backup → identify → patch → write → 4:3 parameters → roll back.
-- **The first backup can be retaken**, with a warning that the new one captures the current state rather than the factory one.
-- Version number in the title bar and on the first tab.
+- **创意外观 LUT 目标升级到 R12**：23 款外观，新增 FL4 / FL5 / FL6，并加入颗粒、光晕、暗角。菜单布局不变。
+- **备份后自动识别版本**（新增第②步）：比对分区里的外观模块、菜单库和两份语言资源，告诉这台相机是原厂 6.00 / R8 / R9.1 / R10 / R11 / R12 中的哪一个。整分区哈希会被相机开机改写的时间戳破坏，这个识别不会。
+- **选项卡改成六步**：初始备份 → 识别版本 → 修补 → 写入 → 4:3 参数 → 回退。
+- **初始备份可以重做**：覆盖前会说明新备份记录的是当前状态，不是出厂状态。
+- 标题栏和首页显示版本号。
 
-**Fixed**
+**修复**
 
-- **The 300 MiB partition channel**: `oData` was dropped by an intermediate layer, replies were capped at 2 MiB and three frames, and requests were never split and capped at 1 MiB. The tab could not complete its first read. Replies now stream straight to the file, requests leave as 1 MiB packets, and the frame loop runs until the declared total is exhausted. Verified on hardware: the dump matched the release image block for block.
-- **Hashing slowed the UI**: every refresh recomputed SHA256 over 300 MiB, which became noticeable once a backup existed. Cached against file size and mtime.
+- **300 MiB 分区读写通道**：`oData` 被中间层丢弃、回复上限卡在 2 MiB 且最多 3 帧、请求不分块且限制 1 MiB。结果是这个选项卡连第一步读取都完成不了。现在回复直接流式落盘，请求按 1 MiB 切包，帧数按声明总量走。真机已验证：读出的分区能与发布镜像逐块比对。
+- **分区哈希拖慢界面**：每次刷新都给 300 MiB 算 SHA256，有备份之后界面明显卡顿。改为按文件大小和修改时间缓存。
 
-### v1.6.1 (2026-11-17)
+### v1.6.1（2026-11-17）
 
-**Fixed**
+**修复**
 
-- **Reverted a regression from v1.5.1**: it decided from the product ID whether reply blocks carry a 512-byte separator. Right for one class of 0x0336 body, disastrous for the other — **every** Fn-slot and flash read/write failed, and a 300 MiB read stopped at the first 32 KB block. Always draining is back (the v1.5.0 behaviour, which the tested hardware needs); bodies that need the other framing set `A9TOOL_UNPADDED=1`.
+- **回退 v1.5.1 引入的回归**：v1.5.1 按产品号判断回复块之间有没有 512 字节分隔块，对一类 0x0336 机身正确，对另一类则是灾难——Fn 槽位和电子快门引闪的**所有**读写都会失败，300 MiB 读取会停在第一个 32 KB 块。现在恢复成始终读分隔块（v1.5.0 的行为，实测可用），需要另一种模式的机身用环境变量 `A9TOOL_UNPADDED=1`。
 
-### v1.6.0 (2026-11-17)
+### v1.6.0（2026-11-17）
 
-**New**
+**新功能**
 
-- **"Unlock 5 GHz Wi-Fi" tab**: changes one byte of the backup, `00A5000C` (09 → 03), so the camera uses the XR77 radio-regulatory configuration it already carries — the default XR83 has an empty 5 GHz channel list. No firmware, no driver, no change to transmit power.
-- Confirmed on hardware: 5 GHz association, channel 161 confirmed on the router with an assigned IP, FTP transfer, reconnect after a full power cycle, and a clean 2.4 GHz regression.
+- **新增「解锁 5GHz WiFi」选项卡**：只改备份里的一个字节 `00A5000C`（09 → 03），让相机用它本来就带着的 XR77 无线电法规配置——出厂默认选中的 XR83 那一套 5 GHz 信道表是空的。不刷固件、不换驱动、不改发射功率。
+- 实机确认：5 GHz 关联成功，路由器侧确认信道 161 并分配 IP，FTP 传输成功，完整断电后重连，2.4 GHz 回归正常。
 
-**Fixed**
+**修复**
 
-- A mid-read `Pipe error` no longer says "try another cable" — it says the camera may have dropped off USB and that repeating the attempt will not help.
-- The connect log prints the service-mode product ID.
+- 读取中途的 `Pipe error` 不再提示「换线换口」——改为说明相机可能已掉线、同一处反复失败就别再重试。
+- 连接日志打印服务模式的产品号，方便定位。
 
-## What it does
+## 它做什么
 
-![The tool's Fn tab](docs/assets/img/tool-fn.png)
+![工具的「Fn 功能」选项卡](docs/assets/img/tool-fn.png)
 
-The A9 has Picture Profile and S-Log Display Assist compiled in, but no menu entry to reach them. This tool writes a one-byte saved value into one of the twelve Fn slots through Sony's own service-mode parameter interface. The camera resolves that byte through its own function table, so the entry appears in the Fn menu. **No firmware is modified.**
+A9 里编译进了 Picture Profile 和 SLog 显示辅助，但没有菜单入口。这个工具通过索尼自己的服务模式参数接口，往十二个 Fn 槽位之一写入一个字节的保存值。相机用**自己的**函数表解析这个字节，于是入口就出现在 Fn 菜单里。**没有改固件。**
 
-Two functions have been confirmed on real hardware:
+两项功能已在实机上确认可用：
 
-| Function | Saved value | Result on camera |
+| 功能 | 保存值 | 实机结果 |
 |---|---|---|
-| Picture Profile | `0x3A` | Fn slot shows the entry, the recorded image changes, survives a restart |
-| S-Log Display Assist | `0x36` | Fn slot shows the entry, works, survives a restart |
+| Picture Profile | `0x3A` | Fn 出现入口，录制画面变化，重启后仍在 |
+| SLog 显示辅助 | `0x36` | Fn 出现入口，功能正常，重启后仍在 |
 
-The other 75 values come from the camera's own function table and are selectable in the app. **None of them has been tested on hardware.** One — Pixel Shift Multi Shooting (`0x64`) — is known to hang the camera after the first frame and require a battery pull; the app marks it red and asks twice.
+另外 75 个保存值来自相机自己的函数表，在程序里可以选。**这些都没有在实机上验证过。** 其中一个——像素转换多重拍摄（`0x64`）——已知会在拍完第一张后卡死、需要拔电池，程序里标红并会二次确认。
 
-## Requirements
+## 前提
 
-- Sony **ILCE-9** with firmware **6.00**. Nothing else. The app reads the model and version first and refuses everything else before writing.
-- Windows 10 or 11.
-- [Zadig](https://zadig.akeo.ie/) — free, no install needed. You will use it twice.
-- One battery, charged. A USB data cable (not a charge-only cable).
-
-> **The app's interface is in Chinese.** Every step below gives the Chinese button label with its meaning, so you can follow it without reading Chinese.
+- Sony **ILCE-9**，固件 **6.00**。其他机型和版本一概不支持，程序会在写入前拒绝。
+- Windows 10 或 11。
+- [Zadig](https://zadig.akeo.ie/)——免费、免安装。你会用到它两次。
+- 一块有电的电池，一根能传数据的 USB 线（不是只能充电的线）。
 
 ---
 
-## Step-by-step
+## 一步一步做
 
-This is the whole procedure. If you are an AI agent following it, stop and ask your human before any step marked **⚠ writes to the camera**.
+下面是完整流程。如果你是一个 AI agent 在照着执行：**标了 ⚠ 的步骤会写入相机，请先取得使用者确认再动手。**
 
-### Step 0 — Check the camera
+### 第 0 步：确认相机
 
-On the camera: **MENU → Setup → Version**. It must say **6.00**, and the body must be an **ILCE-9** (not ILCE-9M2).
+相机上 **MENU → 设置 → 版本**，必须显示 **6.00**；机身必须是 **ILCE-9**（不是 ILCE-9M2）。
 
-If not: stop. Different firmware keeps parameters at different addresses, and the app will refuse anyway.
+不符就停手。不同固件版本的参数地址不同，程序本来也会拒绝。
 
-### Step 1 — Get the executable
+### 第 1 步：拿到程序
 
-Download `ILCE-9_Slog_Project.exe` from this repository's **Releases** page. Put it somewhere persistent, e.g. `C:\A9Tool\`.
+在本仓库的 **Releases** 页面下载 `ILCE-9_Slog_Project.exe`，放到一个固定的位置，比如 `C:\A9Tool\`。
 
-There is no installer and no uninstaller. On first run it creates a `sessions` folder next to the exe — that folder holds the backups, **do not delete it**.
+没有安装程序，也没有卸载程序。第一次运行时它会在自己旁边建一个 `sessions` 文件夹存放备份，**不要删掉**。
 
-### Step 2 — Get past SmartScreen
+### 第 2 步：过 Windows 这一关
 
-Double-click. Windows will say *"Windows protected your PC"*. Click **More info → Run anyway**.
+双击。Windows 会弹「Windows 已保护你的电脑」，点 **「更多信息」→「仍要运行」**。
 
-The exe is unsigned (a code-signing certificate costs several hundred dollars a year). Antivirus software may also flag it, because it talks to a USB device directly. The source is in this repository — read it if you want.
+exe 没有数字签名（证书一年几百美元）。杀毒软件也可能报毒，因为它要直接访问 USB 设备。源码就在本仓库里，想确认可以自己读。
 
-### Step 3 — Install the driver for Mass Storage
+### 第 3 步：给「大容量存储」装驱动
 
-1. Camera **off** → connect the USB cable → camera **on**.
-2. If the camera asks how to connect, choose **Mass Storage**. The memory card should appear in Windows Explorer.
-3. Open **Zadig**.
-4. **Options → List All Devices**.
-5. In the dropdown, select your camera — it may appear as `Sony Digital Still Camera` or similar.
-6. Confirm the target driver on the right says **libusb-win32**; use the arrows to change it if it does not.
-7. Click **Install Driver** (or **Replace Driver**) and wait for it to finish.
+1. 相机关机 → 插 USB 线 → 相机开机。
+2. 如果相机问怎么连接，选 **「大容量存储」**。此时 Windows 资源管理器里应该能看到存储卡。
+3. 打开 **Zadig**。
+4. **Options → List All Devices**。
+5. 在下拉列表里选中你的相机，可能显示为 `Sony Digital Still Camera` 之类。
+6. 确认右侧目标驱动是 **libusb-win32**，不是的话点箭头切换。
+7. 点 **Install Driver**（或 **Replace Driver**），等它完成。
 
-> **Do not pick `USB Input Device` / VID `054C` PID `0994`.** That is the camera's USB *input* interface, not the storage device this tool talks to. Replacing its driver breaks that input device on your PC.
+> **不要选中 `USB Input Device` / VID `054C` PID `0994`。** 那是相机的 USB *输入*接口，不是本工具要操作的那个。改错了会让电脑上的输入设备出问题。
 
-**Expect:** after this, Windows Explorer no longer shows the memory card, and you may get a "you need to format this disk" popup. **That is normal. Do not format.** Section "Restoring the camera to Windows" at the end puts it back.
+**会看到：** 之后资源管理器里看不到存储卡了，还可能弹「需要格式化」。
 
-### Step 4 — Connect
+**这是正常的，不要格式化。** 文末「把相机还给 Windows」一节讲了怎么恢复。
 
-1. Run `ILCE-9_Slog_Project.exe`. A single window opens with four numbered sections and a log at the bottom.
-2. Click **连接并检查** (*Connect and check*) in section ① .
+### 第 4 步：连接
 
-**Expect, in the log:**
+1. 双击 `ILCE-9_Slog_Project.exe`。打开一个窗口，从上到下四个编号区域，底部是日志。
+2. 点 ① 区的 **「连接并检查」**。
+
+**正常的话，日志里会出现：**
 
 ```
-已确认 ILCE-9 / 6.00，正在切换服务模式     ← model confirmed, switching to service mode
-服务模式已认证，正在读取机身参数            ← service mode authenticated, reading parameters
+已确认 ILCE-9 / 6.00，正在切换服务模式
+服务模式已认证，正在读取机身参数
 ```
 
-and section ② fills in with model, firmware, and a serial fingerprint.
+然后 ② 区填上机型、固件、序列号指纹。
 
-**If the log says `Service device not found`:** go to step 5.
+**如果日志说 `Service device not found`**：看第 5 步。
 
-**If the log says 没有找到相机 (*no camera found*):** the camera is not in Mass Storage mode, or the driver from step 3 is not installed, or the cable is charge-only.
+**如果日志说「没有找到相机」**：相机没在「大容量存储」模式，或第 3 步的驱动没装好，或线是只能充电的线。
 
-### Step 5 — Install the driver again (only if step 4 failed)
+### 第 5 步：再装一次驱动（只在第 4 步失败时）
 
-Service mode is a **different USB device** and needs its own driver install. This is normal and expected.
+服务模式是一个**不同的 USB 设备**，需要单独再装一次驱动。这是正常现象。
 
-1. Leave the camera plugged in, exactly as it is.
-2. Open **Zadig** again → **Options → List All Devices**.
-3. A new Sony device is now listed, usually with `(Interface 1)` in the name.
-4. Install **libusb-win32** for it too.
-5. Back in the app, click **重试** (*Retry*).
+1. 相机不要拔线，保持现在的状态。
+2. 再打开 **Zadig** → **Options → List All Devices**。
+3. 列表里会多出一个新的 Sony 设备，名字里通常带 `(Interface 1)`。
+4. 同样给它装 **libusb-win32**。
+5. 回到程序窗口，点 **「重试」**。
 
-**Expect:** the connection completes and section ② fills in.
+> 重试凭据一小时后失效。失效了就拔掉相机、回到大容量存储模式，从第 4 步重来。这一步还没写入任何东西，重来是安全的。
 
-> The retry token expires after one hour. If it does, unplug the camera, return it to Mass Storage, and start again from step 4. Nothing has been written at this point, so restarting is safe.
+### 第 6 步：开启 PP 放行  ⚠ 会写入相机
 
-### Step 6 — Enable the PP override  ⚠ writes to the camera
+② 区显示 **PP 放行：✗ 未开启**。
 
-Section ② shows **PP 放行** (*PP override*) as **✗ 未开启** (*off*).
+点 **「开启 PP 放行」**，确认，等待日志出现成功信息。
 
-Click **开启 PP 放行** (*Enable PP override*), confirm, and wait for **SAVED_AND_READBACK_VERIFIED** or a success message in the log.
+这一步写一个 1024 字节属性里的**五个字节**，**不碰任何 Fn 槽位**。
 
-This writes **five bytes** in one 1024-byte property. It does **not** touch any Fn slot.
+**然后关机重启相机。** 这些参数只在开机时重新读取，不能跳过。
 
-**Then power the camera off and on.** The camera only re-reads these parameters at boot. Do not skip this.
+**如果 ② 区显示 ⚠ 状态异常**：五个字节只改了一部分，程序拒绝写入。用 ④ 区的 **「恢复全部原厂」**，或者重来。
 
-**If section ② shows ⚠ 状态异常 (*inconsistent state*):** the five bytes are partly set. The app refuses to write. Use **恢复全部原厂** (*Restore factory*) in section ④, or start over.
+### 第 7 步：把功能写进槽位  ⚠ 会写入相机
 
-### Step 7 — Write a function into a slot  ⚠ writes to the camera
+重新打开程序，重复第 4 步连接（这次不用再装驱动）。
 
-Run the app again and repeat step 4 (no driver install needed this time).
+③ 区有两个卡片：**Picture Profile** 和 **SLog 显示辅助**。每张卡片下面有槽位下拉（**Fn1**…**Fn12**）和一个写入按钮。
 
-Section ③ now shows two cards: **Picture Profile** and **SLog 显示辅助**. Each has a slot dropdown (**Fn1** … **Fn12**) and a write button.
+1. 选一个槽位。
+2. 点 **「写入」**。
+3. 确认。
 
-1. Pick a slot.
-2. Click the write button (写入).
-3. Confirm.
+要用别的功能，点 **「▸ 全部功能（77 项，多数未验证）」** 展开列表，选一行、选槽位、点「写入所选功能」。
 
-For anything else, expand **▸ 全部功能（77 项，多数未验证）** (*all functions, 77 items, mostly untested*), select a row, choose a slot, click **写入所选功能**.
+**会看到：** 日志出现成功信息，然后**窗口里所有写入按钮变灰**。这是故意的——一次运行只做一次修改，每次修改都有自己的备份。要再改一个槽位，关掉窗口重新打开。
 
-**Expect:** `SAVED_AND_READBACK_VERIFIED` in the log, and **every write button greys out**. That is deliberate — one run of the program performs exactly one change, each with its own backup. To change another slot, close and reopen the app.
+**然后关机重启相机。**
 
-**Then power the camera off and on.**
+### 第 8 步：在相机上确认
 
-### Step 8 — Confirm on the camera
+按 **Fn**，你写入的那个槽位应该变成了对应的功能。
 
-Press **Fn**. The slot you wrote to should now show the function.
+> **「菜单里出现了」不等于「功能能用」。** 十二个槽位都能写进去，相机也都会显示——但显示出来只说明入口存在。Picture Profile 和 SLog 显示辅助是确认能用的；另外 75 个从来没人试过，可能灰显、没反应，甚至卡死。
 
-> **"It appears in the menu" is not "it works."** All twelve slots accept a write and the camera displays the entry — but an entry existing only means the entry exists. Picture Profile and S-Log Display Assist are confirmed working. The other 75 have never been tried on hardware; expect greying out, no effect, or a freeze.
+### 第 9 步：改回去
 
-### Step 9 — Undo
+**撤销一次修改：** ④ 区列出你做过的每一次修改，带时间。点选一行 → **「从备份恢复到原状」** → 重启相机。
 
-**One change:** section ④ lists every write with a timestamp. Select a row → **从备份恢复到原状** (*restore from this backup*) → power-cycle.
+每行的「原值」是**那一次修改之前**的值。如果你连着改了几次，撤销第二次只会回到第一次改完的状态，不是出厂状态。列表里会给这类记录加备注。
 
-Each row's "original" value is the value *before that particular write*. If you made several changes, undoing the second returns you to the state after the first, not to factory. The list marks those rows.
+**全部恢复：** **「恢复全部原厂」** 会把本工具碰过的所有位置写回第一次使用前的值。它也会覆盖你在相机上手动改过的设置。
 
-**Everything:** **恢复全部原厂** (*restore all*) writes back every position this tool has touched, as it was before first use. It will also overwrite settings you changed by hand on the camera.
+### 把相机还给 Windows
 
-### Restoring the camera to Windows
+不用这个工具了之后：
 
-When you are done:
+1. 关掉程序。
+2. 右键「开始」→ **设备管理器**。
+3. 在 **libusb-win32 devices**（或类似分类）下找到相机。
+4. 右键 → **卸载设备**，勾选 **「删除此设备的驱动程序软件」**。
+5. 拔掉 USB 线重新插上。Windows 会自动装回自己的驱动，存储卡回来了。
 
-1. Close the app.
-2. Right-click Start → **Device Manager**.
-3. Find the camera under **libusb-win32 devices** (or similar).
-4. Right-click → **Uninstall device**, tick **Delete the driver software for this device**.
-5. Unplug and replug the USB cable. Windows reinstalls its own driver; the memory card returns.
-
-Uninstall only the camera entry. Leave every other USB device alone.
+只卸相机那一条，别动别的 USB 设备。
 
 ---
 
-## Electronic-shutter flash  ⚠ writes to the camera
+## 电子快门引闪  ⚠ 会写入相机
 
-![The tool's electronic-shutter flash tab](docs/assets/img/tool-flash.png)
+![工具的「电子快门引闪」选项卡](docs/assets/img/tool-flash.png)
 
-This is a second tab in the same window. It lets an electronic shutter fire a flash on the A9. **Nothing here is verified beyond what is written below, and hardware safety has not been established.**
+这是同一个窗口里的第二个选项卡，用来让 A9 的电子快门能引闪。**下面写到的以外都没有验证过，硬件安全也尚未证实。**
 
-**Do this with the camera and the flash both switched off. Take the hot-shoe flash off before connecting.** Put it back only after the app has exited and the camera has been power-cycled and disconnected.
+**操作时相机和闪光灯都要关机。连接之前先把热靴上的闪光灯拆下来**，等程序退出、相机重启并断开 USB 之后，再装回去。
 
-### What is known
+### 已知情况
 
-| Situation | Result |
+| 场景 | 结果 |
 |---|---|
-| Electronic shutter, single shot, both settings open | Fires the flash |
-| Electronic shutter faster than 1/160 s | Black band in the frame |
-| Electronic shutter at 1/125 s or slower | Full-frame illumination reported by the user |
-| Mechanical shutter continuous | Fires every frame |
-| Electronic shutter continuous | **First frame only**; the flash icon then greys out |
-| Hardware safety, TTL accuracy, HSS, wireless | Not verified |
+| 电子快门、单张、两项都开启 | 可以引闪 |
+| 电子快门快于 1/160 s | 照片有黑边 |
+| 电子快门 1/125 s 或更慢 | 用户报告全幅照明可用 |
+| 机械快门连拍 | 每张都能闪 |
+| 电子快门连拍 | **只有第一张**，之后图标变成禁止闪光 |
+| 硬件安全、TTL 精度、HSS、无线引闪 | 未验证 |
 
-### Step 1 — Read, which also saves the baseline
+### 第 1 步：读取，同时保存初始备份
 
-Switch to the **电子快门引闪** tab and click **连接并读取状态**.
+切到 **「电子快门引闪」** 选项卡，点 **「连接并读取状态」**。
 
-Two values appear: the upper-layer rule (`45`) and the AV eligibility byte (`AD`). **The first successful read also writes a baseline into `sessions\flash_baseline\`.** That baseline is what the restore button puts back. Until it exists, both write buttons stay grey on purpose — you cannot reach a state you have no way to undo from the same window.
+界面上会出现两个值：上层规则（`45`）和 AV 资格字节（`AD`）。**第一次读取成功时，程序会把这两项存成初始备份**，放在 `sessions\flash_baseline\`。恢复按钮认的就是这份文件。在它存在之前，两个写入按钮一直是灰的——不让你进入一个没法从这个窗口退回去的状态。
 
-### Step 2 — Open the upper-layer rule  ⚠
+### 第 2 步：开放上层规则  ⚠
 
-With `45 = 1`, click **① 开放上层规则（45：1 → 0）**. Confirm the dialog. Wait for `SAVED_AND_READBACK_VERIFIED` in the log.
+当 `45 = 1` 时，点 **「① 开放上层规则（45：1 → 0）」**，确认弹窗，等日志出现 `SAVED_AND_READBACK_VERIFIED`。
 
-**Power-cycle the camera.** This step alone does not make the flash fire — it only makes the menu item selectable again.
+**然后关机重启相机。** 单独做这一步不会引闪，只是让菜单项恢复可选。
 
-### Step 3 — Open the AV eligibility  ⚠
+### 第 3 步：开放 AV 资格  ⚠
 
-Reconnect, read the state again (it should show `45 = 0`), then click **② 开放 AV 资格（AD：0 → 1）**. Confirm. Wait for the same success line, then **power-cycle again**.
+重新连接、再读一次状态（此时应显示 `45 = 0`），然后点 **「② 开放 AV 资格（AD：0 → 1）」**，确认，等到同样的成功提示，**再关机重启一次**。
 
-With both open, single-frame electronic shutter fires the flash.
+两项都开启后，电子快门单张就能引闪。
 
-### Step 4 — Undo
+### 第 4 步：改回去
 
-Open the tab and click **恢复到初始备份**. It writes both properties back to the values captured on the first read and tells you which ones actually needed restoring. If the baseline was recorded on a different camera body, it refuses.
+打开选项卡，点 **「恢复到初始备份」**。它会把两项都写回第一次读取时的值，并告诉你实际恢复了哪几项。如果这份备份是在另一台机身上记的，它会拒绝执行。
 
-### Why it takes two connections
+### 为什么要点两次连接
 
-Each of the two settings is guarded by its own packet allowlist, and neither guard permits the other's property. The tab therefore opens a fresh connection per step, and closes the Fn session first. A read or a write takes about as long as the connect step in the Fn tab.
+两处配置各自有一套报文白名单，互相不认对方的属性。所以选项卡每做一步都要重新建立一次连接，并且会先断开 Fn 那边的会话。读一次或写一次，耗时和 Fn 选项卡里的「连接并检查」差不多。
 
-## Creative Look LUT  ⚠ replaces a 300 MiB partition
+## 创意外观 LUT  ⚠ 会替换整个 300 MiB 分区
 
-![The tool's Creative Look LUT tab](docs/assets/img/tool-lut.png)
+![工具的「创意外观 LUT」选项卡](docs/assets/img/tool-lut.png)
 
-> **Status (2026-11-17): the read/write channel is verified on hardware.** A 300 MiB partition read completed on a camera, and the data matched the release image block for block — apart from the 13 bytes of ext2 mount counters and timestamps the camera rewrites at every boot. Confirm you know your rollback before patching or writing.
+> **状态（2026-11-17）：读写通道已实机验证。** 300 MiB 分区读取在真机上跑通，读出的数据精确到能与发布镜像逐块比对（只差相机运行时改写的 13 字节 ext2 时间戳）。修补和写入仍建议先确认你知道怎么回退。
 
-The third tab replaces the whole `/dev/nflasha15` partition. **This is not a parameter change.** It replaces the partition that holds `/usr`, and a previous attempt with a different layout left the camera cold-starting with no menu at all (that build is withdrawn).
+第三个选项卡替换整个 `/dev/nflasha15` 分区。**这不是改参数。** 它替换的是装 `/usr` 的那个分区，而此前一个不同布局的版本导致相机按 MENU 毫无反应、整机冷启动——那个版本已停用。
 
-**No image is shipped or downloaded.** The tool reads the camera's own partition, checks it is byte-identical to the factory build, applies the built-in patch, and verifies the result against the candidate SHA256 — all locally, before anything is written. Two hashes pin both ends: `ed835ff9…` going in, `5c0aeb95…` coming out. A partition in any other state is refused, not overwritten.
+**不打包、也不下载任何镜像。** 工具直接读相机自己的分区，确认它与原厂逐字节一致，在本地应用内置的补丁，再算出 SHA256 与候选值比对，全部通过才写入。两头都有哈希钉住：进去时是 `ed835ff9…`，出来必须是 `5c0aeb95…`。分区处于任何其他状态都会被拒绝，而不是覆盖。
 
-That build (called R12 internally) contains: **23 Creative Looks** with grain, halo and vignette, plus Picture Profile and Gamma Display Assist moved onto page 14 of Shooting Assist, alongside the existing four aspect ratios and creative-style entry. 照片效果 and 演示模式 return to the slots PP and the display assist had been occupying.
+这个目标版本（内部编号 R12）带来的是：**23 款创意外观**（含新增的颗粒、光晕、暗角），加上**图片配置文件**和**伽玛显示辅助**并入拍摄辅助第 14 页，以及既有的四项比例和复古衣橱。原本被这两项占用的**照片效果**和**演示模式**回到各自的原始位置。
 
-### After the backup it names the build
+### 备份后会告诉你是哪个版本
 
-Once the partition is read, the tool opens it, pulls out the files that actually
-differ between releases (`lib/a9fl.so`, `lib/viewUnified2.so`,
-`lib/CautionConfig.so`, both language resources), and compares them against a
-bundled fingerprint. It then tells you which of **原厂 6.00 / R8 / R9.1 / R10 /
-R11 / R12** the camera is on.
+读完分区，程序会打开它，取出几个真正区分版本的文件（`lib/a9fl.so`、`lib/viewUnified2.so`、
+`lib/CautionConfig.so`、两份语言资源），和内置的指纹比一遍，然后告诉你这台相机现在是
+**原厂 6.00 / R8 / R9.1 / R10 / R11 / R12** 中的哪一个。
 
-**Why not a whole-partition hash**: the camera rewrites ext2 mount counters and
-timestamps at every boot, so the same build hashes differently each time. Those
-files do not change — which also means a dump taken long after the flash is
-still identifiable.
+**为什么不用整分区哈希**：相机每次开机都会改写 ext2 的挂载计数和时间戳，所以同一个版本
+在不同时间读出来哈希都不一样。那几个文件的内容则不会变，这也意味着——**刷完之后过了很久再备份，
+依然能认出来**。
 
-| Result | Meaning | Next step |
+| 识别结果 | 含义 | 下一步 |
 |---|---|---|
-| 原厂 6.00 | untouched | safe to patch |
-| R12 | already the target | nothing to do |
-| R8 / R9.1 / R10 / R11 | older build | roll back to factory first, then patch |
-| matches nothing | changed by another tool | the tool will not touch it, and lists the files that differ |
+| 原厂 6.00 | 没动过 | 可以修补 |
+| R12 | 已经是目标版本 | 不需要做任何事 |
+| R8 / R9.1 / R10 / R11 | 旧版本 | 先「⑥ 回退」到原厂，再修补 |
+| 对不上任何一个 | 被别的工具改过，或者文件被动过 | 程序不会碰它，会列出是哪几个文件对不上 |
 
-### What the image does and does not carry
+### 这个分区里有什么、没有什么
 
-The partition holds firmware, not camera identity. On the machine this was verified on, the live partition's first 221,609,984 bytes were **byte-identical to the official firmware's `nflasha15`** — no serial, no calibration, no per-body data lives there.
+分区装的是固件，不是机身身份。在验证过的那台机身里，现场分区的前 221,609,984 字节与官方固件里的 `nflasha15` **逐字节相同**——里面没有序列号、没有校准、没有任何按机身唯一的数据。
 
-So the image is portable across ILCE-9 bodies at 6.00. **The features are not.** Opening 4:3 and saving it also needs the companion parameters in `/setting/Backup.bin` (`nflasha2`), which are per-body. A transplanted menu on a body without those parameters will show the entries but not complete the save chain.
+所以镜像可以在同为 6.00 的 ILCE-9 之间通用。**但功能不能。** 打开 4:3 并保存，还需要 `/setting/Backup.bin`（`nflasha2`）里配套的参数，而那是按机身存的。把菜单移植到没有这些参数的机身上，入口会出现，保存链走不完。
 
-### Step 1 — Back up, patch, write — in that order
+### 第 1 步：备份 → 修补 → 写入
 
-The tab is five numbered steps. **Each button stays disabled until the step before it is done.**
+选项卡从左到右就是这五步，**前一步没做完，后一步的按钮是灰的**。
 
-1. **① 初始备份** — read the whole partition and archive it. Read-only; nothing is written. **Without this backup the other four steps are unavailable**, so there is no way to end up half-applied.
-2. **② 识别版本** — read the backup and compare the files that differ between builds, so you know what the camera is on. No camera access.
-3. **③ 修补** — build the target image locally from that backup. The result must hash to `5c0aeb95…` or it stops. The camera is not touched. Enabled only when the backup identified as factory.
-4. **④ 写入相机** — read the live partition once more for the record, write the whole partition in one transfer, read it back to verify.
-5. **⑤ 写入 4:3 保存参数** — see the note below.
-6. **⑥ 回退到初始备份** — write the step-1 backup back at any time.
+1. **① 初始备份** — 完整读出当前分区并存档。只读，不写相机。**没有这份备份，后面四步全部不可用**，也不会生成什么「半套」状态。
+2. **② 识别版本** — 读一遍备份，比对里面几个真正区分版本的文件，告诉你这台相机现在是什么状态。不连相机。
+3. **③ 修补** — 在本地用这份备份算出目标镜像，哈希必须等于 `5c0aeb95…` 才算成功。分区不动。只有识别为原厂时才能点。
+4. **④ 写入相机** — 再完整读一次现场存档，然后一次性写入整个分区，写完回读校验。
+5. **⑤ 写入 4:3 保存参数** — 见下面的说明。
+6. **⑥ 回退到初始备份** — 随时可以退回第 1 步存下的原厂状态。
 
-**The first backup can be retaken.** Pressing ① asks first: if the camera is no longer at factory, the new backup is not a factory backup, and rolling back later returns to that state rather than to the factory one.
+**初始备份可以重做。** 点「① 执行初始备份」时会先确认：如果相机现在已经不是原厂，新备份就不是原厂——之后「回退」会退到现在的状态，而不是出厂状态。
 
-**There is nothing to download or pick.** The patch (51,005 runs, ~1.4 MB) ships inside the program and applies to the partition you read out of your own camera.
+**没有要下载或选择的文件。** 补丁（51,005 段、约 1.4 MB）内置在程序里，作用在你自己读出来的分区上。
 
-**Budget 1.2 GB of free space** per operation: one archive of the current partition, one readback. Allow 2 GB of RAM too — the patch step holds the partition in memory while it rewrites it.
+**每次操作预留 1.2 GB 空闲空间**：一份当前分区存档，一份回读结果。内存建议 2 GB 以上——「修补」那一步会把分区读进内存再改写。
 
-> This build does not upgrade from the older "Menu" or "Creative Look FL" images. If your camera is still on one, the tool says so and points you at **⑥ 回退** first.
+> 这个版本不再从旧的「菜单修改」「创意外观 FL」两个版本升级。如果你的相机还停在旧版，程序会直接告诉你：先点 **⑥ 回退** 写回初始备份，再重新修补。
 
-> **What the light on the camera tells you**
+> **连接状态怎么判断（很重要）**
 >
-> - Press **读取** or **写入**: if the log shows no error and the camera says it is switching to the album, that is the normal path — **do not unplug**, let it finish.
-> - If the log errors out immediately and the camera drops back to USB Mass Storage, then you may unplug: wait for the camera to show the album, plug back in, and press the same button again right away.
-> - These transfers take minutes. Keep the connection stable — **pulling the cable mid-transfer can corrupt the camera's font data.**
+> - 点「读取」或「写入」之后，**日志里没有报错、相机上显示「切换到相册」之类的提示**——这是正常过程，**不要拔线**，等它自己走完。
+> - 如果点了之后**日志立刻报错、相机又回到 USB 大容量存储界面**——这时才可以拔线：等相机显示相册画面再插上，**一插上就立刻再点一次**读取或写入。
+> - 这个功能的读写要几分钟，期间务必保持连接稳定。**中途断线可能损坏相机字库。**
 
-**Camera on, battery charged, USB stable. Close every other program that talks to the camera.**
+**相机关机后重新开机、电量充足、USB 稳定。关掉其他占用相机的程序。**
 
-### Step 2 — Power cycle
+### 第 2 步：断电重启
 
-Normal shutdown, full power removal, cold start. A warm restart is not enough — the partition is re-read at boot.
+正常关机、完整断电、冷启动。热重启不够——分区是在开机时才重新读取的。
 
-### Step 3 — Confirm
+### 第 3 步：确认
 
-Reconnect, press **MENU** → shooting menu → Shooting Assist, and page to 14/14. Five entries (screenshots from the camera):
+重新连接，按 **MENU** → 拍摄菜单 → 拍摄辅助，翻到第 14 页。应该看到五项（实机截图）：
 
-![Shooting Assist page 14: face registration, registered face priority, creative look, picture profile, gamma display assist](docs/assets/img/lut-1.png)
+![拍摄辅助第 14 页：人脸登记、登记的人脸优先、创意外观、图片配置文件、伽玛显示辅助](docs/assets/img/lut-1.png)
 
-Open **Creative Look** and page to the end of the list to see the new FL4 / FL5 / FL6:
+进入「创意外观」，翻到列表末尾能看到新增的 FL4 / FL5 / FL6：
 
-![Creative Look list: Ricoh negative, FX2 FL2, FX2 FL3, FL4 classic negative, FL5 classic documentary, FL6 natural portrait](docs/assets/img/looks-list.png)
+![创意外观列表：理光负片、FX2 FL2、FX2 FL3、FL4 经典负片、FL5 经典纪实、FL6 自然人像](docs/assets/img/looks-list.png)
 
-Page 3 holds the three R12 additions — grain, halo and vignette:
+第 3 页是 R12 新加的三项——颗粒、光晕、暗角：
 
-![Creative Look page 3: highlight, white point, grain, halo, vignette, save](docs/assets/img/looks-page3.png)
+![创意外观第 3 页：亮部、白位、颗粒、光晕、暗角、保存](docs/assets/img/looks-page3.png)
 
-照片效果 should be back at Shooting 1 page 12, and 演示模式 back in the Setup menu — both had been displaced by PP and the display assist.
+「照片效果」应该回到拍摄 1 第 12 页，「演示模式」回到设置第 3 页——这两项原本被 PP 和伽玛辅助顶掉了，现在各自归位。
 
-### Step 4 — 4:3 save parameters
+### 第 4 步：4:3 保存参数
 
-The four ratio entries live in the partition, but the menu alone is not enough. Selecting 4:3 and actually saving also needs 51 output-size, pixel-count and JPEG-capacity parameters written to `/setting/Backup.bin` on `nflasha2` — that file is per-body and not part of the partition.
+四项比例菜单在分区里，但只有菜单还不够。选 4:3 要真的能保存，还得把 51 项出图尺寸、像素数、JPEG 容量参数写进 `/setting/Backup.bin`（`nflasha2`）——那是按机身存的，不在分区里。
 
-**This step is a parameter write, not a partition swap.** It records the current values first, and can be restored on its own.
+**这一步是参数写入，不替换分区**，写前会记录当前值，也可以单独恢复。
 
-### Undo
+### 改回去
 
-**回退到初始备份** writes the partition captured before the first deploy back to the camera. It refuses if that backup is missing or damaged.
+**「回退到初始备份」** 会把第一次部署前保存的分区写回相机。备份缺失或损坏时它会拒绝执行。
 
-If you also wrote the 4:3 parameters, restore them separately from the record that step left behind — it is an independent change.
+如果还写过 4:3 参数，需要的话用参数那一步留下的记录单独还原——它是独立的一份。
 
-### Colour chart for the 23 looks
+### 23 款外观的色卡
 
-R12's real colour tables rendered outside the camera: one set of 24 standard
-patches through the factory baseline and through each of the 23 looks. Every
-patch is computed per pixel with the reconstruction in upstream
-`classic_look_preview.py::sample` — Rec.709-style RGB/YCC interpretation, a
-5x9x9 grid with trilinear interpolation, gamut clipping, 8-bit output. It is
-**not** one averaged filter applied to the whole card, and no Lab average is
-pasted into HSV. The factory column goes through the same model and the real
-stock tables rather than an untreated input card.
+用 R12 的真实色表在机外做色彩模拟：同一组 24 个标准色块，分别过原厂基线和 23 款外观。
+每块都是逐像素按上游 `classic_look_preview.py::sample` 的重建算法算出来的——Rec.709 式的
+RGB/YCC 解释、5×9×9 网格三线性插值、色域裁切、8 位输出——**不是给整张卡套一个平均滤镜**，
+也没有把 Lab 平均值硬套到 HSV 上。原厂那一栏同样过这套模型和真实的原厂色表，不是拿未处理的输入充数。
 
-**This is a colour-table preview, not a shot JPEG.** Actual output also depends
-on white balance, exposure, creative style and colour management; passing on
-hardware does not make this RGB simulation chromatically calibrated.
+**这是色表预览，不是实拍 JPEG。** 实际成像还受白平衡、曝光、创意风格和色彩管理影响；
+功能在实机上通过，也不等于这个 RGB 模拟已经做过色度标定。
 
-The full 24-panel chart is at the top of this page. Below, the same thing
-in four pages of six:
+完整 24 方案见开头那张总览，下面是分页的六方案版：
 
 | | |
 |---|---|
-| ![Chart 1/4](docs/assets/img/r12-looks-1.png) | ![Chart 2/4](docs/assets/img/r12-looks-2.png) |
-| ![Chart 3/4](docs/assets/img/r12-looks-3.png) | ![Chart 4/4](docs/assets/img/r12-looks-4.png) |
+| ![色卡 1/4](docs/assets/img/r12-looks-1.png) | ![色卡 2/4](docs/assets/img/r12-looks-2.png) |
+| ![色卡 3/4](docs/assets/img/r12-looks-3.png) | ![色卡 4/4](docs/assets/img/r12-looks-4.png) |
 
-### Known limits
+### 已知限制
 
-- The 23 looks and the menu layout are accepted on hardware; **the colours are not equivalent to Sony, Fujifilm or Ricoh originals** — the 17 new ones are experimental fits.
-- **4:3 JPEG does not work** — the size submenu has no options and the free-frame count reads 0. 4:3 RAW saves once the companion parameters are applied.
-- The new menu entries target the `0x4B` layout; `0x4C` keeps its existing organisation.
-- A whole-partition readback will not match the image byte for byte: the camera rewrites ext2 mount counters and timestamps at boot. File contents do match.
+- 23 款外观和菜单布局已实机验收；**颜色不等同于索尼、富士或理光的原厂效果**，新增 17 款是实验拟合。
+- **4:3 JPEG 不行**——尺寸子菜单没有可选项，可保存张数显示 0；4:3 RAW 在补齐参数后可以保存。
+- R12 的新增菜单针对 `0x4B` 布局；`0x4C` 沿用既有组织。
+- 写入后第一次冷启动整分区回读与镜像的严格一致性：相机运行一次就会改写 ext2 的挂载计数和时间戳，所以整分区哈希不会与镜像完全相同。逐文件内容一致。
 
-## Unlock 5 GHz Wi-Fi  ⚠ writes to the camera's configuration
+## 解锁 5 GHz WiFi  ⚠ 会写入相机配置
 
-![The tool's 5 GHz tab](docs/assets/img/tool-wifi.png)
+![工具的「解锁 5GHz WiFi」选项卡](docs/assets/img/tool-wifi.png)
 
-The fourth tab lets the camera join a **5 GHz** access point. It changes one byte in the camera's backup — not firmware.
+第四个选项卡让 A9 连得上 **5 GHz** 的路由器。改的是相机备份里的一个字节，不是固件。
 
-**Why one byte is enough.** The A9 ships with two radio-regulatory configurations. The one it selects by default (XR83) has an **empty** 5 GHz channel list, so the camera never offers 5 GHz to an ordinary router. The other (XR77) is already on the camera with 24 usable channels (36–64, 100–140 step 4, and 149/153/157/161/165). Moving the selector from `09` to `03` makes the camera use the configuration it already carries.
+**为什么改一个字节就够了**：A9 出厂就带两套无线电法规配置。默认选中的那套（XR83）的 5 GHz 信道表是**空的**，所以相机从来不把 5 GHz 频道报给普通路由器；另一套（XR77）已经装在相机里，有 24 个可用信道（36–64、100–140 步长 4、149/153/157/161/165）。把选择开关从 `09` 改成 `03`，相机就用它自己的第二套配置。
 
-**Nothing is downloaded or replaced**: no partition image, no driver, no menu library. The change goes through Sony's own Backup service and is persisted with the camera's normal save path.
+**不下载、不替换任何东西**：没有分区镜像、没有驱动、没有菜单库。改动通过索尼自己的 Backup 服务写入，再用相机正常的保存流程持久化。
 
-### Doing it
+### 怎么做
 
-1. Camera on, USB in Mass Storage, this camera only. **Set up a 5 GHz-only test SSID** (different name from the 2.4 GHz one) on a channel your region allows; 20 MHz, WPA2-PSK/AES is the least fiddly.
-2. Open the **「解锁 5GHz WiFi」** tab → **「① 读取状态」**. It reads six properties and keeps a full backup. You need to see `00A5000C = 09` before going on.
-3. Press **「② 解锁 5 GHz」** and confirm.
-4. Shut down normally, unplug USB, **take the battery out for about 10 seconds**, put it back and power on.
-5. Camera → Network → Wi-Fi Settings → Access Point Manual Setting, and scan. The 5 GHz SSID should appear.
+1. 相机开机，USB 设为「大容量存储」，只连这一台。**先建一个只开 5 GHz 的测试 SSID**（和 2.4 GHz 不同名），固定一个你所在地区允许的信道；20 MHz、WPA2-PSK/AES 最省事。
+2. 打开 **「解锁 5GHz WiFi」** 选项卡 → **「① 读取状态」**。会读六项配置并保存一份完整备份。看到 `00A5000C = 09` 才能往下走。
+3. 点 **「② 解锁 5 GHz」**，确认。
+4. 正常关机、拔 USB、**取下电池等约 10 秒**，再装回开机。
+5. 相机 →「网络 → Wi-Fi 设置 → 访问点手动设置」，扫描。应该能看到那个 5 GHz 的 SSID。
 
-**Seeing the SSID is not the test.** Register it, run the FTP entry that already worked on 2.4 GHz, then check on the router that the camera is actually associated at 5 GHz, on which channel, with which IP — and transfer a small file. Finally power-cycle completely and reconnect via FTP without opening the settings page first.
+**只看到 SSID 不算成功。** 注册它，用原来在 2.4 GHz 上能用的 FTP 入口触发一次真实连接，再到路由器里确认相机确实关联在 5 GHz、哪个信道、拿到什么 IP，传一个小文件。最后再完整断电一次，不先打开设置页，直接用 FTP 重连。
 
-### Undoing it
+### 改回去
 
-**「③ 恢复成只支持 2.4 GHz」** writes `00A5000C` back to `09`, again through the normal save. Nothing else changes — PP, S-Log and Creative Look settings are untouched, because only this one byte moves.
+**「③ 恢复成只支持 2.4 GHz」** 把 `00A5000C` 写回 `09`，同样走正常保存。其他设置——PP、S-Log、创意外观——都不受影响：它只动这一个字节。
 
-### Known limits
+### 已知限制
 
-- **Power is unchanged.** This selects a configuration; it does not raise transmit power or touch calibration. Which channels and how much power are legal is a question about where you are.
-- Verified on one body: 5 GHz association, FTP over channel 161, reconnect after a full power cycle, and a 2.4 GHz regression. Channel 44 association, Direct / TV / multi-camera modes and long-run stress were **not** tested.
-- A normal save may also update the backup file's own counters and checksums, so do not expect the file to differ in exactly one byte.
-- The change requires `00A5000B=09`, `013E0061=0000`, `01071563=00`, `00A50009=00` and `00A5000A=00` to still hold their factory values. If any has moved, the tool refuses and tells you which.
+- **功率没变。** 这个改动只选配置，不动发射功率，也不做任何校准。用哪个信道、允许多大功率，按你所在地的法规来。
+- 只验证过一个机身的 5 GHz 关联、信道 161 的 FTP 传输、完整断电后重连，以及 2.4 GHz 回归。信道 44 的关联、Direct / TV / 多机模式、长期压力测试都**没有测过**。
+- 正常保存可能顺带更新备份文件自己的计数和校验和，所以别指望「整个备份文件只变一个字节」。
+- 这项修改要求 `00A5000B=09`、`013E0061=0000`、`01071563=00`、`00A50009=00`、`00A5000A=00` 保持原厂值。任何一项被改过，工具会拒绝执行并列出是哪一项。
 
-## If something goes wrong
+## 出问题了怎么办
 
-| Log message | Meaning | What to do |
+| 日志里看到 | 意思 | 怎么办 |
 |---|---|---|
-| `Service device not found` | Camera is in service mode, Windows has no driver for that device | Step 5 |
-| 没有找到相机 | No camera matched | Check Mass Storage mode, driver from step 3, cable |
-| 找到多台相机 | More than one camera plugged in | Unplug the others |
-| `Camera busy during identity request` | Camera reported busy | Power-cycle the camera, close Imaging Edge and similar software, reconnect |
-| 只支持 ILCE-9 固件 6.00 | Wrong model or firmware | Nothing to do — the app refuses by design |
-| `Pipe error` while reading the camera | The transfer broke part-way; the camera may have dropped off USB | Power-cycle, replug. **If it breaks at the same byte every time, stop retrying** and post the log in Issues |
-| `FAILED_REVIEW_REQUIRED` (inside `sessions/…/journal.json`) | A write failed part-way | Keep the `sessions` folder; the camera may have a partial change. Restore from the app before retrying |
+| `Service device not found` | 相机在服务模式，Windows 没有对应驱动 | 第 5 步 |
+| 没有找到相机 | 没有匹配到相机 | 检查大容量存储模式、第 3 步的驱动、线缆 |
+| 找到多台相机 | 插了不止一台 | 拔掉其他的 |
+| `Camera busy during identity request` | 相机一直回「忙」 | 重启相机、关掉 Imaging Edge 之类占用相机的软件、重连 |
+| 只支持 ILCE-9 固件 6.00 | 机型或版本不符 | 无解，程序按设计拒绝 |
+| `Pipe error`（读机身参数时） | USB 传输中途断了，相机可能已经掉线 | 关机再开机、重新插线。**每次都断在同一处就别再重试**，把日志贴到 Issues |
+| `sessions/…/journal.json` 里出现 `FAILED_REVIEW_REQUIRED` | 写入中途失败 | **保留 `sessions` 文件夹**，相机可能有部分改动。先在程序里恢复，再重试 |
 
-Every write records a journal in `sessions/<timestamp>/` next to the exe. If you ask for help, include that file's `state` and `error` fields plus the log from the bottom of the window — **not** the whole `Backup-original.bin`, which contains camera configuration data.
-
----
-
-## Safety
-
-Every write saves a full backup and a transaction journal next to the executable **before** touching the camera, and every write can be undone from the app.
-
-This is not a Sony tool. Modifying camera parameters may void your warranty. Use it on your own camera, at your own risk.
+每次写入都会在 exe 旁边的 `sessions/<时间戳>/` 留下事务记录。求助时请提供该文件的 `state` 和 `error` 字段，加上窗口底部的日志——**不要**提供整份 `Backup-original.bin`，里面有相机配置数据。
 
 ---
 
-## Building
+## 安全性
 
-Build-time only; end users need nothing installed.
+每次写入之前，程序都会在 exe 旁边存一份完整备份和事务记录，然后才碰相机；每次写入都可以在程序里撤销。
+
+这不是索尼的工具。修改相机参数可能导致保修失效。请在自己的相机上、自担风险地使用。
+
+---
+
+## 自己构建
+
+只对构建者需要，最终用户什么都不用装。
 
 ```powershell
 pip install pyinstaller
 powershell -File build/build_exe.ps1
 ```
 
-Output: `dist/ILCE-9_Slog_Project.exe` (~15 MB, onefile, unsigned).
+产物：`dist/ILCE-9_Slog_Project.exe`（约 15 MB，单文件，未签名）。
 
-Verify the bundle without a camera:
+不接相机也能验证打包产物：
 
 ```powershell
 $env:A9TOOL_CONSOLE=1
@@ -445,51 +443,51 @@ python -m PyInstaller build/a9tool.spec --clean --noconfirm
 $env:A9TOOL_SELFCHECK=1; .\dist\ILCE-9_Slog_Project.exe
 ```
 
-A windowed exe has no console, so build with `A9TOOL_CONSOLE=1` to read the output. It checks the JSON tables, the sessions path, the bundled libusb backend, and that the main window constructs with all 77 rows.
+窗口版没有控制台，所以要用 `A9TOOL_CONSOLE=1` 构建才能看到输出。它会检查 JSON 表、`sessions` 路径、包内 libusb 后端，以及主窗口能否构造出全部 77 行。
 
-## Publishing a release
+## 发布 Release
 
-**The exe is not in git.** `.gitignore` excludes it, so a Release built from the repository alone has no download. `build/entry.py` is what the workflow runs.
+**exe 不在 git 里。** `.gitignore` 把它排除了，所以直接拿仓库做出来的 Release 里没有可下载的文件。
 
-Push a tag:
+推一个 tag：
 
 ```bash
 git tag v1.0.0
 git push origin v1.0.0
 ```
 
-`.github/workflows/release.yml` then runs the tests, builds, self-checks the bundle, and attaches `ILCE-9_Slog_Project.exe` plus `SHA256SUMS.txt` to the Release. Re-running the workflow for the same tag replaces the attached files.
+`.github/workflows/release.yml` 会跑测试、构建、自检打包产物，然后把 `ILCE-9_Slog_Project.exe` 和 `SHA256SUMS.txt` 挂到对应的 Release 上。同一个 tag 重跑会覆盖附件。
 
-To publish a build you made locally instead: GitHub → **Releases** → **Draft a new release** → upload `dist/ILCE-9_Slog_Project.exe`.
+如果你想发布本地构建出来的那个：GitHub → **Releases** → **Draft a new release** → 上传 `dist/ILCE-9_Slog_Project.exe`。
 
-## Tests
+## 测试
 
 ```powershell
 python -m unittest discover -s tests -t .
 ```
 
-All tests are offline: a `FakeCamera` stands in for the real device, so no camera and no USB backend is needed. 236 tests, including Tk widget-state checks and a subprocess check that the vendored stack imports with site-packages disabled.
+全部离线：用 `FakeCamera` 代替真机，不需要相机也不需要 USB 后端。共 236 项，含 Tk 控件状态检查，以及在禁用 site-packages 的子进程里验证 vendored 依赖可导入。
 
-## How it works
+## 原理
 
-The saved byte in an Fn slot is resolved by `viewUnified4.so`'s switch table into an internal node id, then looked up in the Fn runtime root array. That path does not consult the main menu tree, which is why Fn entries work while the settings menu still has no Picture Profile node. The resolver rejects any byte above `0x6E` before the lookup.
+Fn 槽位里的保存字节由 `viewUnified4.so` 的跳转表解析成内部节点 id，再查 Fn 运行根数组。这条路径**不经过主菜单树**，所以 Fn 能出现入口，而设置菜单里依然没有 Picture Profile 节点。解析器在查表前会拒绝任何大于 `0x6E` 的字节。
 
-The PP feature-override property (`0x00880000`, five offsets set to `0x02`) must be enabled first, or the PP-dependent entries resolve to nothing.
+PP 功能放行属性（`0x00880000`，五个偏移置 `0x02`）必须先打开，否则依赖 PP 的条目解析不出东西。
 
-## Acknowledgements
+## 致谢
 
-The 5 GHz unlock follows — and is cross-checked against — **[dino2048/ZV-E10-5GHz-WiFi-Unlock](https://github.com/dino2048/ZV-E10-5GHz-WiFi-Unlock)**. That project targets the ZV-E10; none of its menu-library offsets or property values were copied, because the two cameras differ in configuration numbering, menu-library size and available configurations. The A9 uses its own selection mechanism (`00A5000C` → XR77).
+5 GHz 解锁的思路与交叉验证来自 **[dino2048/ZV-E10-5GHz-WiFi-Unlock](https://github.com/dino2048/ZV-E10-5GHz-WiFi-Unlock)**。那个项目改的是 ZV-E10；A9 上没有照搬它的菜单库偏移或属性值——两台机器的配置编号、菜单库大小和可选配置都不一样。A9 用的是本机自己的一套选择机制（`00A5000C` → XR77）。
 
-**The 17 new Creative Looks are colour-matched from [Erlla/sony-a7m4-custom-firmware](https://github.com/Erlla/sony-a7m4-custom-firmware).** Its LUT and look definitions are what this project fitted against. The implementation on the A9 is a re-adapted dual-source property scheme, not a copy of their files.
+**17 款新增创意外观的配色来源于 [Erlla/sony-a7m4-custom-firmware](https://github.com/Erlla/sony-a7m4-custom-firmware) 的工作。** 该项目的 LUT 与外观定义是本项目拟合的依据；A9 上的实现方式是重新适配的双源属性方案，不是把对方文件直接搬进来。
 
-The menu-transplant approach follows **[robinshie/Sony_A7M3](https://github.com/robinshie/Sony_A7M3)** (MIT), pinned at commit `e6bbfafb55570a5de34e75c195e7e1c780d03340`.
+菜单移植的思路来自 **[robinshie/Sony_A7M3](https://github.com/robinshie/Sony_A7M3)**（MIT），固定提交 `e6bbfafb55570a5de34e75c195e7e1c780d03340`。
 
-Its key insight is what made the transplant work here: attach the change to the **real menu-creation call**, not to `DT_INIT`. An earlier attempt that patched at init time wrote and read back correctly, yet the menu after a restart was unchanged. Everything else — function addresses, property record lengths, the layout of the new entry, the sector-level storage plan — was re-located and re-verified against this camera's own firmware rather than copied, because the A7 III reference differs on every one of those points.
+它的关键做法才让这次移植成立：**把修改挂到真正的菜单创建调用上**，而不是 `DT_INIT`。此前一版在初始化时打补丁，写入和回读都正确，重启后菜单却毫无变化。其余部分——函数地址、属性记录长度、新条目的布局、扇区级的存储方案——都按本机固件重新定位和验证，不是照搬：A7 III 参考版本在这几点上与 A9 全部不同。
 
-The electronic-shutter flash gates and the PP/Fn slot path come from the research in this repository's `analysis/` tree; their reports are cited in the delivery notes.
+电子快门引闪的两处门控，以及 PP/Fn 槽位那条路径，来自本仓库 `analysis/` 下的研究工作，相关报告在交付说明里引用。
 
-## Licence
+## 许可
 
-MIT — see [LICENSE](LICENSE). Third-party components and the origin of the firmware-derived tables are listed in [NOTICE](NOTICE).
+MIT，见 [LICENSE](LICENSE)。第三方组件和固件派生表的来源写在 [NOTICE](NOTICE) 里。
 
-A screenshot-illustrated version of this guide is in `docs/` (`docs/index.html`, `docs/zh-CN/index.html`) — open the file directly in a browser; the images are placeholders until someone takes them on a real machine.
+带截图的版本在 `docs/`（`docs/index.html`、`docs/zh-CN/index.html`），直接用浏览器打开文件即可；图片目前是占位，需要有人在真机上拍。
