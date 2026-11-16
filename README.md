@@ -49,6 +49,8 @@ Put Picture Profile and S-Log Display Assist into the Fn menu of a Sony A9 (ILCE
 
 ## What it does
 
+![The tool's Fn tab](docs/assets/img/tool-fn.png)
+
 The A9 has Picture Profile and S-Log Display Assist compiled in, but no menu entry to reach them. This tool writes a one-byte saved value into one of the twelve Fn slots through Sony's own service-mode parameter interface. The camera resolves that byte through its own function table, so the entry appears in the Fn menu. **No firmware is modified.**
 
 Two functions have been confirmed on real hardware:
@@ -197,6 +199,8 @@ Uninstall only the camera entry. Leave every other USB device alone.
 
 ## Electronic-shutter flash  ⚠ writes to the camera
 
+![The tool's electronic-shutter flash tab](docs/assets/img/tool-flash.png)
+
 This is a second tab in the same window. It lets an electronic shutter fire a flash on the A9. **Nothing here is verified beyond what is written below, and hardware safety has not been established.**
 
 **Do this with the camera and the flash both switched off. Take the hot-shoe flash off before connecting.** Put it back only after the app has exited and the camera has been power-cycled and disconnected.
@@ -239,6 +243,8 @@ Open the tab and click **恢复到初始备份**. It writes both properties back
 Each of the two settings is guarded by its own packet allowlist, and neither guard permits the other's property. The tab therefore opens a fresh connection per step, and closes the Fn session first. A read or a write takes about as long as the connect step in the Fn tab.
 
 ## Creative Look LUT  ⚠ replaces a 300 MiB partition
+
+![The tool's Creative Look LUT tab](docs/assets/img/tool-lut.png)
 
 > **Status (2026-11-17): the read/write channel is verified on hardware.** A 300 MiB partition read completed on a camera, and the data matched the release image block for block — apart from the 13 bytes of ext2 mount counters and timestamps the camera rewrites at every boot. Confirm you know your rollback before patching or writing.
 
@@ -311,13 +317,13 @@ Reconnect, press **MENU** → shooting menu → Shooting Assist, and page to 14/
 
 ![Shooting Assist page 14: face registration, registered face priority, creative look, picture profile, gamma display assist](docs/assets/img/lut-1.png)
 
-Open **Creative Look**, page 1:
+Open **Creative Look** and page to the end of the list to see the new FL4 / FL5 / FL6:
 
-![Creative Look page 1: look, contrast, highlight, shadow, fade, saturation](docs/assets/img/lut-2.png)
+![Creative Look list: Ricoh negative, FX2 FL2, FX2 FL3, FL4 classic negative, FL5 classic documentary, FL6 natural portrait](docs/assets/img/looks-list.png)
 
-Page 3, with **Save** at the bottom:
+Page 3 holds the three R12 additions — grain, halo and vignette:
 
-![Creative Look page 3: highlight, white point, save](docs/assets/img/lut-3.png)
+![Creative Look page 3: highlight, white point, grain, halo, vignette, save](docs/assets/img/looks-page3.png)
 
 照片效果 should be back at Shooting 1 page 12, and 演示模式 back in the Setup menu — both had been displaced by PP and the display assist.
 
@@ -333,6 +339,24 @@ The four ratio entries live in the partition, but the menu alone is not enough. 
 
 If you also wrote the 4:3 parameters, restore them separately from the record that step left behind — it is an independent change.
 
+### Colour character of the 23 looks
+
+These four pages show how each look moves the stock colours. The six swatches are
+the camera's own colour regions (red/yellow/green, cyan/blue/purple); hue is
+rotated as measured, density follows the measured chroma change, and lightness
+uses the mid-tone dL*. **This is the size of the grade, not a rendering** - the
+picture still depends on what you shoot and how the camera processes it.
+
+The differences are deliberately small: ACROS drops chroma by 36% and Ricoh
+positive by 21%, which reads at a glance; Velvia drops 1%, almost identical to
+stock. The data covers IDs 0-20 (stock, the old three, and the first 17); R12's
+FL4-FL6 are not included.
+
+| | |
+|---|---|
+| ![Colour character 1/4](docs/assets/img/colorcard-1.png) | ![Colour character 2/4](docs/assets/img/colorcard-2.png) |
+| ![Colour character 3/4](docs/assets/img/colorcard-3.png) | ![Colour character 4/4](docs/assets/img/colorcard-4.png) |
+
 ### Known limits
 
 - The 23 looks and the menu layout are accepted on hardware; **the colours are not equivalent to Sony, Fujifilm or Ricoh originals** — the 17 new ones are experimental fits.
@@ -341,6 +365,8 @@ If you also wrote the 4:3 parameters, restore them separately from the record th
 - A whole-partition readback will not match the image byte for byte: the camera rewrites ext2 mount counters and timestamps at boot. File contents do match.
 
 ## Unlock 5 GHz Wi-Fi  ⚠ writes to the camera's configuration
+
+![The tool's 5 GHz tab](docs/assets/img/tool-wifi.png)
 
 The fourth tab lets the camera join a **5 GHz** access point. It changes one byte in the camera's backup — not firmware.
 
