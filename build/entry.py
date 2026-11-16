@@ -32,8 +32,18 @@ def selfcheck() -> int:
     except Exception as error:
         print(f'PATCH_FAIL: {type(error).__name__}: {error}')
         return 4
-    print('r11 patch runs:', runs)
-    if runs != 51005:
+    print('r12 patch runs:', runs)
+    from a9tool import versions
+    try:
+        builds = [entry['label'] for entry in versions.table()['versions']]
+    except Exception as error:
+        print(f'FINGERPRINT_FAIL: {type(error).__name__}: {error}')
+        return 4
+    print('version fingerprints:', ', '.join(builds))
+    if 'R12' not in builds:
+        print('FINGERPRINT_UNEXPECTED: R12 missing')
+        return 4
+    if runs != 66319:
         print(f'PATCH_UNEXPECTED: {runs}')
         return 4
 

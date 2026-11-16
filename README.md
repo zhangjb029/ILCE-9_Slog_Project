@@ -8,7 +8,7 @@ Put Picture Profile and S-Log Display Assist into the Fn menu of a Sony A9 (ILCE
 
 **The "Unlock 5 GHz Wi-Fi" tab** makes the camera able to join a 5 GHz router: it changes one byte of the backup (`00A5000C`, `09` → `03`) so the camera uses the 5 GHz regulatory configuration it already ships with. No firmware, no power change. Confirmed on hardware on 2026-11-16: 5 GHz association, FTP transfer, and reconnect after a power cycle.
 
-**The "Creative Look LUT" tab** puts 20 Creative Looks on page 14 of Shooting Assist, moving Picture Profile and Gamma Display Assist there too and letting 照片效果 and 演示模式 return to their own slots. That one replaces a whole partition; it was accepted on hardware on 2026-11-15. It still ships no image and downloads none — the patch lives in the program and applies to a partition you read from your own camera and hash-check. See [the full steps](#creative-look-lut--replaces-a-300-mib-partition).
+**The "Creative Look LUT" tab** puts 23 Creative Looks on page 14 of Shooting Assist, moving Picture Profile and Gamma Display Assist there too and letting 照片效果 and 演示模式 return to their own slots. FL4–FL6 add grain, halo and vignette. That one replaces a whole partition. It still ships no image and downloads none — the patch lives in the program and applies to a partition you read from your own camera and hash-check. See [the full steps](#creative-look-lut--replaces-a-300-mib-partition).
 
 ---
 
@@ -205,13 +205,33 @@ Each of the two settings is guarded by its own packet allowlist, and neither gua
 
 ## Creative Look LUT  ⚠ replaces a 300 MiB partition
 
-> **Status (2026-11-16): not verified end to end on hardware.** The R11 build itself was accepted on a real body, but that was done with a separate deployment script outside this repository. **This program's partition read/write channel** had three implementation gaps ([issue #1](https://github.com/zhangjb029/ILCE-9_Slog_Project/issues/1)); they are fixed in v1.5.2 with offline regression coverage, but nobody has yet run the whole flow on a camera. Know your rollback before the first real deploy.
+> **Status (2026-11-17): the read/write channel is verified on hardware.** A 300 MiB partition read completed on a camera, and the data matched the release image block for block — apart from the 13 bytes of ext2 mount counters and timestamps the camera rewrites at every boot. Confirm you know your rollback before patching or writing.
 
 The third tab replaces the whole `/dev/nflasha15` partition. **This is not a parameter change.** It replaces the partition that holds `/usr`, and a previous attempt with a different layout left the camera cold-starting with no menu at all (that build is withdrawn).
 
-**No image is shipped or downloaded.** The tool reads the camera's own partition, checks it is byte-identical to the factory build, applies the built-in patch, and verifies the result against the candidate SHA256 — all locally, before anything is written. Two hashes pin both ends: `ed835ff9…` going in, `0676e299…` coming out. A partition in any other state is refused, not overwritten.
+**No image is shipped or downloaded.** The tool reads the camera's own partition, checks it is byte-identical to the factory build, applies the built-in patch, and verifies the result against the candidate SHA256 — all locally, before anything is written. Two hashes pin both ends: `ed835ff9…` going in, `5c0aeb95…` coming out. A partition in any other state is refused, not overwritten.
 
-That build (called R11 internally, accepted on hardware) contains: **20 Creative Looks**, plus Picture Profile and Gamma Display Assist moved onto page 14 of Shooting Assist, alongside the existing four aspect ratios and creative-style entry. 照片效果 and 演示模式 return to the slots PP and the display assist had been occupying.
+That build (called R12 internally) contains: **23 Creative Looks** with grain, halo and vignette, plus Picture Profile and Gamma Display Assist moved onto page 14 of Shooting Assist, alongside the existing four aspect ratios and creative-style entry. 照片效果 and 演示模式 return to the slots PP and the display assist had been occupying.
+
+### After the backup it names the build
+
+Once the partition is read, the tool opens it, pulls out the files that actually
+differ between releases (`lib/a9fl.so`, `lib/viewUnified2.so`,
+`lib/CautionConfig.so`, both language resources), and compares them against a
+bundled fingerprint. It then tells you which of **原厂 6.00 / R8 / R9.1 / R10 /
+R11 / R12** the camera is on.
+
+**Why not a whole-partition hash**: the camera rewrites ext2 mount counters and
+timestamps at every boot, so the same build hashes differently each time. Those
+files do not change — which also means a dump taken long after the flash is
+still identifiable.
+
+| Result | Meaning | Next step |
+|---|---|---|
+| 原厂 6.00 | untouched | safe to patch |
+| R12 | already the target | nothing to do |
+| R8 / R9.1 / R10 / R11 | older build | roll back to factory first, then patch |
+| matches nothing | changed by another tool | the tool will not touch it, and lists the files that differ |
 
 ### What the image does and does not carry
 
@@ -224,16 +244,25 @@ So the image is portable across ILCE-9 bodies at 6.00. **The features are not.**
 The tab is five numbered steps. **Each button stays disabled until the step before it is done.**
 
 1. **① 初始备份** — read the whole partition and archive it. Read-only; nothing is written. **Without this backup the other four steps are unavailable**, so there is no way to end up half-applied.
-2. **② 修补** — build the target image locally from that backup. The result must hash to `0676e299…` or it stops. The camera is not touched.
-3. **③ 写入相机** — read the live partition once more for the record, write the whole partition in one transfer, read it back to verify.
-4. **④ 写入 4:3 保存参数** — see the note below.
-5. **⑤ 回退到初始备份** — write the step-1 backup back at any time.
+2. **② 识别版本** — read the backup and compare the files that differ between builds, so you know what the camera is on. No camera access.
+3. **③ 修补** — build the target image locally from that backup. The result must hash to `5c0aeb95…` or it stops. The camera is not touched. Enabled only when the backup identified as factory.
+4. **④ 写入相机** — read the live partition once more for the record, write the whole partition in one transfer, read it back to verify.
+5. **⑤ 写入 4:3 保存参数** — see the note below.
+6. **⑥ 回退到初始备份** — write the step-1 backup back at any time.
+
+**The first backup can be retaken.** Pressing ① asks first: if the camera is no longer at factory, the new backup is not a factory backup, and rolling back later returns to that state rather than to the factory one.
 
 **There is nothing to download or pick.** The patch (51,005 runs, ~1.4 MB) ships inside the program and applies to the partition you read out of your own camera.
 
 **Budget 1.2 GB of free space** per operation: one archive of the current partition, one readback. Allow 2 GB of RAM too — the patch step holds the partition in memory while it rewrites it.
 
-> This build does not upgrade from the older "Menu" or "Creative Look FL" images. If your camera is still on one, the tool says so and points you at **⑤ 回退** first.
+> This build does not upgrade from the older "Menu" or "Creative Look FL" images. If your camera is still on one, the tool says so and points you at **⑥ 回退** first.
+
+> **What the light on the camera tells you**
+>
+> - Press **读取** or **写入**: if the log shows no error and the camera says it is switching to the album, that is the normal path — **do not unplug**, let it finish.
+> - If the log errors out immediately and the camera drops back to USB Mass Storage, then you may unplug: wait for the camera to show the album, plug back in, and press the same button again right away.
+> - These transfers take minutes. Keep the connection stable — **pulling the cable mid-transfer can corrupt the camera's font data.**
 
 **Camera on, battery charged, USB stable. Close every other program that talks to the camera.**
 
@@ -271,10 +300,10 @@ If you also wrote the 4:3 parameters, restore them separately from the record th
 
 ### Known limits
 
-- The 20 looks and the menu layout are accepted on hardware; **the colours are not equivalent to Sony, Fujifilm or Ricoh originals** — the 17 new ones are experimental fits.
+- The 23 looks and the menu layout are accepted on hardware; **the colours are not equivalent to Sony, Fujifilm or Ricoh originals** — the 17 new ones are experimental fits.
 - **4:3 JPEG does not work** — the size submenu has no options and the free-frame count reads 0. 4:3 RAW saves once the companion parameters are applied.
 - The new menu entries target the `0x4B` layout; `0x4C` keeps its existing organisation.
-- A strict whole-partition readback after cold start was not re-run for R11, so this document does not claim it passes.
+- A whole-partition readback will not match the image byte for byte: the camera rewrites ext2 mount counters and timestamps at boot. File contents do match.
 
 ## Unlock 5 GHz Wi-Fi  ⚠ writes to the camera's configuration
 
@@ -371,7 +400,7 @@ To publish a build you made locally instead: GitHub → **Releases** → **Draft
 python -m unittest discover -s tests -t .
 ```
 
-All tests are offline: a `FakeCamera` stands in for the real device, so no camera and no USB backend is needed. 225 tests, including Tk widget-state checks and a subprocess check that the vendored stack imports with site-packages disabled.
+All tests are offline: a `FakeCamera` stands in for the real device, so no camera and no USB backend is needed. 236 tests, including Tk widget-state checks and a subprocess check that the vendored stack imports with site-packages disabled.
 
 ## How it works
 

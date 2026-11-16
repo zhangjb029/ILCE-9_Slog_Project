@@ -1,4 +1,5 @@
 import hashlib
+import json
 import struct
 import tempfile
 import unittest
@@ -45,6 +46,12 @@ class FakeCamera:
 class Base(unittest.TestCase):
     def setUp(self):
         self._tmp = tempfile.TemporaryDirectory()
+        # Identify-on-backup reads an ext2 image; the fakes here are not one.
+        patcher = mock.patch.object(md.versions, 'identify_file',
+                                    return_value={'readable': False, 'matched': False,
+                                                  'label': None, 'note': 'fake', 'mismatch': []})
+        patcher.start()
+        self.addCleanup(patcher.stop)
         self.root = Path(self._tmp.name) / 'sessions'
 
         self.factory = fake_partition(0x11)
@@ -164,6 +171,71 @@ class TestBackup(Base):
         self.assertIn('没有收到任何字节', str(ctx.exception))
 
 
+class TestIdentify(Base):
+    def _backup(self):
+        with mock.patch.object(md.versions, 'identify_file',
+                               return_value={'label': 'x', 'matched': True}):
+            return md.backup(FakeCamera(self.factory), IDENTITY, self.root)
+
+    def test_backup_alone_does_not_claim_a_version(self):
+        info = self._backup()
+        self.assertNotIn('version', info)
+
+    def test_identify_records_what_it_found(self):
+        self._backup()
+        with mock.patch.object(md.versions, 'identify_file',
+                               return_value={'label': '原厂 6.00', 'matched': True}) as spy:
+            result = md.identify(self.root)
+        self.assertEqual(result['label'], '原厂 6.00')
+        self.assertEqual(spy.call_count, 1)
+        self.assertEqual(md.baseline_info(self.root)['version']['label'], '原厂 6.00')
+
+    def test_identify_works_on_a_backup_taken_before_it_existed(self):
+        self._backup()
+        record = md.baseline_path(self.root).with_suffix('.json')
+        meta = json.loads(record.read_text(encoding='utf-8'))
+        meta.pop('version', None)
+        record.write_text(json.dumps(meta), encoding='utf-8')
+        with mock.patch.object(md.versions, 'identify_file',
+                               return_value={'label': 'R12', 'matched': True}):
+            md.identify(self.root)
+        self.assertEqual(md.baseline_info(self.root)['version']['label'], 'R12')
+
+    def test_identify_needs_a_backup_first(self):
+        with self.assertRaises(ValueError):
+            md.identify(Path(self._tmp.name) / 'nothing-here')
+
+    def test_identify_still_answers_when_the_record_cannot_be_rewritten(self):
+        self._backup()
+        record = md.baseline_path(self.root).with_suffix('.json')
+        record.chmod(0o444)
+        try:
+            with mock.patch.object(md.versions, 'identify_file',
+                                   return_value={'label': 'R12', 'matched': True}):
+                self.assertEqual(md.identify(self.root)['label'], 'R12')
+        finally:
+            record.chmod(0o666)
+
+    def test_retaking_a_backup_needs_permission(self):
+        self._backup()
+        with self.assertRaises(ValueError):
+            md.backup(FakeCamera(self.factory), IDENTITY, self.root)
+        with mock.patch.object(md.versions, 'identify_file',
+                               return_value={'label': 'x', 'matched': True}):
+            info = md.backup(FakeCamera(self.factory), IDENTITY, self.root, replace=True)
+        self.assertEqual(info['bytes'], SMALL)
+
+    def test_the_partition_hash_is_not_recomputed_for_an_unchanged_file(self):
+        self._backup()
+        baseline = md.baseline_path(self.root)
+        md._HASH_CACHE.clear()
+        with mock.patch.object(md.hashlib, 'file_digest',
+                               wraps=md.hashlib.file_digest) as spy:
+            md.file_sha256(baseline)
+            md.file_sha256(baseline)
+        self.assertEqual(spy.call_count, 1)
+
+
 class TestPatch(Base):
     def setUp(self):
         super().setUp()
@@ -241,7 +313,7 @@ class TestShippedPatch(unittest.TestCase):
 
     def test_the_bundled_patch_parses(self):
         runs = md.load_patch()
-        self.assertEqual(len(runs), 51005)
+        self.assertEqual(len(runs), 66319)
         offsets = [offset for offset, _ in runs]
         self.assertEqual(offsets, sorted(offsets))
         self.assertTrue(all(len(data) for _, data in runs))

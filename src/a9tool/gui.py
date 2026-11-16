@@ -12,6 +12,7 @@ import tkinter as tk
 from pathlib import Path
 from tkinter import messagebox, ttk
 
+from . import __version__
 from . import (aspect_params, core, data, errors, flash_av, flash_baseline, flash_service,
                fnmap, journal, menu_deploy, usbdev, wifi_5ghz)
 
@@ -28,7 +29,7 @@ STATUS_MARKS = {
 class App:
     def __init__(self, root: tk.Tk):
         self.root = root
-        self.root.title('ILCE-9 功能槽位工具')
+        self.root.title(f'ILCE-9 功能槽位工具  v{__version__}')
         self.root.geometry('960x680')
         self.root.minsize(820, 560)
         self._scroll_canvases: list = []
@@ -106,7 +107,9 @@ class App:
 
         connect = ttk.LabelFrame(body_fn, text='① 连接相机')
         connect.pack(fill='x', **pad)
-        ttk.Label(connect, text='相机 USB 连接模式设为「大容量存储」，只连这一台相机。').pack(anchor='w', padx=10, pady=(8, 4))
+        ttk.Label(connect, text=f'程序版本 v{__version__}　·　只支持 ILCE-9 固件 6.00').pack(
+            anchor='w', padx=10, pady=(8, 2))
+        ttk.Label(connect, text='相机 USB 连接模式设为「大容量存储」，只连这一台相机。').pack(anchor='w', padx=10, pady=(0, 4))
         row = ttk.Frame(connect)
         row.pack(anchor='w', padx=10, pady=(0, 10))
         self.connect_btn = ttk.Button(row, text='连接并检查', command=self.on_connect)
@@ -751,12 +754,21 @@ class App:
         warn.pack(fill='x', padx=10, pady=8)
         ttk.Label(warn, justify='left', wraplength=860, text=(
             '这不是改参数，是把 /dev/nflasha15 整个 300 MiB 分区换掉。\n'
-            '· 曾经有一个不同布局的版本让相机按 MENU 毫无反应并整机冷启动，那个版本已停用。\n'
-            '· 分五步：初始备份 → 本地修补 → 写入 → 4:3 参数 → 回退。没有初始备份不能做后面任何一步。\n'
+            '· 分六步：初始备份 → 识别版本 → 修补 → 写入 → 4:3 参数 → 回退。每一步都以上一步为前提。\n'
             '· 不下载、不分发任何镜像文件：修补用的补丁内置在程序里，从你自己的分区算出来。\n'
             '· 写入后必须正常关机、完整断电、冷启动。\n'
             '· 本地至少需要 1.2 GB 空闲空间、2 GB 以上内存。'
-        )).pack(anchor='w', padx=10, pady=8)
+        )).pack(anchor='w', padx=10, pady=(8, 4))
+
+        ttk.Label(warn, justify='left', wraplength=860, text=(
+            '【连接提醒，很重要】\n'
+            '· 点「读取」或「写入」之后，如果日志里没有报错、相机上显示「切换到相册」之类的提示，'
+            '这是正常过程，不要拔线，等它自己走完。\n'
+            '· 如果点了之后日志立刻报错、相机又回到 USB 大容量存储界面，这时才可以拔线：'
+            '等相机显示相册画面再插上，一插上就立刻再点一次读取或写入。\n'
+            '· 这个功能的读写要几分钟，期间务必保持连接稳定。'
+            '中途断线可能损坏相机字库。'
+        )).pack(anchor='w', padx=10, pady=(0, 8))
 
         backup = ttk.LabelFrame(parent, text='① 初始备份')
         backup.pack(fill='x', padx=10, pady=8)
@@ -766,12 +778,26 @@ class App:
         self.menu_backup_btn = ttk.Button(backup, text='执行初始备份', command=self.on_menu_backup)
         self.menu_backup_btn.pack(anchor='w', padx=10, pady=(0, 10))
 
-        patch = ttk.LabelFrame(parent, text='② 修补')
+        identify = ttk.LabelFrame(parent, text='② 识别版本')
+        identify.pack(fill='x', padx=10, pady=8)
+        ttk.Label(identify, justify='left', wraplength=860, text=(
+            '读一遍刚备份的分区，比对里面几个真正区分版本的文件（外观模块、菜单库、两份语言资源），'
+            '告诉这台相机现在是原厂还是哪个版本。\n'
+            '不连接相机，也不改任何东西；比对结果会记在备份旁边。'
+        )).pack(anchor='w', padx=10, pady=(8, 4))
+        self.menu_version_var = tk.StringVar(value='尚未识别。')
+        ttk.Label(identify, textvariable=self.menu_version_var, wraplength=860,
+                  justify='left').pack(anchor='w', padx=10, pady=(0, 4))
+        self.menu_identify_btn = ttk.Button(identify, text='识别版本',
+                                            command=self.on_menu_identify)
+        self.menu_identify_btn.pack(anchor='w', padx=10, pady=(0, 10))
+
+        patch = ttk.LabelFrame(parent, text='③ 修补')
         patch.pack(fill='x', padx=10, pady=8)
         ttk.Label(patch, justify='left', wraplength=860, text=(
-            '创意外观 LUT：保留 20 款创意外观，并把图片配置文件（PP）和伽玛显示辅助'
-            '移到拍摄辅助第 14 页；照片效果、演示模式回到原来的位置。\n'
-            '下面是改完之后相机上实际的样子。'
+            '创意外观 LUT：23 款创意外观（新增 FL4、FL5、FL6，并加入颗粒、光晕、暗角），'
+            '图片配置文件和伽玛显示辅助在拍摄辅助第 14 页；照片效果、演示模式回到原来的位置。\n'
+            '下面三张是改完之后相机上实际的样子，第三张是外观参数的第 3 页。'
         )).pack(anchor='w', padx=10, pady=(8, 4))
         self.menu_preview_frame = ttk.Frame(patch)
         self.menu_preview_frame.pack(anchor='w', padx=10, pady=(0, 6))
@@ -791,12 +817,12 @@ class App:
         self.menu_patch_btn = ttk.Button(patch, text='修补', command=self.on_menu_patch)
         self.menu_patch_btn.pack(anchor='w', padx=10, pady=(0, 10))
 
-        write = ttk.LabelFrame(parent, text='③ 写入')
+        write = ttk.LabelFrame(parent, text='④ 写入')
         write.pack(fill='x', padx=10, pady=8)
         self.menu_write_btn = ttk.Button(write, text='写入相机', command=self.on_menu_write)
         self.menu_write_btn.pack(anchor='w', padx=10, pady=8)
 
-        aspect = ttk.LabelFrame(parent, text='④ 4:3 保存参数')
+        aspect = ttk.LabelFrame(parent, text='⑤ 4:3 保存参数')
         aspect.pack(fill='x', padx=10, pady=8)
         ttk.Label(aspect, justify='left', wraplength=860, text=(
             '四项比例菜单在分区里，但选 4:3 要真的能保存，还需要写 51 项出图尺寸／像素数／'
@@ -807,7 +833,7 @@ class App:
                                      command=self.on_menu_aspect)
         self.aspect_btn.pack(anchor='w', padx=10, pady=(0, 10))
 
-        rollback = ttk.LabelFrame(parent, text='⑤ 回退')
+        rollback = ttk.LabelFrame(parent, text='⑥ 回退')
         rollback.pack(fill='x', padx=10, pady=8)
         self.menu_restore_btn = ttk.Button(rollback, text='回退到初始备份',
                                            command=self.on_menu_restore)
@@ -820,10 +846,14 @@ class App:
         info = menu_deploy.baseline_info(self.menu_root)
         if info is None:
             self.menu_baseline_var.set('尚未备份。点「执行初始备份」，程序会完整读出当前分区并存档。')
+            self.menu_version_var.set('尚未识别。先做初始备份，再点「识别版本」。')
         else:
             self.menu_baseline_var.set(
                 f'已备份：{info.get("bytes", menu_deploy.PARTITION_BYTES):,} 字节，'
                 f'{info.get("created", "")}，SHA256 {info.get("sha256", "")[:16]}…')
+            self.menu_version_var.set(
+                self._describe_version(info.get('version'))
+                or '尚未识别。点「识别版本」比对分区里的文件。')
         pending = menu_deploy.pending_info(self.menu_root)
         if pending is None:
             self.menu_pending_var.set('尚未修补。点「修补」会在本地从初始备份算出目标镜像，相机不参与。')
@@ -832,15 +862,40 @@ class App:
                 f'已修补：{pending["label"]}，{pending["bytes"]:,} 字节，'
                 f'SHA256 {pending["sha256"][:16]}…（{pending["created"]}）')
 
+    @staticmethod
+    def _describe_version(version) -> str:
+        """One line saying which build the backup turned out to be."""
+        if not version:
+            return ''
+        if not version.get('readable'):
+            return '版本识别：分区读不懂，不是预期的 ext2 镜像。'
+        label = version.get('label') or '未知'
+        if version.get('matched'):
+            if label == menu_deploy.VERSION_LABEL:
+                return f'版本识别：{label}（已经是目标版本，不需要再修补）。'
+            if label.startswith('原厂'):
+                return f'版本识别：{label}（可以修补）。'
+            return f'版本识别：{label}（旧版本，本工具只从原厂出发，请先回退）。'
+        names = '、'.join(name.split('/')[-1] for name in version.get('mismatch', []))
+        return (f'版本识别：最接近 {label}，但有 {len(version.get("mismatch", []))} 个文件对不上'
+                f'（{names}）。这个状态本工具不处理。')
+
     def _refresh_menu(self) -> None:
         def normal(ok):
             return 'normal' if ok else 'disabled'
 
         busy = self.busy
-        has_baseline = menu_deploy.baseline_info(self.menu_root) is not None
+        info = menu_deploy.baseline_info(self.menu_root)
+        has_baseline = info is not None
         has_pending = menu_deploy.pending_info(self.menu_root) is not None
-        self.menu_backup_btn.configure(state=normal(not busy and not has_baseline))
-        self.menu_patch_btn.configure(state=normal(not busy and has_baseline))
+        version = (info or {}).get('version') or {}
+        exact = bool(version.get('readable')) and bool(version.get('matched'))
+        at_factory = exact and str(version.get('label', '')).startswith('原厂')
+        # Backups can be retaken, so this button never goes away; the click
+        # asks before it replaces what is there.
+        self.menu_backup_btn.configure(state=normal(not busy))
+        self.menu_identify_btn.configure(state=normal(not busy and has_baseline))
+        self.menu_patch_btn.configure(state=normal(not busy and has_baseline and at_factory))
         self.menu_write_btn.configure(state=normal(not busy and has_pending))
         self.aspect_btn.configure(state=normal(not busy))
         self.menu_restore_btn.configure(state=normal(not busy and has_baseline))
@@ -861,12 +916,21 @@ class App:
             handle.close()
 
     def on_menu_backup(self) -> None:
-        if self.busy or menu_deploy.baseline_info(self.menu_root) is not None:
+        if self.busy:
             return
-        if not messagebox.askyesno(
-                '执行初始备份',
-                '会完整读出相机 /dev/nflasha15 分区（300 MiB）并存档。\n\n'
-                '这一步只读，不写入相机。之后的修补和回退都以这份备份为准。\n\n继续吗？'):
+        existing = menu_deploy.baseline_info(self.menu_root)
+        if existing is None:
+            question = ('会完整读出相机 /dev/nflasha15 分区（300 MiB）并存档。\n\n'
+                        '这一步只读，不写入相机。之后的修补和回退都以这份备份为准。\n\n继续吗？')
+        else:
+            label = ((existing.get('version') or {}).get('label')) or '尚未识别'
+            question = (f'已经有一份初始备份（{label}，{existing.get("created", "")}）。\n\n'
+                        '重新备份会把它替换掉。\n'
+                        '如果相机现在已经不是原厂状态，新备份就不是原厂——'
+                        '之后「回退」会退到现在的状态，而不是出厂状态。\n\n确定重新备份吗？')
+            if not messagebox.askyesno('重新备份', question, default='no'):
+                return
+        if existing is None and not messagebox.askyesno('执行初始备份', question):
             return
         self._set_busy(True)
         self._close_main_handle()
@@ -874,10 +938,35 @@ class App:
         def work():
             return self._menu_connect(
                 lambda handle: menu_deploy.backup(handle.camera, handle.identity,
-                                                  self.menu_root, progress=self._menu_progress),
+                                                  self.menu_root, progress=self._menu_progress,
+                                                  replace=True),
                 None)
 
         self._background(work, self._menu_done)
+
+    def on_menu_identify(self) -> None:
+        if self.busy or menu_deploy.baseline_info(self.menu_root) is None:
+            return
+        self._set_busy(True)
+
+        def work():
+            return menu_deploy.identify(self.menu_root, progress=self._menu_progress)
+
+        self._background(work, self._menu_identify_done)
+
+    def _menu_identify_done(self, result, error) -> None:
+        self._set_busy(False)
+        if error is not None:
+            self.log(errors.user_message(error))
+        elif isinstance(result, dict):
+            self.log(self._describe_version(result))
+            if result.get('matched') and result.get('label'):
+                self.log(f'识别完成：{result["label"]}。')
+            elif result.get('mismatch'):
+                self.log('识别完成，但对不上任何已知版本：'
+                         + '、'.join(name.split('/')[-1] for name in result['mismatch']))
+        self._update_menu_texts()
+        self._refresh_menu()
 
     def on_menu_patch(self) -> None:
         if self.busy or menu_deploy.baseline_info(self.menu_root) is None:

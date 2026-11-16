@@ -8,6 +8,7 @@ to need.
 from __future__ import annotations
 
 import json
+import os
 import struct
 import time
 from dataclasses import dataclass, field
@@ -21,6 +22,12 @@ MAX_SERVICE_REPLY = 2 * 1024 * 1024  # the A9 snapshot handler's own limit
 # memory cap above does not apply to it. 300 MiB partitions need far more.
 MAX_STREAMED_REPLY = 512 * 1024 * 1024
 MAX_RESPONSE_FRAMES = 1024           # 1 MiB per frame, so 1 GiB of reply
+# Whether this body separates reply blocks with 512 bytes. The product ID does
+# not settle it: two ILCE-9 bodies at 6.00 both answer on 0x0336 and disagree,
+# so one of them fails every read at a fixed byte count under the other's
+# assumption. Default follows the body we have tested most; A9TOOL_UNPADDED=1
+# switches to back-to-back payload for a body that reads fail that way.
+UNPADDED = os.environ.get('A9TOOL_UNPADDED') == '1'
 SERVICE_RESPONSE_SECONDS = 30
 RECEIPT_SCHEMA = 'a9tool-identity-v1'
 RECEIPT_FILENAME = '_receipt.json'
@@ -360,15 +367,13 @@ def _make_senser(sony, driver, response_timeout=None):
                     else:
                         sink.write(chunk)
                     done += amount
-                    # minimum is 0 on the 0x0336 service interface, which sends
-                    # payload back-to-back with no 512-byte block padding. The
-                    # upstream code derived minimum once and then ignored it
-                    # here, draining 512 bytes this device never sends: a 1 KiB
-                    # read blocked until timeout, and a 1 MiB read ate the next
-                    # payload block and ended in EPIPE.
-                    if minimum and not (amount & (minimum - 1)):
+                    # Block separators are what the stock framing expects; only
+                    # a body that proved otherwise (A9TOOL_UNPADDED=1) skips
+                    # them. This is the v1.5.0 behaviour, which the hardware we
+                    # have tested most actually needs.
+                    if not UNPADDED and not (amount & (self.SenserMinSize - 1)):
                         self._read_phase = 'padding drain'
-                        self._read_bounded(minimum)
+                        self._read_bounded(self.SenserMinSize)
                     chunk_size = self.SenserChunkSize
                 remaining -= length
                 if remaining <= 0:

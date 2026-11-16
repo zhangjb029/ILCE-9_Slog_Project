@@ -1,0 +1,78 @@
+{
+  "schema": "a9tool-version-fingerprints-v1",
+  "files": [
+    "lib/a9fl.so",
+    "lib/viewUnified2.so",
+    "lib/CautionConfig.so",
+    "share/app/string_simplifiedchinese.uxc",
+    "share/app/string_english.uxc"
+  ],
+  "versions": [
+    {
+      "label": "原厂 6.00",
+      "note": "未修改过的原厂分区",
+      "files": {
+        "lib/a9fl.so": null,
+        "lib/viewUnified2.so": "d34b52f03c61f839e16141b8857a3f06b2960aafe3a6ceeba0e6c4a101954223",
+        "lib/CautionConfig.so": "577a29088c971344f8191049a298480aa1b2221393ad05815bbef860d2c35ac7",
+        "share/app/string_simplifiedchinese.uxc": "8ba55a52276a84f427e0e92816765ea584b7c44a7e20cad59eed3370d7d7cf7b",
+        "share/app/string_english.uxc": "c23b39b0f6115f2720d3e9b25ac247190db01f1570b1a57617ae5954da7e6d64"
+      }
+    },
+    {
+      "label": "R8",
+      "note": "128 字节配置，FL / FL2 / FL3",
+      "files": {
+        "lib/a9fl.so": "a12358a5a3f75a1497e98fed946f7ee4f4252fc26dfe50aba49892be79005cf4",
+        "lib/viewUnified2.so": "b5d6a6d3c0e5fb93d016dea2e8ae11b450cfc3e2f30a3696b11a3ede2d658c01",
+        "lib/CautionConfig.so": "24747bfedee7dfcd9b66deae2a86629405394d7647e1736c303452495359f391",
+        "share/app/string_simplifiedchinese.uxc": "8a5e51f768630fa831d6372b20f37b3f08ed0c6c8e3aeec63986bcc1eed035af",
+        "share/app/string_english.uxc": "9cfb78c053098d7e447352951f6669c34636a89a69962d5b18d112df3ca2dc8d"
+      }
+    },
+    {
+      "label": "R9.1",
+      "note": "修复 R8 配置兼容",
+      "files": {
+        "lib/a9fl.so": "3e01f0d0c1e6659fb66d74a41afe3b6621cab9c2660602b719668e70b210dd3d",
+        "lib/viewUnified2.so": "b5d6a6d3c0e5fb93d016dea2e8ae11b450cfc3e2f30a3696b11a3ede2d658c01",
+        "lib/CautionConfig.so": "24747bfedee7dfcd9b66deae2a86629405394d7647e1736c303452495359f391",
+        "share/app/string_simplifiedchinese.uxc": "1eee0fbb7850f4e8b5eae8a5fd9ec1ebbaba00cbfac8f272c6307f7e50650728",
+        "share/app/string_english.uxc": "01bd3ee7918eb14621bf5a024f4ef23429778a78a9778ebb8f9aa00e43aaaaea"
+      }
+    },
+    {
+      "label": "R10",
+      "note": "20 款创意外观",
+      "files": {
+        "lib/a9fl.so": "39e575666c211e1d000d7838af175c4d6eb14c5aa560ab96141dcf416f77075c",
+        "lib/viewUnified2.so": "b5d6a6d3c0e5fb93d016dea2e8ae11b450cfc3e2f30a3696b11a3ede2d658c01",
+        "lib/CautionConfig.so": "24747bfedee7dfcd9b66deae2a86629405394d7647e1736c303452495359f391",
+        "share/app/string_simplifiedchinese.uxc": "7f2f7d5138478b6a68517da585498099f6f8720f20d4406f0714e319018ffbd6",
+        "share/app/string_english.uxc": "6396ce51851402e94aea218d5cc6c6f781e602069ed253dda03012cc0a7f227c"
+      }
+    },
+    {
+      "label": "R11",
+      "note": "R10 + 图片配置文件与伽玛显示辅助并入第 14 页",
+      "files": {
+        "lib/a9fl.so": "17c3315e7a0b260962e76d927f649f2eb237fef2dfff044fbe08eec760efbc9b",
+        "lib/viewUnified2.so": "6c1885d86feb358cf11b7f742ff2391e2dac9302ca15d1f98e91b2cff79946ba",
+        "lib/CautionConfig.so": "24747bfedee7dfcd9b66deae2a86629405394d7647e1736c303452495359f391",
+        "share/app/string_simplifiedchinese.uxc": "7f2f7d5138478b6a68517da585498099f6f8720f20d4406f0714e319018ffbd6",
+        "share/app/string_english.uxc": "6396ce51851402e94aea218d5cc6c6f781e602069ed253dda03012cc0a7f227c"
+      }
+    },
+    {
+      "label": "R12",
+      "note": "23 款外观，含颗粒 / 光晕 / 暗角",
+      "files": {
+        "lib/a9fl.so": "706cd7b36bf0ec86b813db3ac69f251c3d495c7b3d7d74e1664dc134a64afcc2",
+        "lib/viewUnified2.so": "6c1885d86feb358cf11b7f742ff2391e2dac9302ca15d1f98e91b2cff79946ba",
+        "lib/CautionConfig.so": "24747bfedee7dfcd9b66deae2a86629405394d7647e1736c303452495359f391",
+        "share/app/string_simplifiedchinese.uxc": "ddf566457a0fa2a76370df018635f50752893829244b123c381c38b619844cb9",
+        "share/app/string_english.uxc": "908eba5f6685787d74115e0324da0396673f1310a88a8d1463c5d8f9fc90b9dd"
+      }
+    }
+  ]
+}

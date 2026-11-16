@@ -22,7 +22,7 @@ import lzma
 from functools import lru_cache
 from pathlib import Path
 
-from . import data, journal
+from . import data, journal, versions
 
 PARTITION = '/dev/nflasha15'
 PARTITION_BYTES = 314572800
@@ -37,10 +37,11 @@ TRANSFER_TIMEOUT_SECONDS = 900
 # padded with zeros to the full partition size, and this hash is what the
 # successful deployment recorded as its preimage.
 FACTORY_SHA = 'ed835ff938e5d9d816b611263d1e124c08eb907a883d08587170bdbd7c32f9d2'
-# R11: 20 Creative Looks, plus PP and Gamma Display Assist moved onto page 14
-# of Shooting Assist, with 照片效果 and 演示模式 restored to their own places.
-LUT_SHA = '0676e29917bf3ef555df9c876eecc46e8e781d9a7e8f1c4b06c5ab225ef06a35'
-PATCH_FILE = 'r11_patch.bin'
+# R12: 23 Creative Looks (FL4-FL6 added), plus grain, halo and vignette, with
+# PP and Gamma Display Assist on page 14 of Shooting Assist and 照片效果 /
+# 演示模式 restored to their own places.
+LUT_SHA = '5c0aeb952899e2db597be02669d1dfe8deaa540c81da271c4dcbd492484cc790'
+PATCH_FILE = 'r12_patch.bin'
 
 # Superseded builds this tool no longer produces. Recognising them lets the
 # error message say what to do instead of only that the partition is unknown.
@@ -48,26 +49,33 @@ LEGACY_SHAS = {
     '4fa7bbe5c9cc21661c334fa5640af59a5d725f2214ee877112230c123f2eafa4':
         '旧版「菜单修改」（PP/S-Log/四比例 + 复古衣橱）',
     'cba78da44df413058f56db74b62305bda7d1de756d65ffd96b93d4e2659ef22e':
-        '旧版「创意外观 FL」（实验）',
+        'R8（早期创意外观测试版，128 字节配置）',
+    '3ae82f81973e5378983b6bce9a76ee8b6ca1013cf3622c6b3d1f513efeea869a':
+        'R10（20 款创意外观）',
+    '0676e29917bf3ef555df9c876eecc46e8e781d9a7e8f1c4b06c5ab225ef06a35':
+        'R11（20 款 + PP/伽玛显示辅助）',
 }
 
 TARGETS = {
-    'lut': (LUT_SHA, '创意外观 LUT（20 款 + 图片配置文件 + 伽玛显示辅助）'),
+    'lut': (LUT_SHA, '创意外观 LUT（23 款 + 颗粒/光晕/暗角 + 图片配置文件 + 伽玛显示辅助）'),
 }
+# What versions.identify() calls this build. Used to tell a camera that already
+# has it apart from one at some state nobody has seen.
+VERSION_LABEL = 'R12'
 
 LABEL = TARGETS['lut'][1]
 
 
 @lru_cache(maxsize=1)
 def load_patch() -> tuple:
-    """The 51,005 runs between the factory partition and the R11 build.
+    """The 66,319 runs between the factory partition and the R12 build.
 
     Each run stores the replacement bytes and the distance from the previous
     run's offset. The input partition is pinned by SHA256, so the bytes being
     replaced never have to be carried in the program.
     """
     raw = lzma.decompress((data.data_root() / PATCH_FILE).read_bytes())
-    if raw[:4] != b'R11P':
+    if raw[:4] != b'R12P':
         raise ValueError('内置补丁格式不正确')
     count, = struct.unpack_from('<I', raw, 4)
     pos, offset, runs = 8, 0, []
@@ -130,9 +138,37 @@ class PartitionGuard:
         return self.transport.sendSenserPacket(function, data, oData)
 
 
+# Hashing a 300 MiB partition takes seconds. The GUI asks for the baseline on
+# every refresh, so the last answer is kept against the file's size and mtime.
+_HASH_CACHE: dict = {}
+
+
 def file_sha256(path: Path) -> str:
-    with Path(path).open('rb') as stream:
-        return hashlib.file_digest(stream, 'sha256').hexdigest()
+    path = Path(path)
+    try:
+        stat = path.stat()
+    except OSError:
+        raise
+    key = (str(path.resolve()), stat.st_size, stat.st_mtime_ns)
+    cached = _HASH_CACHE.get(key)
+    if cached is not None:
+        return cached
+    with path.open('rb') as stream:
+        digest = hashlib.file_digest(stream, 'sha256').hexdigest()
+    _HASH_CACHE.clear()          # one entry is all these calls ever need
+    _HASH_CACHE[key] = digest
+    return digest
+
+
+def _replace_json(path: Path, payload: dict) -> None:
+    """Atomically rewrite a record; a torn write here would orphan the backup."""
+    temporary = path.with_suffix('.json.tmp')
+    with temporary.open('w', encoding='utf-8') as stream:
+        json.dump(payload, stream, ensure_ascii=False, indent=2)
+        stream.write('\n')
+        stream.flush()
+        os.fsync(stream.fileno())
+    os.replace(temporary, path)
 
 
 def sanity(blob: bytes) -> None:
@@ -165,7 +201,10 @@ def build_candidate(dump: bytes, target: str = 'lut') -> bytes:
     if actual != FACTORY_SHA:
         raise ValueError(
             '相机上的分区既不是原厂 6.00 状态、也不是本工具生成过的版本'
-            '（SHA256 %s…），本工具只处理原厂状态，已停止' % actual[:16])
+            '（SHA256 %s…），本工具只从原厂状态出发，已停止。\n'
+            '如果你之前已经刷过这个版本，相机每次开机会改写分区里的时间戳，'
+            '整分区哈希就对不上了——这种情况下不需要再做任何操作。\n'
+            '如果确实要重刷，请先用「⑤ 回退」把原厂备份写回去。' % actual[:16])
 
     blob = _apply(dump, load_patch())
     if hashlib.sha256(blob).hexdigest() != want_sha:
@@ -223,15 +262,16 @@ def _move(src: Path, dst: Path) -> None:
     os.replace(src, dst)
 
 
-def backup(camera, identity: dict, root: Path, progress=None) -> dict:
+def backup(camera, identity: dict, root: Path, progress=None, replace=False) -> dict:
     """Step 1: read the whole partition once and keep it as the baseline.
 
-    Refuses to overwrite an existing baseline: everything else (patch, write,
-    restore) is defined relative to this one capture.
+    Everything else — identify, patch, write, restore — is defined relative to
+    this one capture, so replacing it is a deliberate act: the caller has to
+    say so, and the GUI asks first.
     """
     say = progress or (lambda _message: None)
     target = baseline_path(root)
-    if target.exists():
+    if target.exists() and not replace:
         raise ValueError('已经存在初始备份，不会覆盖')
 
     session = _new_session(root, 'backup')
@@ -249,8 +289,39 @@ def backup(camera, identity: dict, root: Path, progress=None) -> dict:
     meta = dict(sha256=snapshot['sha256'], bytes=snapshot['bytes'],
                 from_session=session.name, identity=identity,
                 created=time.strftime('%Y-%m-%dT%H:%M:%S'))
-    _write_json(record_path_for(target), meta)
+    record = record_path_for(target)
+    if replace and record.exists():
+        _replace_json(record, meta)      # the old record is being superseded
+    else:
+        _write_json(record, meta)
     return meta
+
+
+def identify(root: Path, progress=None) -> dict:
+    """Step 2: work out which build the backup holds. Reads the camera not at all.
+
+    A whole-partition hash cannot answer this: the camera rewrites ext2 mount
+    counters and timestamps at every boot, so the same build hashes differently
+    on every body. Comparing the files that actually differ still works, and
+    keeps working for a dump taken long after the flash.
+    """
+    say = progress or (lambda _message: None)
+    baseline = baseline_path(root)
+    record = baseline.with_suffix('.json')
+    if not baseline.exists() or not record.exists():
+        raise ValueError('还没有初始备份，请先执行「① 初始备份」')
+    try:
+        meta = json.loads(record.read_text(encoding='utf-8'))
+    except (OSError, ValueError) as error:
+        raise ValueError('初始备份的记录读不出来，请重新执行初始备份') from error
+    say('正在比对分区里的版本指纹…')
+    result = versions.identify_file(baseline)
+    meta['version'] = result
+    try:
+        _replace_json(record, meta)
+    except OSError:
+        pass                     # the answer still stands for this run
+    return result
 
 
 def patch_from_baseline(root: Path, target: str = 'lut', progress=None) -> dict:
@@ -262,6 +333,10 @@ def patch_from_baseline(root: Path, target: str = 'lut', progress=None) -> dict:
     if target not in TARGETS:
         raise ValueError('未知的目标版本')
 
+    known = versions.identify_file(baseline)
+    if known.get('matched') and known.get('label') == VERSION_LABEL:
+        raise ValueError(
+            f'相机上已经是 {VERSION_LABEL}（23 款创意外观），不需要修补。')
     say(f'正在本地生成：{TARGETS[target][1]}…')
     candidate = build_candidate(baseline.read_bytes(), target)
     out = pending_dir(root) / 'candidate.bin'

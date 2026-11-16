@@ -35,13 +35,14 @@ class FakeSenserDriver:
                              miconType=0, offsetType=0, response=response)
         self.stream = bytearray()
         if padding:
-            # Padded framing: the first 512-byte packet carries the header and
-            # the first 500 payload bytes; every later full block is followed
-            # by 512 bytes that carry no payload.
-            lead = MIN - len(header)
+            # A body that separates reply blocks with 512 bytes. On 0x02a9 the
+            # header packet also carries the first 500 payload bytes; on 0x0336
+            # the header is bare and the separators only start after a block.
+            minimum = 0 if product == 0x0336 else MIN
+            lead = max(minimum - len(header), 0)
             self.stream += header + payload[:lead]
             position = lead
-            for per_block in (CHUNK - MIN, *([CHUNK] * 64)):
+            for per_block in (CHUNK - minimum, *([CHUNK] * 64)):
                 if position >= len(payload):
                     break
                 block = payload[position:position + per_block]
@@ -119,7 +120,17 @@ class TestPaddedInterface(Base):
 
 
 class TestUnpaddedInterface(Base):
-    """0x0336: payload is sent back-to-back, with no padding at all."""
+    """0x0336 with back-to-back payload — the A9TOOL_UNPADDED=1 body.
+
+    Its separators are absent, so the stock framing mis-reads every block
+    after the first. Only a body that needs this should run in this mode.
+    """
+
+    def setUp(self):
+        super().setUp()
+        patcher = mock.patch.object(usbdev, 'UNPADDED', True)
+        patcher.start()
+        self.addCleanup(patcher.stop)
 
     def test_small_payload(self):
         payload = bytes(range(256)) * 4
@@ -142,8 +153,42 @@ class TestUnpaddedInterface(Base):
         self.assertEqual(driver.overreads, 0)
 
 
+class TestPadded0336(Base):
+    """A 0x0336 body that *does* separate blocks, which the PID does not predict.
+
+    This is the combination that broke every read after v1.5.1: the product ID
+    says "no padding", the hardware sends it anyway, and the payload after the
+    first block lands 512 bytes off.
+    """
+
+    def test_value_that_ends_on_a_block_boundary(self):
+        payload = bytes(range(256)) * 4          # 1024
+        (response, data), driver = self.read_back(0x0336, payload, padding=True)
+        self.assertEqual(data, payload)
+        self.assertEqual(response, 0)
+        self.assertEqual(driver.overreads, 0)
+
+    def test_value_that_does_not_end_on_a_boundary(self):
+        payload = b'\x42' * 700
+        (_, data), driver = self.read_back(0x0336, payload, padding=True)
+        self.assertEqual(data, payload)
+        self.assertEqual(driver.overreads, 0)
+
+    def test_several_blocks(self):
+        payload = bytes((i * 5) & 0xFF for i in range(70000))
+        (_, data), driver = self.read_back(0x0336, payload, padding=True)
+        self.assertEqual(data, payload)
+        self.assertEqual(driver.overreads, 0)
+
+
 class TestStreamedReply(Base):
     """A reply larger than the in-memory cap must reach a sink instead."""
+
+    def setUp(self):
+        super().setUp()
+        patcher = mock.patch.object(usbdev, 'UNPADDED', True)
+        patcher.start()
+        self.addCleanup(patcher.stop)
 
     def test_a_partition_sized_reply_streams_to_the_sink(self):
         payload = bytes((i * 11) & 0xFF for i in range(3 * MAX + 7))
