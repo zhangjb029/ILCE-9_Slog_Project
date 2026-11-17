@@ -6,6 +6,7 @@ import unittest
 from pathlib import Path
 from unittest import mock
 
+from a9tool import errors
 from a9tool import menu_deploy as md
 
 SMALL = 8192
@@ -191,6 +192,25 @@ class TestBackup(Base):
         joined = '\n'.join(seen)
         self.assertIn('会话目录：', joined)
         self.assertIn('backup_', joined)
+
+    def test_the_report_names_this_packages_frame(self):
+        """The innermost frame is vendored pyusb, which places nothing."""
+        class DyingCamera(FakeCamera):
+            def readFile(self, path, out):
+                out.write(bytes(self.data[:4096]))
+                raise NotImplementedError(
+                    'Operation not supported or unimplemented on this platform')
+        target = Path(self._tmp.name) / 'vendor-frame.bin'
+        # Not assertRaises: it stores the exception with its traceback cleared,
+        # and the traceback is exactly what this test is about.
+        try:
+            md.read_partition(DyingCamera(self.factory), target)
+        except NotImplementedError as error:
+            msg = errors.user_message(error)
+        else:
+            self.fail('read_partition did not raise')
+        self.assertIn('menu_deploy.py', msg)
+        self.assertIn('-12', msg)
 
 
 class TestIdentify(Base):

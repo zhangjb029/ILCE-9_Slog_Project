@@ -266,6 +266,14 @@ def _make_senser(sony, driver, response_timeout=None):
                 timeout = max(1, min(5000, int(remaining * 1000)))
                 result = self.driver.read(count, timeout=timeout)
             except Exception as error:
+                if isinstance(error, NotImplementedError):
+                    # pyusb turns libusb's LIBUSB_ERROR_NOT_SUPPORTED into a bare
+                    # NotImplementedError, which reads like a programming mistake.
+                    # Say what the driver actually reported before the context note.
+                    error.add_note(
+                        'libusb 返回 -12（LIBUSB_ERROR_NOT_SUPPORTED）：这个接口不接受这次传输。'
+                        'Windows 上要么是接口没有绑定 libusb 兼容驱动，'
+                        '要么是传输中途相机掉线或被重置。')
                 error.add_note(
                     f'Service USB read: phase={self._read_phase}, frame={self._frame_index}, '
                     f'function={self._request_function:#x}, sequence={self._sequence}, '

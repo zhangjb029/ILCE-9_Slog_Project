@@ -74,6 +74,14 @@ FAILURE_HINTS = (
         '如果每次都在同一处停下，先换一根线和一个 USB 口再试；换了仍然一样，'
         '说明不是线的问题，请把「技术细节」原样反馈。',
     ),
+    (
+        'Operation not supported or unimplemented',
+        'USB 驱动层回了一个「不支持这个操作」（libusb -12，LIBUSB_ERROR_NOT_SUPPORTED）。\n'
+        '在 Windows 上通常是两种情况之一：\n'
+        '① 相机这个接口没有绑定 libusb 兼容的驱动——用 Zadig 重新装一次'
+        '（Options → List All Devices，选中相机那一项，装 libusb-win32），装完拔线重插；\n'
+        '② 传输中途相机掉线或者被重置了——关机重开，换一根线、换一个 USB 口再试。',
+    ),
 )
 
 FALLBACK = (
@@ -85,6 +93,17 @@ FALLBACK = (
 )
 
 
+_PACKAGE = Path(__file__).resolve().parent
+
+
+def _is_ours(filename: str) -> bool:
+    """True for a frame in this package, as opposed to vendored pyusb."""
+    try:
+        return Path(filename).resolve().parent == _PACKAGE
+    except OSError:
+        return False
+
+
 def _detail(error: BaseException) -> str:
     """The raw failure, plus whatever the transport attached to it.
 
@@ -93,18 +112,20 @@ def _detail(error: BaseException) -> str:
     "something went wrong" and a report that can be acted on, so it travels with
     every message instead of only living in a traceback nobody sees.
 
-    The innermost frame is appended last: one line naming the file and function
-    the exception left is usually enough to place it without asking the user for
-    a stack trace.
+    The innermost frame is named too — but on this path it is usually inside
+    vendored ``libusb1.py``, which points at pyusb rather than at what the tool
+    was doing. Two of this package's own frames follow it for that reason.
     """
     lines = [f'{type(error).__name__}: {error}']
     for note in getattr(error, '__notes__', None) or ():
         lines.extend(f'    {part}' for part in str(note).splitlines())
-    if error.__traceback__ is not None:
-        frames = traceback.extract_tb(error.__traceback__)
-        if frames:
-            last = frames[-1]
-            lines.append(f'    位置：{Path(last.filename).name}:{last.lineno} {last.name}()')
+    frames = traceback.extract_tb(error.__traceback__) if error.__traceback__ else []
+    if frames:
+        last = frames[-1]
+        lines.append(f'    位置：{Path(last.filename).name}:{last.lineno} {last.name}()')
+        ours = [frame for frame in frames[:-1] if _is_ours(frame.filename)]
+        for frame in ours[-2:]:
+            lines.append(f'      ← {Path(frame.filename).name}:{frame.lineno} {frame.name}()')
     return '\n'.join(lines)
 
 

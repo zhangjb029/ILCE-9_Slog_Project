@@ -18,6 +18,13 @@ Put Picture Profile and S-Log Display Assist into the Fn menu of a Sony A9 (ILCE
 
 ## Change log
 
+### v1.8.2 (2026-11-17)
+
+**Fixed**
+
+- **libusb's "operation not supported" now says what it is**: pyusb maps `LIBUSB_ERROR_NOT_SUPPORTED` (-12) to `NotImplementedError`, and PMCA's driver only converts `usb.core.USBError` — so it reached the UI looking like a programming mistake. The message now names -12, gives the two usual causes on Windows (interface not bound to a libusb-compatible driver; device dropped or reset mid-transfer) and the Zadig / replug steps.
+- **The technical block adds this package's own stack frames**: it used to show only the innermost frame, which is almost always inside vendored `libusb1.py` and points at pyusb rather than at what the tool was doing.
+
 ### v1.8.1 (2026-11-17)
 
 **Fixed**

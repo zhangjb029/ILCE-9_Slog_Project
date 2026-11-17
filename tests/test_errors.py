@@ -38,6 +38,13 @@ class TestErrorMessages(unittest.TestCase):
         self.assertIn('超时', msg)
         self.assertIn('没有重试', msg)
 
+    def test_libusb_not_supported_gets_driver_advice(self):
+        """pyusb turns -12 into a bare NotImplementedError; say what it means."""
+        msg = errors.user_message(
+            NotImplementedError('Operation not supported or unimplemented on this platform'))
+        self.assertIn('-12', msg)
+        self.assertIn('Zadig', msg)
+
 
 class TestRawDetailAlwaysReachesTheUser(unittest.TestCase):
     """A remote report showed the fallback text and nothing else.
