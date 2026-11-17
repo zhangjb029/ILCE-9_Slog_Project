@@ -5,6 +5,7 @@
 把 Picture Profile（图片配置文件）和 SLog 显示辅助放进 Sony A9（ILCE-9，固件 6.00）的 Fn 菜单——顺带还有相机里本来就有、但官方界面没给入口的另外 75 个功能。
 
 [English](README.en.md)
+　·　[PDF 版使用说明](docs/ILCE-9_Slog_Project-manual.pdf)
 
 **图形界面新增「电子快门引闪」选项卡**：分两步开放上层规则和 AV 资格，
 读取状态、执行和恢复都在窗口里完成。同样的功能也保留两个源码入口

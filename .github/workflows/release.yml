@@ -66,7 +66,15 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAG: ${{ github.event.inputs.tag || github.ref_name }}
         run: |
-          $files = 'dist\ILCE-9_Slog_Project.exe', 'dist\SHA256SUMS.txt'
+          $files = @('dist\ILCE-9_Slog_Project.exe', 'dist\SHA256SUMS.txt')
+
+          # The PDF manual is generated from README.md and committed, so it
+          # rides along with every release it exists in.
+          $manual = 'docs\ILCE-9_Slog_Project-manual.pdf'
+          if (Test-Path $manual) {
+            $files += $manual
+            Write-Output "attaching manual: $manual"
+          }
 
           # A hand-written note in docs/releases/<tag>.md is what readers see;
           # its first heading becomes the release title. Without one the release

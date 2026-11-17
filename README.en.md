@@ -5,6 +5,7 @@
 Put Picture Profile and S-Log Display Assist into the Fn menu of a Sony A9 (ILCE-9, firmware 6.00) — plus 75 other functions the camera ships with but never exposes.
 
 [简体中文](README.md)
+　·　[PDF manual (Chinese)](docs/ILCE-9_Slog_Project-manual.pdf)
 
 **The window now has an "electronic-shutter flash" tab**: read the current state, open the upper-layer rule and the AV eligibility gate as two separate steps, and restore from either journal. The same operations remain available as `python -m a9tool.flash` and `python -m a9tool.flash_av` (read-only by default). As of 2026-11-11 the user confirmed that with both settings open, single-frame electronic shutter actually fires a flash; electronic burst still fires only the first frame, and hardware safety is not verified. Procedure, restore and limits: [delivery notes](docs/FLASH_DELIVERY.zh-CN.md) (Chinese).
 
