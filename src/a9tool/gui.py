@@ -44,6 +44,10 @@ class App:
         self.root.protocol('WM_DELETE_WINDOW', self.on_close)
         self.root.after(100, self._drain)
         self.log('尚未连接相机。请用 USB 线连接相机，把 USB 连接模式设为「大容量存储」，然后点「连接并检查」。')
+        # Say where backups land before anything can go wrong with them: users
+        # run the exe from Downloads, a second copy, or a shortcut, and then
+        # report that "sessions is empty" while looking at a different folder.
+        self.log(f'会话目录（备份和日志都写在这里）：{journal.sessions_root()}')
 
     # -- plumbing ---------------------------------------------------------
     def log(self, message: str) -> None:

@@ -2,7 +2,14 @@
 
 The user is not a developer: an exception type and a stack trace tell them
 nothing. Every message here answers "what do I do next".
+
+That said, a report that only says "something unexpected happened" cannot be
+fixed either. So each message ends with a short, factual block naming the
+exception, its message, the transport's note and the innermost code location —
+enough to identify the fault without printing a stack trace at the user.
 """
+import traceback
+from pathlib import Path
 
 # Matched against "<ExceptionType>: <message>". First hit wins.
 FAILURE_HINTS = (
@@ -61,17 +68,57 @@ FAILURE_HINTS = (
         '这个槽位的当前值既不是当初的原值、也不是写入的值——你可能在相机上手动改过它。'
         '为避免覆盖你后来的改动，恢复已停止。请先在相机上确认当前值。',
     ),
+    (
+        'Service response exceeded',
+        '读取超时：相机在时限内没有把这一段数据传完，程序按约定停止，没有重试。\n'
+        '如果每次都在同一处停下，先换一根线和一个 USB 口再试；换了仍然一样，'
+        '说明不是线的问题，请把「技术细节」原样反馈。',
+    ),
 )
 
 FALLBACK = (
-    '遇到未预期的问题。请把窗口下方日志整段复制下来。\n'
-    '相机可能已经发生了部分改动，请保留 sessions 目录，并在相机上确认功能是否正常。'
+    '遇到未预期的问题：这不是程序认识的已知故障，没有现成的处理建议。\n'
+    '请把窗口下方日志整段复制下来，尤其是下面「技术细节」那几行——'
+    '它们记录了程序收到的原始错误类型、错误内容和出错时 USB 传输所处的阶段，'
+    '是定位这个问题的唯一线索。\n'
+    '如果相机已经发生了部分改动，请保留 sessions 目录，并在相机上确认功能是否正常。'
 )
 
 
+def _detail(error: BaseException) -> str:
+    """The raw failure, plus whatever the transport attached to it.
+
+    ``usbdev._read_bounded`` adds a note naming the phase, frame and byte
+    counters at the moment the read failed. That note is the difference between
+    "something went wrong" and a report that can be acted on, so it travels with
+    every message instead of only living in a traceback nobody sees.
+
+    The innermost frame is appended last: one line naming the file and function
+    the exception left is usually enough to place it without asking the user for
+    a stack trace.
+    """
+    lines = [f'{type(error).__name__}: {error}']
+    for note in getattr(error, '__notes__', None) or ():
+        lines.extend(f'    {part}' for part in str(note).splitlines())
+    if error.__traceback__ is not None:
+        frames = traceback.extract_tb(error.__traceback__)
+        if frames:
+            last = frames[-1]
+            lines.append(f'    位置：{Path(last.filename).name}:{last.lineno} {last.name}()')
+    return '\n'.join(lines)
+
+
 def user_message(error: BaseException) -> str:
+    """The advice for a known failure, then the original error underneath.
+
+    The hint alone was enough while every failure came from this tool's own
+    vocabulary. A remote report showed the fallback text with nothing to act
+    on and no way to tell what had happened, so the exception itself — and the
+    transport's note — now always reaches the user.
+    """
     text = f'{type(error).__name__}: {error}'
+    detail = f'\n\n技术细节：\n{_detail(error)}'
     for needle, hint in FAILURE_HINTS:
         if needle in text:
-            return hint
-    return FALLBACK
+            return f'{hint}{detail}'
+    return f'{FALLBACK}{detail}'

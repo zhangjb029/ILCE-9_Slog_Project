@@ -213,14 +213,28 @@ def build_candidate(dump: bytes, target: str = 'lut') -> bytes:
 
 
 def read_partition(camera, path: Path) -> dict:
-    """Stream the whole partition to disk; a failed read keeps its partial file."""
+    """Stream the whole partition to disk; a failed read keeps its partial file.
+
+    When the transfer dies, how far it got is the fastest way to tell a stalled
+    link from one that never started. The byte count is attached to the
+    exception so it reaches the user through errors.user_message instead of
+    sitting unread in a partial file.
+    """
     path.parent.mkdir(parents=True, exist_ok=True)
-    with path.open('xb') as stream:
+    try:
+        with path.open('xb') as stream:
+            try:
+                camera.readFile(PARTITION, stream)
+            finally:
+                stream.flush()
+                os.fsync(stream.fileno())
+    except BaseException as error:
         try:
-            camera.readFile(PARTITION, stream)
-        finally:
-            stream.flush()
-            os.fsync(stream.fileno())
+            error.add_note(f'分区读取中断，已收到 {path.stat().st_size:,} 字节；'
+                           f'现场保留在 {path.parent}')
+        except OSError:
+            pass
+        raise
     written = path.stat().st_size
     if written == 0:
         # A zero-byte file means the sink never received anything — the read
@@ -277,6 +291,7 @@ def backup(camera, identity: dict, root: Path, progress=None, replace=False) -> 
     session = _new_session(root, 'backup')
     _write_json(session / 'request.json', dict(
         partition=PARTITION, identity=identity, created_epoch=time.time()))
+    say(f'会话目录：{session}')
     say('正在完整读取当前分区（约 300 MB，需要几分钟）…')
     snapshot = read_partition(camera, session / 'preimage.bin')
     _write_json(session / 'preimage.json', snapshot)
@@ -382,6 +397,7 @@ def write_candidate(camera, identity: dict, root: Path, progress=None) -> dict:
         partition=PARTITION, target=info['target'], candidate_sha256=want_sha,
         identity=identity, created_epoch=time.time()))
 
+    say(f'会话目录：{session}')
     say('正在完整读取当前分区（写入前留一份现场）…')
     snapshot = read_partition(camera, session / 'preimage.bin')
     if snapshot['bytes'] != PARTITION_BYTES:
@@ -430,6 +446,7 @@ def restore(camera, identity: dict, root: Path, progress=None) -> dict:
         partition=PARTITION, target_sha256=meta['sha256'], identity=identity,
         source=meta.get('from_session'), created_epoch=time.time()))
 
+    say(f'会话目录：{session}')
     say('正在完整读取当前分区（回滚前也会留一份）…')
     snapshot = read_partition(camera, session / 'preimage.bin')
     if snapshot['bytes'] != PARTITION_BYTES:

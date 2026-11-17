@@ -170,6 +170,28 @@ class TestBackup(Base):
             md.read_partition(SilentCamera(self.factory), target)
         self.assertIn('没有收到任何字节', str(ctx.exception))
 
+    def test_an_interrupted_read_records_how_far_it_got(self):
+        """The failure report must say where the transfer stopped."""
+        class DyingCamera(FakeCamera):
+            def readFile(self, path, out):
+                out.write(bytes(self.data[:4096]))
+                raise OSError('Invalid or empty service response')
+        target = Path(self._tmp.name) / 'partial.bin'
+        with self.assertRaises(OSError) as ctx:
+            md.read_partition(DyingCamera(self.factory), target)
+        notes = '\n'.join(getattr(ctx.exception, '__notes__', []))
+        self.assertIn('4,096', notes)
+        self.assertIn(str(target.parent), notes)
+        self.assertTrue(target.exists())
+
+    def test_backup_announces_where_its_session_lands(self):
+        """So "sessions is empty" can be answered without guessing."""
+        seen = []
+        md.backup(FakeCamera(self.factory), IDENTITY, self.root, progress=seen.append)
+        joined = '\n'.join(seen)
+        self.assertIn('会话目录：', joined)
+        self.assertIn('backup_', joined)
+
 
 class TestIdentify(Base):
     def _backup(self):

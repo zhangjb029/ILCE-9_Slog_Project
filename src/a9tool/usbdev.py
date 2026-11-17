@@ -261,7 +261,8 @@ def _make_senser(sony, driver, response_timeout=None):
             try:
                 remaining = self._deadline - time.monotonic()
                 if remaining <= 0:
-                    raise TimeoutError('Service response exceeded 30 seconds; no request retry')
+                    raise TimeoutError(
+                        f'Service response exceeded {budget:g} seconds; no request retry')
                 timeout = max(1, min(5000, int(remaining * 1000)))
                 result = self.driver.read(count, timeout=timeout)
             except Exception as error:

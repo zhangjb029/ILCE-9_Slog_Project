@@ -60,6 +60,13 @@ class TestGui(unittest.TestCase):
         for button in self.app.card_buttons:
             self.assertEqual(str(button['state']), 'disabled')
 
+    def test_the_window_says_where_sessions_live(self):
+        """Users run the exe from Downloads or a second copy, then look in the
+        wrong folder and report that sessions is empty."""
+        text = self.app.log_box.get('1.0', 'end')
+        self.assertIn('会话目录', text)
+        self.assertIn(str(self.app.menu_root.parent), text)
+
     def test_cards_disabled_until_override_enabled(self):
         self._connect(_override(1))
         self.assertIn('未开启', self.app.override_var.get())

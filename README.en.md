@@ -18,6 +18,14 @@ Put Picture Profile and S-Log Display Assist into the Fn menu of a Sony A9 (ILCE
 
 ## Change log
 
+### v1.8.1 (2026-11-17)
+
+**Fixed**
+
+- **An unexpected failure now says what actually failed**: every message ends with a technical block naming the exception, the USB transfer phase and frame it died in, how many partition bytes had arrived, and the code location. A remote report previously showed only the generic sentence.
+- **The timeout message was wrong**: a partition read allows 900 seconds, but the error always said "30 seconds". It now reports the real budget, and a timeout has its own hint.
+- **The session directory is printed at startup** and again before every backup, write and restore. "sessions is empty" usually means the exe was run from a different folder than the one being inspected.
+
 ### v1.8.0 (2026-11-17)
 
 **New**
