@@ -1,0 +1,13 @@
+{
+  "source": "git archive v1.8.2",
+  "native_windows_usb": true,
+  "wsl_used": false,
+  "commit": "975f21e76c28ed82905438d35b4a86c1a49bf4b0",
+  "hardware_accessed": false,
+  "date": "2026-11-24",
+  "new_version": "1.9.0",
+  "tag": "v1.8.2",
+  "schema": "a9-native-release-baseline-v1",
+  "usbdev_sha256": "107086bd70bcc752508088bffc5a224ae6bb1002b693a4b49b68c6eb327941e0",
+  "source_line_endings": "exact released git blob"
+}

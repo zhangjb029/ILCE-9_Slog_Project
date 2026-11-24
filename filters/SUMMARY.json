@@ -1,0 +1,34 @@
+{
+  "packages": 227,
+  "native_decoder_pass": 227,
+  "groups": {
+    "Film_GlassMeter": 30,
+    "Fujifilm_abpy": 11,
+    "Fujifilm_derived": 10,
+    "Fujifilm_official": 49,
+    "Multi_camera": 6,
+    "Nikon_official": 5,
+    "Panasonic_creators": 22,
+    "Panasonic_VariCam": 35,
+    "Pentax": 59
+  },
+  "grades": {
+    "A": 85,
+    "C": 92,
+    "B": 50
+  },
+  "mean_of_per_table_mean_DE00": 4.311755840351774,
+  "median_of_per_table_mean_DE00": 1.4680499358709342,
+  "min_of_per_table_mean_DE00": 0.23687076517823588,
+  "max_of_per_table_mean_DE00": 32.567673140598245,
+  "held_out_samples_per_table": 17343,
+  "sd_card_sets": 23,
+  "camera_tested": false,
+  "QEMU_used": false,
+  "existing_gallery": 28,
+  "gallery_total": 255,
+  "delivery_format": "folder",
+  "library_filename_basis": "original source filename stem + .A9P",
+  "preview_baseline": "existing R15 standard24 factory-output baseline",
+  "A9P_payloads_changed": false
+}

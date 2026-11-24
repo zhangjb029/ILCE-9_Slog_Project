@@ -1,0 +1,65 @@
+{
+  "schema": "a9-filecontrol-install-v7",
+  "model": "ILCE-9",
+  "firmware": "6.00",
+  "hardware_verified": false,
+  "device_hash_checks": true,
+  "owner_file_update": false,
+  "files": [
+    {
+      "name": "a9-autoexec-v7.so",
+      "file": "a9-autoexec-v7.so",
+      "path": "/etc/a9-autoexec-v7.so",
+      "bytes": 45428,
+      "sha256": "5f8fe58379f1109affe6deb49934f0359353ac036d915d2d2a2b61e03b08124a"
+    },
+    {
+      "name": "a9-v7.sh",
+      "file": "a9-v7.sh",
+      "path": "/tmp/a9-v7.sh",
+      "bytes": 3609,
+      "sha256": "828d059ac63f1f424668cec2b8b140f2e30ae5f6da048788739b47ebc5eb7e26"
+    },
+    {
+      "name": "a9-film-boot-v7.tar",
+      "file": "a9-film-boot-v7.tar",
+      "path": "/tmp/a9-film-boot-v7.tar",
+      "bytes": 204800,
+      "sha256": "acd5a6ceac2e5f821dd4f5f6738ffce2d4d1e968cc232155308ce7a4cb850ddc"
+    }
+  ],
+  "bundle_files": {
+    "a9-extra-menu.so": {
+      "bytes": 56980,
+      "sha256": "f7f937cbb09924068189712a3d93913dca43c436f5d2e73204c5a51969a082e6"
+    },
+    "a9-extra-menu-guard.elf": {
+      "bytes": 68352,
+      "sha256": "8bb7053753bffa16c756c2c53b9dfd362ed70039eb9cb5632ec5f891747156c2"
+    },
+    "a9-check-persist.req": {
+      "bytes": 500,
+      "sha256": "b54b53915f4d55eb02561c78bd3efee4d0b1f21d8c2244258dc0a3758eeb5ceb"
+    },
+    "a9-install-persist.req": {
+      "bytes": 500,
+      "sha256": "cb84e0d54921b38fc9085c887b0500cdf3bcb09fd9c82c4c6fd2af3f947275f9"
+    },
+    "a9-remove-persist.req": {
+      "bytes": 500,
+      "sha256": "f2cb3f7bddf4fe8f2cb032a2e915bd4e151c200317a4c68d03b20cc79c920522"
+    },
+    "a9-wps-boot.elf": {
+      "bytes": 60284,
+      "sha256": "5c338b55f73ccd4994917075fb83478a2d66b840d406cd5becba51e229f524b7"
+    },
+    "prepare.sh": {
+      "bytes": 3366,
+      "sha256": "beaf206f603fc138c6fc55aa903646b10a96cc86eea37b7459b4b042183b1fcd"
+    },
+    "runtime-start.sh": {
+      "bytes": 6915,
+      "sha256": "69a843facc32d8dda20c024e926c3afd4ab9348eb6b27d5664dd58380aa65487"
+    }
+  }
+}

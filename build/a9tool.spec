@@ -36,12 +36,7 @@ def tree(src, prefix):
     return entries
 
 
-datas = [
-    (os.path.join(SRC, 'data', 'a9_fn_functions.json'), 'data'),
-    (os.path.join(SRC, 'data', 'a9_fn_chinese_names.json'), 'data'),
-    (os.path.join(SRC, 'data', 'r12_patch.bin'), 'data'),
-    (os.path.join(SRC, 'data', 'version_fingerprints.json'), 'data'),
-] + tree(os.path.join(SRC, 'data', 'preview'), 'data/preview') + tree(VENDOR, 'vendor')
+datas = tree(os.path.join(SRC, 'data'), 'data') + tree(VENDOR, 'vendor')
 
 binaries = [
     (DLL, 'libusb_package'),          # where importlib.resources looks

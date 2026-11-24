@@ -1,0 +1,12 @@
+version: 1.9.0
+baseline: v1.8.2 / native Windows USB
+functions: 77
+sessions root: <application>/sessions
+libusb backend: <usb.backend.libusb1._LibUSB object at 0x0000020BFCFB0530>
+r12 patch runs: 66319
+version fingerprints: 原厂 6.00, R8, R9.1, R10, R11, R12
+force rollback: dat4 6.00 <-> 5.00
+R15NH: read -> identify -> patch -> write; FF01 full partition
+release assets: 38 verified
+gui: 77-row table, 6 tabs
+SELFCHECK_OK

@@ -1,0 +1,12 @@
+# Release identities include exact line endings; never normalize pinned files.
+src/data/releases/** -text -diff
+src/a9tool/usbdev.py -text
+filters/**/*.A9P binary
+filters/provenance/source_docs/** -text whitespace=-blank-at-eol,-blank-at-eof
+*.png binary
+*.jpg binary
+*.xz binary
+*.bin binary
+*.dll binary
+*.so binary
+*.elf binary

@@ -61,6 +61,10 @@ jobs:
           Get-Content dist\SHA256SUMS.txt
 
       - name: Publish release
+        # Versioned, privacy-reviewed distributions and filter archives are
+        # published together. Tag CI validates the build without replacing
+        # those reviewed attachments; manual dispatch retains the old route.
+        if: github.event_name == 'workflow_dispatch'
         shell: pwsh
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

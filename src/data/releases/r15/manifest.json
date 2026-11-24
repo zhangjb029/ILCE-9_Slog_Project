@@ -1,0 +1,120 @@
+{
+  "schema": "a9-r15-file-release-v1",
+  "initial_files": [
+    {
+      "path": "/usr/lib/a9fl.so",
+      "file": "lib_a9fl.so",
+      "sha256": "1dcb196ad8f181a6821d1987f730c350ad4c0bd90a60b6cade4e90a366a0228e",
+      "bytes": 692224
+    },
+    {
+      "path": "/usr/lib/viewUnified2.so",
+      "file": "lib_viewUnified2.so",
+      "sha256": "6c1885d86feb358cf11b7f742ff2391e2dac9302ca15d1f98e91b2cff79946ba",
+      "bytes": 10913344
+    },
+    {
+      "path": "/usr/lib/CautionConfig.so",
+      "file": "lib_CautionConfig.so",
+      "sha256": "24747bfedee7dfcd9b66deae2a86629405394d7647e1736c303452495359f391",
+      "bytes": 13289540
+    },
+    {
+      "path": "/usr/share/app/string_english.uxc",
+      "file": "share_app_string_english.uxc",
+      "sha256": "17d1d15dde1c06b7caf35be399a0f6c10f9859b7a079fa771d64f38a131167a8",
+      "bytes": 395920
+    },
+    {
+      "path": "/usr/share/app/string_simplifiedchinese.uxc",
+      "file": "share_app_string_simplifiedchinese.uxc",
+      "sha256": "ecbbb59ad3b649694cdd97525a506301a57c60217c5a54799c2e2e06555bafac",
+      "bytes": 351820
+    }
+  ],
+  "sources": [
+    {
+      "original_length": 356576,
+      "object_offset": 364544,
+      "object_blocks": 80,
+      "object_block_length": 4096,
+      "load_file_ranges": [
+        [
+          0,
+          335256
+        ],
+        [
+          335256,
+          336476
+        ]
+      ],
+      "elf_sha256": "5d3af544b1e23ddf7be07b42a9cabc611112c59ad254f169f9b4aed4e9fed551",
+      "immutable_prefix_sha256": "f9935b0e4a93e7797042173561c4b88ca3671ba7346b39d0bb3a6bf4bf402dae",
+      "initial_full_file_sha256": "1dcb196ad8f181a6821d1987f730c350ad4c0bd90a60b6cade4e90a366a0228e",
+      "profile": "R15-SD",
+      "fixture": "R15-SD.so",
+      "source_image_sha256": "704d9401fb8f63823ffde6a8812eda38ae27d81d6432bf8332cdad95e46233da",
+      "source_proof": "evidence/image.json",
+      "aliases": [
+        "NAME HELP"
+      ]
+    },
+    {
+      "original_length": 283636,
+      "object_offset": 290816,
+      "object_blocks": 80,
+      "object_block_length": 4096,
+      "load_file_ranges": [
+        [
+          0,
+          263680
+        ],
+        [
+          263680,
+          264484
+        ]
+      ],
+      "elf_sha256": "46d96c5a817cb42074a09d4c53db4bfc9c16109554166d84a46a4bfbda298887",
+      "immutable_prefix_sha256": "6f1e284d882144d6462eed7eeaa615c193a2e03149bd3c5b68d937a911c82aa0",
+      "initial_full_file_sha256": "75483e9eebf09987e027318ddb8c4f19c881c09824ab16bfcdd5d70116c40eed",
+      "profile": "R14-SD",
+      "fixture": "R14-SD.so",
+      "source_image_sha256": "63292cf14b1571d0fa6da4b63732bf139e18b0c97d23e3a28c3e904ad1158cbe",
+      "source_proof": "reference/r14_image.json",
+      "aliases": [
+        "R14 FIX1"
+      ]
+    },
+    {
+      "original_length": 352944,
+      "object_offset": 360448,
+      "object_blocks": 80,
+      "object_block_length": 4096,
+      "load_file_ranges": [
+        [
+          0,
+          332864
+        ],
+        [
+          332864,
+          333668
+        ]
+      ],
+      "elf_sha256": "7e7f982a9741e04a6307efb97facda93e018b5511c6490a6781acfe050cfb8c1",
+      "immutable_prefix_sha256": "4e4a0b536856107fc06dac1184239fe0c02c49fd8c80e24b037af6baff333aa6",
+      "initial_full_file_sha256": "ba469724e09def7bc68e8d9a89aaa712b4df784434aed7d658a4da2201030260",
+      "profile": "R15-ORIGINAL",
+      "fixture": "R15-ORIGINAL.so",
+      "source_image_sha256": "070c0e141b3ae260dd8ddd065f2d25d0604c262ecddb096dbe53d6058d6f359f",
+      "source_proof": "reference/r15_original_image.json",
+      "aliases": [
+        "R15 FIX1",
+        "original R15"
+      ]
+    }
+  ],
+  "target_profile": "R15-SD",
+  "source": "analysis/a9_fl_r15_name_only_20261121/operator",
+  "replacement_enabled": false,
+  "initial_install_enabled": false
+}

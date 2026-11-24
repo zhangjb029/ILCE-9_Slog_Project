@@ -15,8 +15,10 @@ from pathlib import Path
 
 
 def selfcheck() -> int:
-    from a9tool import fnmap, journal, usbdev
+    from a9tool import fnmap, journal, usbdev, __version__
 
+    print('version:', __version__)
+    print('baseline: v1.8.2 / native Windows USB')
     print('functions:', len(fnmap.load_functions()))
     print('sessions root:', journal.sessions_root())
     try:
@@ -53,6 +55,24 @@ def selfcheck() -> int:
         print('RESET_UNEXPECTED: dat4 encoding')
         return 4
     print('force rollback: dat4 6.00 <-> 5.00')
+    from a9tool import release_assets, r15nh_deploy, v8_deploy
+    try:
+        assets = release_assets.verify()
+        patch_release = r15nh_deploy.execute('r15.check', {})
+        r15nh_deploy.runtime()
+        for source in r15nh_deploy.package()['sources']:
+            if 'patch' in source:
+                r15nh_deploy._patch_runs(source)
+        if set(patch_release['patch_sources']) != {'stock','R8','R9','R9.1','R10','R11','R12'}:
+            raise ValueError('Expected seven supported R12P source profiles')
+        if (release_assets.ROOT/'r15nh/target.bin.xz').exists():
+            raise ValueError('A complete R15NH partition image must not be distributed')
+        print('R15NH: read -> identify -> patch -> write; FF01 full partition')
+        v8_deploy.execute('v8.check', {})
+    except Exception as error:
+        print(f'RELEASE_FAIL: {type(error).__name__}: {error}')
+        return 4
+    print('release assets:', assets['files'], 'verified')
 
     # GUI construction needs a desktop. A CI runner may not have one, so a
     # failure here is fatal only when A9TOOL_SELFCHECK_GUI=1 (which is what you
@@ -71,8 +91,13 @@ def selfcheck() -> int:
     except Exception as error:
         print(f'GUI_FAIL: {type(error).__name__}: {error}')
         return 3 if strict_gui else 0
-    print('gui: 77-row table, 5 tabs' if rows == 77 and len(tabs) == 5
+    print('gui: 77-row table, 6 tabs' if rows == 77 and len(tabs) == 6
           else f'gui: UNEXPECTED rows={rows} tabs={tabs}')
+    if rows != 77 or len(tabs) != 6:
+        return 3
+    if any('wsl' in name.lower() for name in sys.modules if name.startswith('a9tool.')):
+        print('UNEXPECTED: WSL backend loaded')
+        return 4
 
     print('SELFCHECK_OK')
     return 0

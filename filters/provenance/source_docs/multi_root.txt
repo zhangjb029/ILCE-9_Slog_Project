@@ -1,0 +1,99 @@
+# Panasonic V‑Log -> Fujifilm / Leica / ARRI LUTs
+
+A cross‑brand color‑science translation pipeline that uses ACES and analytically inverted IDTs to reproduce other manufacturers’ color rendering from Panasonic Lumix V‑Log / V‑Gamut footage.
+
+## Contents
+- Introduction
+- Supported LUTs
+- Usage
+    - Real‑Time (camera)
+    - Post‑production
+- Mathematical basis
+- Disclaimer
+
+## Introduction
+
+This project provides a mathematically grounded method to reproduce the color characteristics of other camera ecosystems directly from Panasonic Lumix V‑Log / V‑Gamut footage. The pipeline:
+
+1. Converts V‑Log / V‑Gamut to ACES AP0 (linear).
+2. Applies a precisely inverted IDT of the target camera system.
+3. Re‑encodes the signal into the target brand’s native Log / gamut space.
+4. Optionally applies the manufacturer’s official LUTs.
+
+The resulting LUTs can be used in‑camera (real‑time LUTs) or in post‑production.
+
+## Supported LUTs
+
+All LUTs assume Panasonic V‑Log / V‑Gamut input.
+
+- Fujifilm (F‑Log2C)
+    - Reproductions: reala ace, classic chrome, classic neg, provia, velvia, astia, eterna, eterna (bleach bypass), pro neg std, acros
+    - Technical transforms: F‑Log2C → Rec.709, F‑Log2C → WDR
+    - Built using official F‑Log2C IDT
+
+- Leica (L‑Log)
+    - Classic and natural looks approximating SL / Q tonal behavior
+
+- Nikon (N‑Log)
+    - Official Rec.709 conversion and artistic variants (RED achromic, film bias series)
+
+- ARRI (LogC)
+    - ARRI Classic 709 derived from LogC colorimetry
+
+- Film emulation (Cineon)
+    - Print‑stock emulations (e.g., Fuji 3513DI, Kodak 2383)
+
+- RED IPP2
+    - RED IPP2 medium contrast / soft highlight
+
+
+## Usage
+
+### Real‑time (Camera LUTs)
+
+Please note that real‑time LUTs can only be used on Panasonic Lumix cameras that support LUT import (e.g., S5 II, S9, etc.). Check for compatibility with your specific model.
+
+1. Download the pre‑generated 33‑point .cube files form the Luts folder.
+2. Copy to SD card or import via the Lumix Lab App.
+3. Load them into the LUT library on the camera.
+4. Shoot with real‑time Fujifilm / Leica / ARRI color rendering.
+
+### Post‑production
+- Apply the provided .cube LUTs in your NLE or color grading tool as a V‑Log -> target camera transform before further grading.
+
+
+
+## Mathematical basis
+
+Transforms are constructed from analytically inverted IDT matrices. Example: ACES AP0 → F‑Log2C inversion (Fujifilm IDT v1.00):
+
+```c
+{
+         1.18805632080277f,  -0.0526707998586238f, -0.135385520944148f,
+         0.000717966415014f,  0.987967895093181f,  0.011314138491804f,
+         0.009581414665876f,  0.005040683806666f,  0.985377901527459f,
+};
+```
+
+V‑Log behaves similarly to the logarithmic curve of a negative film scan, making it highly compatible with traditional film workflows. Light captured by the lens is converted into electronic signals by the camera sensor, meaning there is a proportional relationship between the scene’s light and the recorded signal. The logarithmic curve character of V‑Log represents how the linear video signal relates to exposure in stops: each change of one stop in exposure results in an approximately equal change in the encoded signal.
+
+The graph shows the characteristics of V-Log. This graph is defined as the x axis being exposure and the
+y axis being 10bit code values. The table shows reflection and code assignment. Gray output code with
+reflection of 18% is defined as 433, black output code with reflection of 0% as 128, and white output code
+with reflection of 90% as 602.
+
+![alt text](IMG/V-Log.png)
+Figure: Panasonic V‑Log curve
+
+### V‑Log Code Values
+
+| Input Reflection [%] | V‑Log IRE [%] | 10‑bit code value | 12‑bit code value |
+|--------------------:|---------------:|-----------------:|-----------------:|
+| 0                   | 7.3            | 128              | 512              |
+| 18                  | 42             | 433              | 1732             |
+| 90                  | 61             | 602              | 2408             |
+
+
+## Disclaimer
+
+This project is not affiliated with Panasonic, Fujifilm, Leica, ARRI, Nikon, Sony or RED.

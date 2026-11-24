@@ -1,0 +1,157 @@
+{
+  "schema": "a9-releases-v1",
+  "files": {
+    "LICENSE-PolyForm-Noncommercial.txt": {
+      "bytes": 4563,
+      "sha256": "c0ea4a896d2c8c394b29f9427589996db826cd501c512279ff0ed3ef48fabbe5"
+    },
+    "NOTICE.md": {
+      "bytes": 532,
+      "sha256": "3bbf4a018a6d2d9b5fe976ff2a431dcfb4643df450f2cc6f5856fc7b18ba14d0"
+    },
+    "r15/a9fl.so": {
+      "bytes": 692224,
+      "sha256": "1dcb196ad8f181a6821d1987f730c350ad4c0bd90a60b6cade4e90a366a0228e"
+    },
+    "r15/lib_a9fl.so": {
+      "bytes": 692224,
+      "sha256": "1dcb196ad8f181a6821d1987f730c350ad4c0bd90a60b6cade4e90a366a0228e"
+    },
+    "r15/lib_CautionConfig.so": {
+      "bytes": 13289540,
+      "sha256": "24747bfedee7dfcd9b66deae2a86629405394d7647e1736c303452495359f391"
+    },
+    "r15/lib_viewUnified2.so": {
+      "bytes": 10913344,
+      "sha256": "6c1885d86feb358cf11b7f742ff2391e2dac9302ca15d1f98e91b2cff79946ba"
+    },
+    "r15/manifest.json": {
+      "bytes": 3911,
+      "sha256": "6f05d3bc6c67e7a82c47744aca555713c7c1bc62b328531e5253a1b3986ef6c4"
+    },
+    "r15/R14-SD.so": {
+      "bytes": 618496,
+      "sha256": "75483e9eebf09987e027318ddb8c4f19c881c09824ab16bfcdd5d70116c40eed"
+    },
+    "r15/R15-ORIGINAL.so": {
+      "bytes": 688128,
+      "sha256": "ba469724e09def7bc68e8d9a89aaa712b4df784434aed7d658a4da2201030260"
+    },
+    "r15/R15-SD.so": {
+      "bytes": 692224,
+      "sha256": "1dcb196ad8f181a6821d1987f730c350ad4c0bd90a60b6cade4e90a366a0228e"
+    },
+    "r15/share_app_string_english.uxc": {
+      "bytes": 395920,
+      "sha256": "17d1d15dde1c06b7caf35be399a0f6c10f9859b7a079fa771d64f38a131167a8"
+    },
+    "r15/share_app_string_simplifiedchinese.uxc": {
+      "bytes": 351820,
+      "sha256": "ecbbb59ad3b649694cdd97525a506301a57c60217c5a54799c2e2e06555bafac"
+    },
+    "r15/stock0.bin": {
+      "bytes": 1280,
+      "sha256": "df84f482bd2f0bd26f1f7fa3fb5e96556020ff340eecddc4a41ae010ca04ddcf"
+    },
+    "r15/stock1.bin": {
+      "bytes": 1280,
+      "sha256": "c8da59e6abe83c1cccdb8285001fb4019cbb8ffe59be9495949bfe59fb0dd522"
+    },
+    "v7/a9-autoexec-v7.so": {
+      "bytes": 45428,
+      "sha256": "5f8fe58379f1109affe6deb49934f0359353ac036d915d2d2a2b61e03b08124a"
+    },
+    "v7/a9-film-boot-v7.tar": {
+      "bytes": 204800,
+      "sha256": "acd5a6ceac2e5f821dd4f5f6738ffce2d4d1e968cc232155308ce7a4cb850ddc"
+    },
+    "v7/a9-v7.sh": {
+      "bytes": 3609,
+      "sha256": "828d059ac63f1f424668cec2b8b140f2e30ae5f6da048788739b47ebc5eb7e26"
+    },
+    "v7/deploy.py": {
+      "bytes": 24687,
+      "sha256": "879a6f8e5f75292bc5e8fa176e5997b5627a61d7622fe266bcbdcd815c70d799"
+    },
+    "v7/manifest.json": {
+      "bytes": 2057,
+      "sha256": "a5a474ec75fc6119ad41e33e98c60e660c538097b30fe3bfeb4164f02de8ec32"
+    },
+    "r15nh/config_records.py": {
+      "bytes": 5739,
+      "sha256": "68983afc0667f54ca5f8ef4c0294bed6f7b1c821d32c71adbb8341975254ea49"
+    },
+    "r15nh/guarded_config.py": {
+      "bytes": 9285,
+      "sha256": "2d673eb5416e73fe3ca544056de5d715588b53c9c62b22d4aebf76f718b59338"
+    },
+    "r15nh/lut_backup.py": {
+      "bytes": 4015,
+      "sha256": "4c82b1eecf334f3b1c41bc8b321ecca100e16020e29afd8e2eb5fed8b4937f8b"
+    },
+    "r15nh/manifest.json": {
+      "bytes": 66009,
+      "sha256": "364c2e3167963574d5e3ec35fa0bb5b40a880427b0dd28cbe1079ac6083dbb74"
+    },
+    "r15nh/partition_core.py": {
+      "bytes": 5709,
+      "sha256": "d5d3296d0f0fb3a68d60b70530e921b9d7149b013b7982e0da284804fe803a8a"
+    },
+    "r15nh/r10.r12p.xz": {
+      "bytes": 449332,
+      "sha256": "eb4088cde882a8086b75a12160914e99324aa522b75db4060986866920ae5c45"
+    },
+    "r15nh/r11.r12p.xz": {
+      "bytes": 449080,
+      "sha256": "2c66cd9e62879d068ee7963e98392aeb7c199d4c465a7d9c926d65b5dc3401cc"
+    },
+    "r15nh/r12.r12p.xz": {
+      "bytes": 447984,
+      "sha256": "6dd172a2ee6d50b6bc8e49e8f5ed18791717e2d35a34e3a47aa9a10bd02c07ba"
+    },
+    "r15nh/r8.r12p.xz": {
+      "bytes": 399384,
+      "sha256": "2dcc622077c0b18d871dc430c34ad931a4ea1757a89bdc72250c957c120887e7"
+    },
+    "r15nh/r9.r12p.xz": {
+      "bytes": 450068,
+      "sha256": "f7d11446a81dc8975e10d9da1390c3195c41d13a576512b70d55e6b1595239b0"
+    },
+    "r15nh/r9_1.r12p.xz": {
+      "bytes": 449964,
+      "sha256": "db85ae9b7d7ed1091a3c92cd73f280f5e4159e74e6bea201100bda909da720c3"
+    },
+    "r15nh/readback_rules.py": {
+      "bytes": 1795,
+      "sha256": "bc1a3d3ad4fa61ece9d310e6309d834931272fca0a3c01454aab610dab1c1070"
+    },
+    "r15nh/snapshot_fs.py": {
+      "bytes": 10796,
+      "sha256": "d4954445c22f1f22f677c06e28fae4d7821233919e5c6b680638ec9eedce5216"
+    },
+    "r15nh/stock.r12p.xz": {
+      "bytes": 571984,
+      "sha256": "cb8ffc6ab520ce5eea0f70c3670c21aa97b24afc37530b4cea435ca00b00a34c"
+    },
+    "v8/a9-autoexec-v71mt.so": {
+      "bytes": 45428,
+      "sha256": "a98281a5886319f1cf04848fecbc21ba79cb08d2b3bdc06deb05755e7b48d926"
+    },
+    "v8/a9-film-boot-v71mt.tar": {
+      "bytes": 215040,
+      "sha256": "563d9c072ef85e0bf7020446a04eec7e8da8822f904a7c48707260f924ead8b2"
+    },
+    "v8/a9-v71mt.sh": {
+      "bytes": 3612,
+      "sha256": "cd12fe646e1fe0d209d2dfb5ba89c8f41fefd4763aa3cfb4df53359b5b3fc56e"
+    },
+    "v8/deploy.py": {
+      "bytes": 24795,
+      "sha256": "b0bc84f94e197c4a2d23abbe343e8688bd9dc601425c0116c5c3ecc20d22fa89"
+    },
+    "v8/manifest.json": {
+      "bytes": 2087,
+      "sha256": "2fdff7e4d09ab87e03d5322c40699b294b04cf1065a2a5877089207a7285ed23"
+    }
+  }
+}

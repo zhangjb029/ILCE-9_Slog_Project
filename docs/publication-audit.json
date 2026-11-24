@@ -1,0 +1,23 @@
+{
+  "schema": "a9-publication-review-v1",
+  "date": "2026-11-24",
+  "version": "1.9.0",
+  "personal_paths_removed": true,
+  "machine_sessions_included": false,
+  "full_partition_image_included": false,
+  "anonymous_ui_screenshots": 6,
+  "frozen_private_path_scan": "PASS",
+  "original_filter_count": 227,
+  "all_filter_and_card_files_checked": 486,
+  "all_a9p_strict_decoder": "PASS",
+  "filter_payloads_unchanged": true,
+  "photo_recommended_slots": 16,
+  "source_licenses_preserved": true,
+  "native_usb_source_matches_released_git_blob": true,
+  "tests": {
+    "passed": 374,
+    "failed": 0,
+    "skipped": 0
+  },
+  "camera_accessed": false
+}

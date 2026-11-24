@@ -1,0 +1,3579 @@
+{
+  "schema": "a9-r15nh-r12p-release-v2",
+  "model": "ILCE-9",
+  "firmware": "6.00",
+  "build": "37111_13.2019091301",
+  "pair_sha256": "d4a9a6234f6c05083716fb9cb1218d7e50ef541a0a279ac0a61b786a73822d1b",
+  "partition": "/dev/nflasha15",
+  "partition_bytes": 314572800,
+  "candidate_sha256": "704d9401fb8f63823ffde6a8812eda38ae27d81d6432bf8332cdad95e46233da",
+  "sources": [
+    {
+      "label": "stock",
+      "files": {
+        "/usr/lib/a9fl.so": null,
+        "/usr/lib/viewUnified2.so": "d34b52f03c61f839e16141b8857a3f06b2960aafe3a6ceeba0e6c4a101954223",
+        "/usr/lib/CautionConfig.so": "577a29088c971344f8191049a298480aa1b2221393ad05815bbef860d2c35ac7",
+        "/usr/share/app/string_simplifiedchinese.uxc": "8ba55a52276a84f427e0e92816765ea584b7c44a7e20cad59eed3370d7d7cf7b",
+        "/usr/share/app/string_english.uxc": "c23b39b0f6115f2720d3e9b25ac247190db01f1570b1a57617ae5954da7e6d64"
+      },
+      "source": "src/data/version_fingerprints.json",
+      "config_schema": null,
+      "object_layout": null,
+      "normalized_partition_sha256": "6fa2bf8058ebe5b2a67c8bd8e80a421a2e125bc8c68f6a9f541f8fc7cc1ba1f7",
+      "canonical_sha256": "ed835ff938e5d9d816b611263d1e124c08eb907a883d08587170bdbd7c32f9d2",
+      "normalization_regions": [
+        [
+          1036,
+          1044
+        ],
+        [
+          1068,
+          1078
+        ],
+        [
+          2060,
+          2064
+        ],
+        [
+          2092,
+          2096
+        ],
+        [
+          2124,
+          2128
+        ],
+        [
+          2156,
+          2160
+        ],
+        [
+          2188,
+          2192
+        ],
+        [
+          2220,
+          2224
+        ],
+        [
+          2252,
+          2256
+        ],
+        [
+          2284,
+          2288
+        ],
+        [
+          2316,
+          2320
+        ],
+        [
+          2348,
+          2352
+        ],
+        [
+          2380,
+          2384
+        ],
+        [
+          2412,
+          2416
+        ],
+        [
+          2444,
+          2448
+        ],
+        [
+          2476,
+          2480
+        ],
+        [
+          2508,
+          2512
+        ],
+        [
+          2540,
+          2544
+        ],
+        [
+          2572,
+          2576
+        ],
+        [
+          2604,
+          2608
+        ],
+        [
+          2636,
+          2640
+        ],
+        [
+          2668,
+          2672
+        ],
+        [
+          2700,
+          2704
+        ],
+        [
+          2732,
+          2736
+        ],
+        [
+          2764,
+          2768
+        ],
+        [
+          2796,
+          2800
+        ],
+        [
+          2828,
+          2832
+        ],
+        [
+          2860,
+          2864
+        ],
+        [
+          2892,
+          2896
+        ]
+      ],
+      "patch": "stock.r12p.xz",
+      "patch_statistics": {
+        "offset_runs": 73175,
+        "changed_bytes": 1650738,
+        "uncompressed_patch_bytes": 2236146,
+        "compressed_patch_bytes": 571984,
+        "patch_sha256": "cb8ffc6ab520ce5eea0f70c3670c21aa97b24afc37530b4cea435ca00b00a34c"
+      },
+      "canonical_metadata": [
+        {
+          "start": 1036,
+          "end": 1044,
+          "hex": "682600004bd00000"
+        },
+        {
+          "start": 1068,
+          "end": 1078,
+          "hex": "00000000c2997a5d0100"
+        },
+        {
+          "start": 2060,
+          "end": 2064,
+          "hex": "0000c207"
+        },
+        {
+          "start": 2092,
+          "end": 2096,
+          "hex": "0000d807"
+        },
+        {
+          "start": 2124,
+          "end": 2128,
+          "hex": "0000a307"
+        },
+        {
+          "start": 2156,
+          "end": 2160,
+          "hex": "0000d707"
+        },
+        {
+          "start": 2188,
+          "end": 2192,
+          "hex": "00007207"
+        },
+        {
+          "start": 2220,
+          "end": 2224,
+          "hex": "0000d807"
+        },
+        {
+          "start": 2252,
+          "end": 2256,
+          "hex": "0000d807"
+        },
+        {
+          "start": 2284,
+          "end": 2288,
+          "hex": "0000d807"
+        },
+        {
+          "start": 2316,
+          "end": 2320,
+          "hex": "0000d807"
+        },
+        {
+          "start": 2348,
+          "end": 2352,
+          "hex": "0000d807"
+        },
+        {
+          "start": 2380,
+          "end": 2384,
+          "hex": "0000d707"
+        },
+        {
+          "start": 2412,
+          "end": 2416,
+          "hex": "0000d707"
+        },
+        {
+          "start": 2444,
+          "end": 2448,
+          "hex": "0000d407"
+        },
+        {
+          "start": 2476,
+          "end": 2480,
+          "hex": "00008207"
+        },
+        {
+          "start": 2508,
+          "end": 2512,
+          "hex": "0000b407"
+        },
+        {
+          "start": 2540,
+          "end": 2544,
+          "hex": "0000d807"
+        },
+        {
+          "start": 2572,
+          "end": 2576,
+          "hex": "0000d807"
+        },
+        {
+          "start": 2604,
+          "end": 2608,
+          "hex": "0000d107"
+        },
+        {
+          "start": 2636,
+          "end": 2640,
+          "hex": "0000d807"
+        },
+        {
+          "start": 2668,
+          "end": 2672,
+          "hex": "0000d707"
+        },
+        {
+          "start": 2700,
+          "end": 2704,
+          "hex": "0000d707"
+        },
+        {
+          "start": 2732,
+          "end": 2736,
+          "hex": "0000c107"
+        },
+        {
+          "start": 2764,
+          "end": 2768,
+          "hex": "651ba007"
+        },
+        {
+          "start": 2796,
+          "end": 2800,
+          "hex": "030bf805"
+        },
+        {
+          "start": 2828,
+          "end": 2832,
+          "hex": "0000cf07"
+        },
+        {
+          "start": 2860,
+          "end": 2864,
+          "hex": "0000ce07"
+        },
+        {
+          "start": 2892,
+          "end": 2896,
+          "hex": "0000d807"
+        }
+      ]
+    },
+    {
+      "label": "R8",
+      "files": {
+        "/usr/lib/a9fl.so": "a12358a5a3f75a1497e98fed946f7ee4f4252fc26dfe50aba49892be79005cf4",
+        "/usr/lib/viewUnified2.so": "b5d6a6d3c0e5fb93d016dea2e8ae11b450cfc3e2f30a3696b11a3ede2d658c01",
+        "/usr/lib/CautionConfig.so": "24747bfedee7dfcd9b66deae2a86629405394d7647e1736c303452495359f391",
+        "/usr/share/app/string_simplifiedchinese.uxc": "8a5e51f768630fa831d6372b20f37b3f08ed0c6c8e3aeec63986bcc1eed035af",
+        "/usr/share/app/string_english.uxc": "9cfb78c053098d7e447352951f6669c34636a89a69962d5b18d112df3ca2dc8d"
+      },
+      "source": "src/data/version_fingerprints.json",
+      "config_schema": 1,
+      "object_layout": null,
+      "normalized_partition_sha256": "a9d3787fe0d7f082e5605de8ccd7a1ec642a2182cf9cdd410603f7500d5b5d40",
+      "canonical_sha256": "cba78da44df413058f56db74b62305bda7d1de756d65ffd96b93d4e2659ef22e",
+      "normalization_regions": [
+        [
+          1036,
+          1044
+        ],
+        [
+          1068,
+          1078
+        ],
+        [
+          2060,
+          2064
+        ],
+        [
+          2092,
+          2096
+        ],
+        [
+          2124,
+          2128
+        ],
+        [
+          2156,
+          2160
+        ],
+        [
+          2188,
+          2192
+        ],
+        [
+          2220,
+          2224
+        ],
+        [
+          2252,
+          2256
+        ],
+        [
+          2284,
+          2288
+        ],
+        [
+          2316,
+          2320
+        ],
+        [
+          2348,
+          2352
+        ],
+        [
+          2380,
+          2384
+        ],
+        [
+          2412,
+          2416
+        ],
+        [
+          2444,
+          2448
+        ],
+        [
+          2476,
+          2480
+        ],
+        [
+          2508,
+          2512
+        ],
+        [
+          2540,
+          2544
+        ],
+        [
+          2572,
+          2576
+        ],
+        [
+          2604,
+          2608
+        ],
+        [
+          2636,
+          2640
+        ],
+        [
+          2668,
+          2672
+        ],
+        [
+          2700,
+          2704
+        ],
+        [
+          2732,
+          2736
+        ],
+        [
+          2764,
+          2768
+        ],
+        [
+          2796,
+          2800
+        ],
+        [
+          2828,
+          2832
+        ],
+        [
+          2860,
+          2864
+        ],
+        [
+          2892,
+          2896
+        ],
+        [
+          193002504,
+          193002516
+        ]
+      ],
+      "patch": "r8.r12p.xz",
+      "patch_statistics": {
+        "offset_runs": 49379,
+        "changed_bytes": 993600,
+        "uncompressed_patch_bytes": 1388640,
+        "compressed_patch_bytes": 399384,
+        "patch_sha256": "2dcc622077c0b18d871dc430c34ad931a4ea1757a89bdc72250c957c120887e7"
+      },
+      "canonical_metadata": [
+        {
+          "start": 1036,
+          "end": 1044,
+          "hex": "412600004ad00000"
+        },
+        {
+          "start": 1068,
+          "end": 1078,
+          "hex": "000000007b03f76a0100"
+        },
+        {
+          "start": 2060,
+          "end": 2064,
+          "hex": "0000c207"
+        },
+        {
+          "start": 2092,
+          "end": 2096,
+          "hex": "0000d807"
+        },
+        {
+          "start": 2124,
+          "end": 2128,
+          "hex": "0000a307"
+        },
+        {
+          "start": 2156,
+          "end": 2160,
+          "hex": "0000d707"
+        },
+        {
+          "start": 2188,
+          "end": 2192,
+          "hex": "00007207"
+        },
+        {
+          "start": 2220,
+          "end": 2224,
+          "hex": "0000d807"
+        },
+        {
+          "start": 2252,
+          "end": 2256,
+          "hex": "0000d807"
+        },
+        {
+          "start": 2284,
+          "end": 2288,
+          "hex": "0000d807"
+        },
+        {
+          "start": 2316,
+          "end": 2320,
+          "hex": "0000d807"
+        },
+        {
+          "start": 2348,
+          "end": 2352,
+          "hex": "0000d807"
+        },
+        {
+          "start": 2380,
+          "end": 2384,
+          "hex": "0000d707"
+        },
+        {
+          "start": 2412,
+          "end": 2416,
+          "hex": "0000d707"
+        },
+        {
+          "start": 2444,
+          "end": 2448,
+          "hex": "0000d407"
+        },
+        {
+          "start": 2476,
+          "end": 2480,
+          "hex": "00008207"
+        },
+        {
+          "start": 2508,
+          "end": 2512,
+          "hex": "0000b407"
+        },
+        {
+          "start": 2540,
+          "end": 2544,
+          "hex": "0000d807"
+        },
+        {
+          "start": 2572,
+          "end": 2576,
+          "hex": "0000d807"
+        },
+        {
+          "start": 2604,
+          "end": 2608,
+          "hex": "0000d107"
+        },
+        {
+          "start": 2636,
+          "end": 2640,
+          "hex": "0000d807"
+        },
+        {
+          "start": 2668,
+          "end": 2672,
+          "hex": "0000d707"
+        },
+        {
+          "start": 2700,
+          "end": 2704,
+          "hex": "0000d707"
+        },
+        {
+          "start": 2732,
+          "end": 2736,
+          "hex": "0000c107"
+        },
+        {
+          "start": 2764,
+          "end": 2768,
+          "hex": "651ba007"
+        },
+        {
+          "start": 2796,
+          "end": 2800,
+          "hex": "dc0af705"
+        },
+        {
+          "start": 2828,
+          "end": 2832,
+          "hex": "0000cf07"
+        },
+        {
+          "start": 2860,
+          "end": 2864,
+          "hex": "0000ce07"
+        },
+        {
+          "start": 2892,
+          "end": 2896,
+          "hex": "0000d807"
+        },
+        {
+          "start": 193002504,
+          "end": 193002516,
+          "hex": "7b03f76a7b03f76a7b03f76a"
+        }
+      ]
+    },
+    {
+      "label": "R9",
+      "files": {
+        "/usr/lib/a9fl.so": "eedc65f33e07460e42da542063cbcab792eeb53e438072fd9e22ebfb5a9457ff",
+        "/usr/share/app/string_simplifiedchinese.uxc": "1eee0fbb7850f4e8b5eae8a5fd9ec1ebbaba00cbfac8f272c6307f7e50650728",
+        "/usr/share/app/string_english.uxc": "01bd3ee7918eb14621bf5a024f4ef23429778a78a9778ebb8f9aa00e43aaaaea",
+        "/usr/lib/viewUnified2.so": "b5d6a6d3c0e5fb93d016dea2e8ae11b450cfc3e2f30a3696b11a3ede2d658c01",
+        "/usr/lib/CautionConfig.so": "24747bfedee7dfcd9b66deae2a86629405394d7647e1736c303452495359f391"
+      },
+      "source": "analysis/a9_fl23_operator_20261114_R9/manifest.json",
+      "config_schema": 4,
+      "object_layout": null,
+      "normalized_partition_sha256": "85f62a70030573034b1be9fe3e3af653e53d28baf0fa92ba58a17268aa7c980c",
+      "canonical_sha256": "e5085e21c11e194875f48bee0e2f2bd5e411e20b6ce2e2ba7d0a9565852d40ea",
+      "normalization_regions": [
+        [
+          1036,
+          1044
+        ],
+        [
+          1068,
+          1078
+        ],
+        [
+          2060,
+          2064
+        ],
+        [
+          2092,
+          2096
+        ],
+        [
+          2124,
+          2128
+        ],
+        [
+          2156,
+          2160
+        ],
+        [
+          2188,
+          2192
+        ],
+        [
+          2220,
+          2224
+        ],
+        [
+          2252,
+          2256
+        ],
+        [
+          2284,
+          2288
+        ],
+        [
+          2316,
+          2320
+        ],
+        [
+          2348,
+          2352
+        ],
+        [
+          2380,
+          2384
+        ],
+        [
+          2412,
+          2416
+        ],
+        [
+          2444,
+          2448
+        ],
+        [
+          2476,
+          2480
+        ],
+        [
+          2508,
+          2512
+        ],
+        [
+          2540,
+          2544
+        ],
+        [
+          2572,
+          2576
+        ],
+        [
+          2604,
+          2608
+        ],
+        [
+          2636,
+          2640
+        ],
+        [
+          2668,
+          2672
+        ],
+        [
+          2700,
+          2704
+        ],
+        [
+          2732,
+          2736
+        ],
+        [
+          2764,
+          2768
+        ],
+        [
+          2796,
+          2800
+        ],
+        [
+          2828,
+          2832
+        ],
+        [
+          2860,
+          2864
+        ],
+        [
+          2892,
+          2896
+        ],
+        [
+          193002504,
+          193002516
+        ]
+      ],
+      "patch": "r9.r12p.xz",
+      "patch_statistics": {
+        "offset_runs": 48845,
+        "changed_bytes": 950718,
+        "uncompressed_patch_bytes": 1341486,
+        "compressed_patch_bytes": 450068,
+        "patch_sha256": "f7d11446a81dc8975e10d9da1390c3195c41d13a576512b70d55e6b1595239b0"
+      },
+      "canonical_metadata": [
+        {
+          "start": 1036,
+          "end": 1044,
+          "hex": "352600004ad00000"
+        },
+        {
+          "start": 1068,
+          "end": 1078,
+          "hex": "00000000cc78f86a0100"
+        },
+        {
+          "start": 2060,
+          "end": 2064,
+          "hex": "0000c207"
+        },
+        {
+          "start": 2092,
+          "end": 2096,
+          "hex": "0000d807"
+        },
+        {
+          "start": 2124,
+          "end": 2128,
+          "hex": "0000a307"
+        },
+        {
+          "start": 2156,
+          "end": 2160,
+          "hex": "0000d707"
+        },
+        {
+          "start": 2188,
+          "end": 2192,
+          "hex": "00007207"
+        },
+        {
+          "start": 2220,
+          "end": 2224,
+          "hex": "0000d807"
+        },
+        {
+          "start": 2252,
+          "end": 2256,
+          "hex": "0000d807"
+        },
+        {
+          "start": 2284,
+          "end": 2288,
+          "hex": "0000d807"
+        },
+        {
+          "start": 2316,
+          "end": 2320,
+          "hex": "0000d807"
+        },
+        {
+          "start": 2348,
+          "end": 2352,
+          "hex": "0000d807"
+        },
+        {
+          "start": 2380,
+          "end": 2384,
+          "hex": "8501d707"
+        },
+        {
+          "start": 2412,
+          "end": 2416,
+          "hex": "0000d707"
+        },
+        {
+          "start": 2444,
+          "end": 2448,
+          "hex": "0000d407"
+        },
+        {
+          "start": 2476,
+          "end": 2480,
+          "hex": "00008207"
+        },
+        {
+          "start": 2508,
+          "end": 2512,
+          "hex": "0000b407"
+        },
+        {
+          "start": 2540,
+          "end": 2544,
+          "hex": "0000d807"
+        },
+        {
+          "start": 2572,
+          "end": 2576,
+          "hex": "5a01d807"
+        },
+        {
+          "start": 2604,
+          "end": 2608,
+          "hex": "0000d107"
+        },
+        {
+          "start": 2636,
+          "end": 2640,
+          "hex": "0000d807"
+        },
+        {
+          "start": 2668,
+          "end": 2672,
+          "hex": "0000d707"
+        },
+        {
+          "start": 2700,
+          "end": 2704,
+          "hex": "0000d707"
+        },
+        {
+          "start": 2732,
+          "end": 2736,
+          "hex": "0000c107"
+        },
+        {
+          "start": 2764,
+          "end": 2768,
+          "hex": "651ba007"
+        },
+        {
+          "start": 2796,
+          "end": 2800,
+          "hex": "f107f705"
+        },
+        {
+          "start": 2828,
+          "end": 2832,
+          "hex": "0000cf07"
+        },
+        {
+          "start": 2860,
+          "end": 2864,
+          "hex": "0000ce07"
+        },
+        {
+          "start": 2892,
+          "end": 2896,
+          "hex": "0000d807"
+        },
+        {
+          "start": 193002504,
+          "end": 193002516,
+          "hex": "cb78f86acb78f86acb78f86a"
+        }
+      ]
+    },
+    {
+      "label": "R9.1",
+      "files": {
+        "/usr/lib/a9fl.so": "3e01f0d0c1e6659fb66d74a41afe3b6621cab9c2660602b719668e70b210dd3d",
+        "/usr/lib/viewUnified2.so": "b5d6a6d3c0e5fb93d016dea2e8ae11b450cfc3e2f30a3696b11a3ede2d658c01",
+        "/usr/lib/CautionConfig.so": "24747bfedee7dfcd9b66deae2a86629405394d7647e1736c303452495359f391",
+        "/usr/share/app/string_simplifiedchinese.uxc": "1eee0fbb7850f4e8b5eae8a5fd9ec1ebbaba00cbfac8f272c6307f7e50650728",
+        "/usr/share/app/string_english.uxc": "01bd3ee7918eb14621bf5a024f4ef23429778a78a9778ebb8f9aa00e43aaaaea"
+      },
+      "source": "src/data/version_fingerprints.json",
+      "config_schema": 4,
+      "object_layout": null,
+      "normalized_partition_sha256": "12eeeca4885268f5b146c21a83a26b3c4e90f118016f8d3b340d20c9ba1bed04",
+      "canonical_sha256": "623253c8da83a641074e95a348055ca1e218698feee28ce63e1da43433252c19",
+      "normalization_regions": [
+        [
+          1036,
+          1044
+        ],
+        [
+          1068,
+          1078
+        ],
+        [
+          2060,
+          2064
+        ],
+        [
+          2092,
+          2096
+        ],
+        [
+          2124,
+          2128
+        ],
+        [
+          2156,
+          2160
+        ],
+        [
+          2188,
+          2192
+        ],
+        [
+          2220,
+          2224
+        ],
+        [
+          2252,
+          2256
+        ],
+        [
+          2284,
+          2288
+        ],
+        [
+          2316,
+          2320
+        ],
+        [
+          2348,
+          2352
+        ],
+        [
+          2380,
+          2384
+        ],
+        [
+          2412,
+          2416
+        ],
+        [
+          2444,
+          2448
+        ],
+        [
+          2476,
+          2480
+        ],
+        [
+          2508,
+          2512
+        ],
+        [
+          2540,
+          2544
+        ],
+        [
+          2572,
+          2576
+        ],
+        [
+          2604,
+          2608
+        ],
+        [
+          2636,
+          2640
+        ],
+        [
+          2668,
+          2672
+        ],
+        [
+          2700,
+          2704
+        ],
+        [
+          2732,
+          2736
+        ],
+        [
+          2764,
+          2768
+        ],
+        [
+          2796,
+          2800
+        ],
+        [
+          2828,
+          2832
+        ],
+        [
+          2860,
+          2864
+        ],
+        [
+          2892,
+          2896
+        ],
+        [
+          193002504,
+          193002516
+        ]
+      ],
+      "patch": "r9_1.r12p.xz",
+      "patch_statistics": {
+        "offset_runs": 48792,
+        "changed_bytes": 950785,
+        "uncompressed_patch_bytes": 1341129,
+        "compressed_patch_bytes": 449964,
+        "patch_sha256": "db85ae9b7d7ed1091a3c92cd73f280f5e4159e74e6bea201100bda909da720c3"
+      },
+      "canonical_metadata": [
+        {
+          "start": 1036,
+          "end": 1044,
+          "hex": "352600004ad00000"
+        },
+        {
+          "start": 1068,
+          "end": 1078,
+          "hex": "00000000a4c2f86a0100"
+        },
+        {
+          "start": 2060,
+          "end": 2064,
+          "hex": "0000c207"
+        },
+        {
+          "start": 2092,
+          "end": 2096,
+          "hex": "0000d807"
+        },
+        {
+          "start": 2124,
+          "end": 2128,
+          "hex": "0000a307"
+        },
+        {
+          "start": 2156,
+          "end": 2160,
+          "hex": "0000d707"
+        },
+        {
+          "start": 2188,
+          "end": 2192,
+          "hex": "00007207"
+        },
+        {
+          "start": 2220,
+          "end": 2224,
+          "hex": "0000d807"
+        },
+        {
+          "start": 2252,
+          "end": 2256,
+          "hex": "0000d807"
+        },
+        {
+          "start": 2284,
+          "end": 2288,
+          "hex": "0000d807"
+        },
+        {
+          "start": 2316,
+          "end": 2320,
+          "hex": "0000d807"
+        },
+        {
+          "start": 2348,
+          "end": 2352,
+          "hex": "0000d807"
+        },
+        {
+          "start": 2380,
+          "end": 2384,
+          "hex": "8501d707"
+        },
+        {
+          "start": 2412,
+          "end": 2416,
+          "hex": "0000d707"
+        },
+        {
+          "start": 2444,
+          "end": 2448,
+          "hex": "0000d407"
+        },
+        {
+          "start": 2476,
+          "end": 2480,
+          "hex": "00008207"
+        },
+        {
+          "start": 2508,
+          "end": 2512,
+          "hex": "0000b407"
+        },
+        {
+          "start": 2540,
+          "end": 2544,
+          "hex": "0000d807"
+        },
+        {
+          "start": 2572,
+          "end": 2576,
+          "hex": "5a01d807"
+        },
+        {
+          "start": 2604,
+          "end": 2608,
+          "hex": "0000d107"
+        },
+        {
+          "start": 2636,
+          "end": 2640,
+          "hex": "0000d807"
+        },
+        {
+          "start": 2668,
+          "end": 2672,
+          "hex": "0000d707"
+        },
+        {
+          "start": 2700,
+          "end": 2704,
+          "hex": "0000d707"
+        },
+        {
+          "start": 2732,
+          "end": 2736,
+          "hex": "0000c107"
+        },
+        {
+          "start": 2764,
+          "end": 2768,
+          "hex": "651ba007"
+        },
+        {
+          "start": 2796,
+          "end": 2800,
+          "hex": "f107f705"
+        },
+        {
+          "start": 2828,
+          "end": 2832,
+          "hex": "0000cf07"
+        },
+        {
+          "start": 2860,
+          "end": 2864,
+          "hex": "0000ce07"
+        },
+        {
+          "start": 2892,
+          "end": 2896,
+          "hex": "0000d807"
+        },
+        {
+          "start": 193002504,
+          "end": 193002516,
+          "hex": "a4c2f86aa4c2f86aa4c2f86a"
+        }
+      ]
+    },
+    {
+      "label": "R10",
+      "files": {
+        "/usr/lib/a9fl.so": "39e575666c211e1d000d7838af175c4d6eb14c5aa560ab96141dcf416f77075c",
+        "/usr/lib/viewUnified2.so": "b5d6a6d3c0e5fb93d016dea2e8ae11b450cfc3e2f30a3696b11a3ede2d658c01",
+        "/usr/lib/CautionConfig.so": "24747bfedee7dfcd9b66deae2a86629405394d7647e1736c303452495359f391",
+        "/usr/share/app/string_simplifiedchinese.uxc": "7f2f7d5138478b6a68517da585498099f6f8720f20d4406f0714e319018ffbd6",
+        "/usr/share/app/string_english.uxc": "6396ce51851402e94aea218d5cc6c6f781e602069ed253dda03012cc0a7f227c"
+      },
+      "source": "src/data/version_fingerprints.json",
+      "config_schema": 5,
+      "object_layout": null,
+      "normalized_partition_sha256": "2330c3abc3cfcee649847bb4f0c15f4bb511b45158ed22d21d30196be333f5b5",
+      "canonical_sha256": "3ae82f81973e5378983b6bce9a76ee8b6ca1013cf3622c6b3d1f513efeea869a",
+      "normalization_regions": [
+        [
+          1036,
+          1044
+        ],
+        [
+          1068,
+          1078
+        ],
+        [
+          2060,
+          2064
+        ],
+        [
+          2092,
+          2096
+        ],
+        [
+          2124,
+          2128
+        ],
+        [
+          2156,
+          2160
+        ],
+        [
+          2188,
+          2192
+        ],
+        [
+          2220,
+          2224
+        ],
+        [
+          2252,
+          2256
+        ],
+        [
+          2284,
+          2288
+        ],
+        [
+          2316,
+          2320
+        ],
+        [
+          2348,
+          2352
+        ],
+        [
+          2380,
+          2384
+        ],
+        [
+          2412,
+          2416
+        ],
+        [
+          2444,
+          2448
+        ],
+        [
+          2476,
+          2480
+        ],
+        [
+          2508,
+          2512
+        ],
+        [
+          2540,
+          2544
+        ],
+        [
+          2572,
+          2576
+        ],
+        [
+          2604,
+          2608
+        ],
+        [
+          2636,
+          2640
+        ],
+        [
+          2668,
+          2672
+        ],
+        [
+          2700,
+          2704
+        ],
+        [
+          2732,
+          2736
+        ],
+        [
+          2764,
+          2768
+        ],
+        [
+          2796,
+          2800
+        ],
+        [
+          2828,
+          2832
+        ],
+        [
+          2860,
+          2864
+        ],
+        [
+          2892,
+          2896
+        ],
+        [
+          193002504,
+          193002516
+        ]
+      ],
+      "patch": "r10.r12p.xz",
+      "patch_statistics": {
+        "offset_runs": 49490,
+        "changed_bytes": 949893,
+        "uncompressed_patch_bytes": 1345821,
+        "compressed_patch_bytes": 449332,
+        "patch_sha256": "eb4088cde882a8086b75a12160914e99324aa522b75db4060986866920ae5c45"
+      },
+      "canonical_metadata": [
+        {
+          "start": 1036,
+          "end": 1044,
+          "hex": "092600004ad00000"
+        },
+        {
+          "start": 1068,
+          "end": 1078,
+          "hex": "00000000721df96a0100"
+        },
+        {
+          "start": 2060,
+          "end": 2064,
+          "hex": "0000c207"
+        },
+        {
+          "start": 2092,
+          "end": 2096,
+          "hex": "0000d807"
+        },
+        {
+          "start": 2124,
+          "end": 2128,
+          "hex": "0000a307"
+        },
+        {
+          "start": 2156,
+          "end": 2160,
+          "hex": "0000d707"
+        },
+        {
+          "start": 2188,
+          "end": 2192,
+          "hex": "00007207"
+        },
+        {
+          "start": 2220,
+          "end": 2224,
+          "hex": "0000d807"
+        },
+        {
+          "start": 2252,
+          "end": 2256,
+          "hex": "0000d807"
+        },
+        {
+          "start": 2284,
+          "end": 2288,
+          "hex": "0000d807"
+        },
+        {
+          "start": 2316,
+          "end": 2320,
+          "hex": "0000d807"
+        },
+        {
+          "start": 2348,
+          "end": 2352,
+          "hex": "0000d807"
+        },
+        {
+          "start": 2380,
+          "end": 2384,
+          "hex": "8501d707"
+        },
+        {
+          "start": 2412,
+          "end": 2416,
+          "hex": "0000d707"
+        },
+        {
+          "start": 2444,
+          "end": 2448,
+          "hex": "0000d407"
+        },
+        {
+          "start": 2476,
+          "end": 2480,
+          "hex": "00008207"
+        },
+        {
+          "start": 2508,
+          "end": 2512,
+          "hex": "0000b407"
+        },
+        {
+          "start": 2540,
+          "end": 2544,
+          "hex": "0000d807"
+        },
+        {
+          "start": 2572,
+          "end": 2576,
+          "hex": "5a01d807"
+        },
+        {
+          "start": 2604,
+          "end": 2608,
+          "hex": "0000d107"
+        },
+        {
+          "start": 2636,
+          "end": 2640,
+          "hex": "0000d807"
+        },
+        {
+          "start": 2668,
+          "end": 2672,
+          "hex": "0000d707"
+        },
+        {
+          "start": 2700,
+          "end": 2704,
+          "hex": "0000d707"
+        },
+        {
+          "start": 2732,
+          "end": 2736,
+          "hex": "0000c107"
+        },
+        {
+          "start": 2764,
+          "end": 2768,
+          "hex": "651ba007"
+        },
+        {
+          "start": 2796,
+          "end": 2800,
+          "hex": "c507f705"
+        },
+        {
+          "start": 2828,
+          "end": 2832,
+          "hex": "0000cf07"
+        },
+        {
+          "start": 2860,
+          "end": 2864,
+          "hex": "0000ce07"
+        },
+        {
+          "start": 2892,
+          "end": 2896,
+          "hex": "0000d807"
+        },
+        {
+          "start": 193002504,
+          "end": 193002516,
+          "hex": "721df96a721df96a721df96a"
+        }
+      ]
+    },
+    {
+      "label": "R11",
+      "files": {
+        "/usr/lib/a9fl.so": "17c3315e7a0b260962e76d927f649f2eb237fef2dfff044fbe08eec760efbc9b",
+        "/usr/lib/viewUnified2.so": "6c1885d86feb358cf11b7f742ff2391e2dac9302ca15d1f98e91b2cff79946ba",
+        "/usr/lib/CautionConfig.so": "24747bfedee7dfcd9b66deae2a86629405394d7647e1736c303452495359f391",
+        "/usr/share/app/string_simplifiedchinese.uxc": "7f2f7d5138478b6a68517da585498099f6f8720f20d4406f0714e319018ffbd6",
+        "/usr/share/app/string_english.uxc": "6396ce51851402e94aea218d5cc6c6f781e602069ed253dda03012cc0a7f227c"
+      },
+      "source": "src/data/version_fingerprints.json",
+      "config_schema": 5,
+      "object_layout": null,
+      "normalized_partition_sha256": "20bc66b1a9aacb27c036784faaf876fe0911b6e4f8bbe5c40b904afa9bdaf6e8",
+      "canonical_sha256": "0676e29917bf3ef555df9c876eecc46e8e781d9a7e8f1c4b06c5ab225ef06a35",
+      "normalization_regions": [
+        [
+          1036,
+          1044
+        ],
+        [
+          1068,
+          1078
+        ],
+        [
+          2060,
+          2064
+        ],
+        [
+          2092,
+          2096
+        ],
+        [
+          2124,
+          2128
+        ],
+        [
+          2156,
+          2160
+        ],
+        [
+          2188,
+          2192
+        ],
+        [
+          2220,
+          2224
+        ],
+        [
+          2252,
+          2256
+        ],
+        [
+          2284,
+          2288
+        ],
+        [
+          2316,
+          2320
+        ],
+        [
+          2348,
+          2352
+        ],
+        [
+          2380,
+          2384
+        ],
+        [
+          2412,
+          2416
+        ],
+        [
+          2444,
+          2448
+        ],
+        [
+          2476,
+          2480
+        ],
+        [
+          2508,
+          2512
+        ],
+        [
+          2540,
+          2544
+        ],
+        [
+          2572,
+          2576
+        ],
+        [
+          2604,
+          2608
+        ],
+        [
+          2636,
+          2640
+        ],
+        [
+          2668,
+          2672
+        ],
+        [
+          2700,
+          2704
+        ],
+        [
+          2732,
+          2736
+        ],
+        [
+          2764,
+          2768
+        ],
+        [
+          2796,
+          2800
+        ],
+        [
+          2828,
+          2832
+        ],
+        [
+          2860,
+          2864
+        ],
+        [
+          2892,
+          2896
+        ],
+        [
+          193002504,
+          193002516
+        ]
+      ],
+      "patch": "r11.r12p.xz",
+      "patch_statistics": {
+        "offset_runs": 49525,
+        "changed_bytes": 949973,
+        "uncompressed_patch_bytes": 1346181,
+        "compressed_patch_bytes": 449080,
+        "patch_sha256": "2c66cd9e62879d068ee7963e98392aeb7c199d4c465a7d9c926d65b5dc3401cc"
+      },
+      "canonical_metadata": [
+        {
+          "start": 1036,
+          "end": 1044,
+          "hex": "082600004ad00000"
+        },
+        {
+          "start": 1068,
+          "end": 1078,
+          "hex": "00000000e295f96a0100"
+        },
+        {
+          "start": 2060,
+          "end": 2064,
+          "hex": "0000c207"
+        },
+        {
+          "start": 2092,
+          "end": 2096,
+          "hex": "0000d807"
+        },
+        {
+          "start": 2124,
+          "end": 2128,
+          "hex": "0000a307"
+        },
+        {
+          "start": 2156,
+          "end": 2160,
+          "hex": "0000d707"
+        },
+        {
+          "start": 2188,
+          "end": 2192,
+          "hex": "00007207"
+        },
+        {
+          "start": 2220,
+          "end": 2224,
+          "hex": "0000d807"
+        },
+        {
+          "start": 2252,
+          "end": 2256,
+          "hex": "0000d807"
+        },
+        {
+          "start": 2284,
+          "end": 2288,
+          "hex": "0000d807"
+        },
+        {
+          "start": 2316,
+          "end": 2320,
+          "hex": "0000d807"
+        },
+        {
+          "start": 2348,
+          "end": 2352,
+          "hex": "0000d807"
+        },
+        {
+          "start": 2380,
+          "end": 2384,
+          "hex": "8501d707"
+        },
+        {
+          "start": 2412,
+          "end": 2416,
+          "hex": "0000d707"
+        },
+        {
+          "start": 2444,
+          "end": 2448,
+          "hex": "0000d407"
+        },
+        {
+          "start": 2476,
+          "end": 2480,
+          "hex": "00008207"
+        },
+        {
+          "start": 2508,
+          "end": 2512,
+          "hex": "0000b407"
+        },
+        {
+          "start": 2540,
+          "end": 2544,
+          "hex": "0000d807"
+        },
+        {
+          "start": 2572,
+          "end": 2576,
+          "hex": "5a01d807"
+        },
+        {
+          "start": 2604,
+          "end": 2608,
+          "hex": "0000d107"
+        },
+        {
+          "start": 2636,
+          "end": 2640,
+          "hex": "0000d807"
+        },
+        {
+          "start": 2668,
+          "end": 2672,
+          "hex": "0000d707"
+        },
+        {
+          "start": 2700,
+          "end": 2704,
+          "hex": "0000d707"
+        },
+        {
+          "start": 2732,
+          "end": 2736,
+          "hex": "0000c107"
+        },
+        {
+          "start": 2764,
+          "end": 2768,
+          "hex": "651ba007"
+        },
+        {
+          "start": 2796,
+          "end": 2800,
+          "hex": "c407f705"
+        },
+        {
+          "start": 2828,
+          "end": 2832,
+          "hex": "0000cf07"
+        },
+        {
+          "start": 2860,
+          "end": 2864,
+          "hex": "0000ce07"
+        },
+        {
+          "start": 2892,
+          "end": 2896,
+          "hex": "0000d807"
+        },
+        {
+          "start": 193002504,
+          "end": 193002516,
+          "hex": "e295f96ae295f96ae295f96a"
+        }
+      ]
+    },
+    {
+      "label": "R12",
+      "files": {
+        "/usr/lib/a9fl.so": "706cd7b36bf0ec86b813db3ac69f251c3d495c7b3d7d74e1664dc134a64afcc2",
+        "/usr/lib/viewUnified2.so": "6c1885d86feb358cf11b7f742ff2391e2dac9302ca15d1f98e91b2cff79946ba",
+        "/usr/lib/CautionConfig.so": "24747bfedee7dfcd9b66deae2a86629405394d7647e1736c303452495359f391",
+        "/usr/share/app/string_simplifiedchinese.uxc": "ddf566457a0fa2a76370df018635f50752893829244b123c381c38b619844cb9",
+        "/usr/share/app/string_english.uxc": "908eba5f6685787d74115e0324da0396673f1310a88a8d1463c5d8f9fc90b9dd"
+      },
+      "source": "src/data/version_fingerprints.json",
+      "config_schema": 6,
+      "object_layout": null,
+      "normalized_partition_sha256": "64742a18612f3b02c84283067fee4458c945c7f24ee228297cff14aa06b6fba5",
+      "canonical_sha256": "5c0aeb952899e2db597be02669d1dfe8deaa540c81da271c4dcbd492484cc790",
+      "normalization_regions": [
+        [
+          1036,
+          1044
+        ],
+        [
+          1068,
+          1078
+        ],
+        [
+          2060,
+          2064
+        ],
+        [
+          2092,
+          2096
+        ],
+        [
+          2124,
+          2128
+        ],
+        [
+          2156,
+          2160
+        ],
+        [
+          2188,
+          2192
+        ],
+        [
+          2220,
+          2224
+        ],
+        [
+          2252,
+          2256
+        ],
+        [
+          2284,
+          2288
+        ],
+        [
+          2316,
+          2320
+        ],
+        [
+          2348,
+          2352
+        ],
+        [
+          2380,
+          2384
+        ],
+        [
+          2412,
+          2416
+        ],
+        [
+          2444,
+          2448
+        ],
+        [
+          2476,
+          2480
+        ],
+        [
+          2508,
+          2512
+        ],
+        [
+          2540,
+          2544
+        ],
+        [
+          2572,
+          2576
+        ],
+        [
+          2604,
+          2608
+        ],
+        [
+          2636,
+          2640
+        ],
+        [
+          2668,
+          2672
+        ],
+        [
+          2700,
+          2704
+        ],
+        [
+          2732,
+          2736
+        ],
+        [
+          2764,
+          2768
+        ],
+        [
+          2796,
+          2800
+        ],
+        [
+          2828,
+          2832
+        ],
+        [
+          2860,
+          2864
+        ],
+        [
+          2892,
+          2896
+        ],
+        [
+          193002504,
+          193002516
+        ]
+      ],
+      "patch": "r12.r12p.xz",
+      "patch_statistics": {
+        "offset_runs": 48990,
+        "changed_bytes": 959501,
+        "uncompressed_patch_bytes": 1351429,
+        "compressed_patch_bytes": 447984,
+        "patch_sha256": "6dd172a2ee6d50b6bc8e49e8f5ed18791717e2d35a34e3a47aa9a10bd02c07ba"
+      },
+      "canonical_metadata": [
+        {
+          "start": 1036,
+          "end": 1044,
+          "hex": "962500004ad00000"
+        },
+        {
+          "start": 1068,
+          "end": 1078,
+          "hex": "0000000054cbf96a0100"
+        },
+        {
+          "start": 2060,
+          "end": 2064,
+          "hex": "0000c207"
+        },
+        {
+          "start": 2092,
+          "end": 2096,
+          "hex": "0000d807"
+        },
+        {
+          "start": 2124,
+          "end": 2128,
+          "hex": "0000a307"
+        },
+        {
+          "start": 2156,
+          "end": 2160,
+          "hex": "0000d707"
+        },
+        {
+          "start": 2188,
+          "end": 2192,
+          "hex": "00007207"
+        },
+        {
+          "start": 2220,
+          "end": 2224,
+          "hex": "0000d807"
+        },
+        {
+          "start": 2252,
+          "end": 2256,
+          "hex": "0000d807"
+        },
+        {
+          "start": 2284,
+          "end": 2288,
+          "hex": "0000d807"
+        },
+        {
+          "start": 2316,
+          "end": 2320,
+          "hex": "0000d807"
+        },
+        {
+          "start": 2348,
+          "end": 2352,
+          "hex": "0000d807"
+        },
+        {
+          "start": 2380,
+          "end": 2384,
+          "hex": "8501d707"
+        },
+        {
+          "start": 2412,
+          "end": 2416,
+          "hex": "0000d707"
+        },
+        {
+          "start": 2444,
+          "end": 2448,
+          "hex": "0000d407"
+        },
+        {
+          "start": 2476,
+          "end": 2480,
+          "hex": "00008207"
+        },
+        {
+          "start": 2508,
+          "end": 2512,
+          "hex": "0000b407"
+        },
+        {
+          "start": 2540,
+          "end": 2544,
+          "hex": "0000d807"
+        },
+        {
+          "start": 2572,
+          "end": 2576,
+          "hex": "5a01d807"
+        },
+        {
+          "start": 2604,
+          "end": 2608,
+          "hex": "0000d107"
+        },
+        {
+          "start": 2636,
+          "end": 2640,
+          "hex": "0000d807"
+        },
+        {
+          "start": 2668,
+          "end": 2672,
+          "hex": "0000d707"
+        },
+        {
+          "start": 2700,
+          "end": 2704,
+          "hex": "0000d707"
+        },
+        {
+          "start": 2732,
+          "end": 2736,
+          "hex": "0000c107"
+        },
+        {
+          "start": 2764,
+          "end": 2768,
+          "hex": "651ba007"
+        },
+        {
+          "start": 2796,
+          "end": 2800,
+          "hex": "5207f705"
+        },
+        {
+          "start": 2828,
+          "end": 2832,
+          "hex": "0000cf07"
+        },
+        {
+          "start": 2860,
+          "end": 2864,
+          "hex": "0000ce07"
+        },
+        {
+          "start": 2892,
+          "end": 2896,
+          "hex": "0000d807"
+        },
+        {
+          "start": 193002504,
+          "end": 193002516,
+          "hex": "18c3e8b518c3e8b518c3e8b5"
+        }
+      ]
+    },
+    {
+      "label": "R15 NAME HELP",
+      "files": {
+        "/usr/lib/a9fl.so": "1dcb196ad8f181a6821d1987f730c350ad4c0bd90a60b6cade4e90a366a0228e",
+        "/usr/lib/viewUnified2.so": "6c1885d86feb358cf11b7f742ff2391e2dac9302ca15d1f98e91b2cff79946ba",
+        "/usr/lib/CautionConfig.so": "24747bfedee7dfcd9b66deae2a86629405394d7647e1736c303452495359f391",
+        "/usr/share/app/string_english.uxc": "17d1d15dde1c06b7caf35be399a0f6c10f9859b7a079fa771d64f38a131167a8",
+        "/usr/share/app/string_simplifiedchinese.uxc": "ecbbb59ad3b649694cdd97525a506301a57c60217c5a54799c2e2e06555bafac"
+      },
+      "source": "src/data/releases/r15/manifest.json",
+      "config_schema": 9,
+      "object_layout": {
+        "original_length": 356576,
+        "object_offset": 364544,
+        "object_blocks": 80,
+        "object_block_length": 4096,
+        "load_file_ranges": [
+          [
+            0,
+            335256
+          ],
+          [
+            335256,
+            336476
+          ]
+        ],
+        "elf_sha256": "5d3af544b1e23ddf7be07b42a9cabc611112c59ad254f169f9b4aed4e9fed551",
+        "immutable_prefix_sha256": "f9935b0e4a93e7797042173561c4b88ca3671ba7346b39d0bb3a6bf4bf402dae",
+        "initial_full_file_sha256": "1dcb196ad8f181a6821d1987f730c350ad4c0bd90a60b6cade4e90a366a0228e",
+        "profile": "R15-SD",
+        "fixture": "R15-SD.so",
+        "source_image_sha256": "704d9401fb8f63823ffde6a8812eda38ae27d81d6432bf8332cdad95e46233da",
+        "source_proof": "evidence/image.json",
+        "aliases": [
+          "NAME HELP"
+        ]
+      },
+      "normalized_partition_sha256": "f09c5003a26926ba66efc68edf6a7367d768430a4d0b20d30a1b9a7ab85a9a66",
+      "canonical_sha256": "704d9401fb8f63823ffde6a8812eda38ae27d81d6432bf8332cdad95e46233da",
+      "normalization_regions": [
+        [
+          1036,
+          1044
+        ],
+        [
+          1068,
+          1078
+        ],
+        [
+          2060,
+          2064
+        ],
+        [
+          2092,
+          2096
+        ],
+        [
+          2124,
+          2128
+        ],
+        [
+          2156,
+          2160
+        ],
+        [
+          2188,
+          2192
+        ],
+        [
+          2220,
+          2224
+        ],
+        [
+          2252,
+          2256
+        ],
+        [
+          2284,
+          2288
+        ],
+        [
+          2316,
+          2320
+        ],
+        [
+          2348,
+          2352
+        ],
+        [
+          2380,
+          2384
+        ],
+        [
+          2412,
+          2416
+        ],
+        [
+          2444,
+          2448
+        ],
+        [
+          2476,
+          2480
+        ],
+        [
+          2508,
+          2512
+        ],
+        [
+          2540,
+          2544
+        ],
+        [
+          2572,
+          2576
+        ],
+        [
+          2604,
+          2608
+        ],
+        [
+          2636,
+          2640
+        ],
+        [
+          2668,
+          2672
+        ],
+        [
+          2700,
+          2704
+        ],
+        [
+          2732,
+          2736
+        ],
+        [
+          2764,
+          2768
+        ],
+        [
+          2796,
+          2800
+        ],
+        [
+          2828,
+          2832
+        ],
+        [
+          2860,
+          2864
+        ],
+        [
+          2892,
+          2896
+        ],
+        [
+          193002504,
+          193002516
+        ],
+        [
+          194320384,
+          194321408
+        ],
+        [
+          194321408,
+          194322432
+        ],
+        [
+          194322432,
+          194323456
+        ],
+        [
+          194323456,
+          194324480
+        ],
+        [
+          194324480,
+          194325504
+        ],
+        [
+          194325504,
+          194326528
+        ],
+        [
+          194326528,
+          194327552
+        ],
+        [
+          194327552,
+          194328576
+        ],
+        [
+          194328576,
+          194329600
+        ],
+        [
+          194329600,
+          194330624
+        ],
+        [
+          194330624,
+          194331648
+        ],
+        [
+          194331648,
+          194332672
+        ],
+        [
+          194332672,
+          194333696
+        ],
+        [
+          194333696,
+          194334720
+        ],
+        [
+          194334720,
+          194335744
+        ],
+        [
+          194335744,
+          194336768
+        ],
+        [
+          194336768,
+          194337792
+        ],
+        [
+          194337792,
+          194338816
+        ],
+        [
+          194338816,
+          194339840
+        ],
+        [
+          194339840,
+          194340864
+        ],
+        [
+          194340864,
+          194341888
+        ],
+        [
+          194341888,
+          194342912
+        ],
+        [
+          194342912,
+          194343936
+        ],
+        [
+          194343936,
+          194344960
+        ],
+        [
+          194344960,
+          194345984
+        ],
+        [
+          194345984,
+          194347008
+        ],
+        [
+          194347008,
+          194348032
+        ],
+        [
+          194348032,
+          194349056
+        ],
+        [
+          194349056,
+          194350080
+        ],
+        [
+          194350080,
+          194351104
+        ],
+        [
+          194351104,
+          194352128
+        ],
+        [
+          194352128,
+          194353152
+        ],
+        [
+          194353152,
+          194354176
+        ],
+        [
+          194354176,
+          194355200
+        ],
+        [
+          194355200,
+          194356224
+        ],
+        [
+          194356224,
+          194357248
+        ],
+        [
+          194357248,
+          194358272
+        ],
+        [
+          194358272,
+          194359296
+        ],
+        [
+          194359296,
+          194360320
+        ],
+        [
+          194360320,
+          194361344
+        ],
+        [
+          194361344,
+          194362368
+        ],
+        [
+          194362368,
+          194363392
+        ],
+        [
+          194363392,
+          194364416
+        ],
+        [
+          194364416,
+          194365440
+        ],
+        [
+          194365440,
+          194366464
+        ],
+        [
+          194366464,
+          194367488
+        ],
+        [
+          194367488,
+          194368512
+        ],
+        [
+          194368512,
+          194369536
+        ],
+        [
+          194369536,
+          194370560
+        ],
+        [
+          194370560,
+          194371584
+        ],
+        [
+          194371584,
+          194372608
+        ],
+        [
+          194372608,
+          194373632
+        ],
+        [
+          194373632,
+          194374656
+        ],
+        [
+          194374656,
+          194375680
+        ],
+        [
+          194375680,
+          194376704
+        ],
+        [
+          194376704,
+          194377728
+        ],
+        [
+          194377728,
+          194378752
+        ],
+        [
+          194378752,
+          194379776
+        ],
+        [
+          194379776,
+          194380800
+        ],
+        [
+          194380800,
+          194381824
+        ],
+        [
+          194381824,
+          194382848
+        ],
+        [
+          194382848,
+          194383872
+        ],
+        [
+          194383872,
+          194384896
+        ],
+        [
+          194384896,
+          194385920
+        ],
+        [
+          194385920,
+          194386944
+        ],
+        [
+          194386944,
+          194387968
+        ],
+        [
+          194387968,
+          194388992
+        ],
+        [
+          194388992,
+          194390016
+        ],
+        [
+          194390016,
+          194391040
+        ],
+        [
+          194391040,
+          194392064
+        ],
+        [
+          194392064,
+          194393088
+        ],
+        [
+          194393088,
+          194394112
+        ],
+        [
+          194394112,
+          194395136
+        ],
+        [
+          194395136,
+          194396160
+        ],
+        [
+          194396160,
+          194397184
+        ],
+        [
+          194397184,
+          194398208
+        ],
+        [
+          194398208,
+          194399232
+        ],
+        [
+          194399232,
+          194400256
+        ],
+        [
+          194400256,
+          194401280
+        ],
+        [
+          194401280,
+          194402304
+        ],
+        [
+          194402304,
+          194403328
+        ],
+        [
+          194403328,
+          194404352
+        ],
+        [
+          194404352,
+          194405376
+        ],
+        [
+          194405376,
+          194406400
+        ],
+        [
+          194406400,
+          194407424
+        ],
+        [
+          194407424,
+          194408448
+        ],
+        [
+          194408448,
+          194409472
+        ],
+        [
+          194409472,
+          194410496
+        ],
+        [
+          194410496,
+          194411520
+        ],
+        [
+          194411520,
+          194412544
+        ],
+        [
+          194412544,
+          194413568
+        ],
+        [
+          194413568,
+          194414592
+        ],
+        [
+          194414592,
+          194415616
+        ],
+        [
+          194415616,
+          194416640
+        ],
+        [
+          194416640,
+          194417664
+        ],
+        [
+          194417664,
+          194418688
+        ],
+        [
+          194418688,
+          194419712
+        ],
+        [
+          194419712,
+          194420736
+        ],
+        [
+          194420736,
+          194421760
+        ],
+        [
+          194421760,
+          194422784
+        ],
+        [
+          194422784,
+          194423808
+        ],
+        [
+          194423808,
+          194424832
+        ],
+        [
+          194424832,
+          194425856
+        ],
+        [
+          194425856,
+          194426880
+        ],
+        [
+          194426880,
+          194427904
+        ],
+        [
+          194427904,
+          194428928
+        ],
+        [
+          194428928,
+          194429952
+        ],
+        [
+          194429952,
+          194430976
+        ],
+        [
+          194430976,
+          194432000
+        ],
+        [
+          194432000,
+          194433024
+        ],
+        [
+          194433024,
+          194434048
+        ],
+        [
+          194434048,
+          194435072
+        ],
+        [
+          194435072,
+          194436096
+        ],
+        [
+          194436096,
+          194437120
+        ],
+        [
+          194437120,
+          194438144
+        ],
+        [
+          194438144,
+          194439168
+        ],
+        [
+          194439168,
+          194440192
+        ],
+        [
+          194440192,
+          194441216
+        ],
+        [
+          194441216,
+          194442240
+        ],
+        [
+          194442240,
+          194443264
+        ],
+        [
+          194443264,
+          194444288
+        ],
+        [
+          194444288,
+          194445312
+        ],
+        [
+          194445312,
+          194446336
+        ],
+        [
+          194446336,
+          194447360
+        ],
+        [
+          194447360,
+          194448384
+        ],
+        [
+          194448384,
+          194449408
+        ],
+        [
+          194449408,
+          194450432
+        ],
+        [
+          194450432,
+          194451456
+        ],
+        [
+          194451456,
+          194452480
+        ],
+        [
+          194452480,
+          194453504
+        ],
+        [
+          194453504,
+          194454528
+        ],
+        [
+          194454528,
+          194455552
+        ],
+        [
+          194455552,
+          194456576
+        ],
+        [
+          194456576,
+          194457600
+        ],
+        [
+          194457600,
+          194458624
+        ],
+        [
+          194458624,
+          194459648
+        ],
+        [
+          194459648,
+          194460672
+        ],
+        [
+          194460672,
+          194461696
+        ],
+        [
+          194461696,
+          194462720
+        ],
+        [
+          194462720,
+          194463744
+        ],
+        [
+          194463744,
+          194464768
+        ],
+        [
+          194464768,
+          194465792
+        ],
+        [
+          194465792,
+          194466816
+        ],
+        [
+          194466816,
+          194467840
+        ],
+        [
+          194467840,
+          194468864
+        ],
+        [
+          194468864,
+          194469888
+        ],
+        [
+          194469888,
+          194470912
+        ],
+        [
+          194470912,
+          194471936
+        ],
+        [
+          194471936,
+          194472960
+        ],
+        [
+          194472960,
+          194473984
+        ],
+        [
+          194473984,
+          194475008
+        ],
+        [
+          194475008,
+          194476032
+        ],
+        [
+          194476032,
+          194477056
+        ],
+        [
+          194477056,
+          194478080
+        ],
+        [
+          194478080,
+          194479104
+        ],
+        [
+          194479104,
+          194480128
+        ],
+        [
+          194480128,
+          194481152
+        ],
+        [
+          194481152,
+          194482176
+        ],
+        [
+          194482176,
+          194483200
+        ],
+        [
+          194483200,
+          194484224
+        ],
+        [
+          194484224,
+          194485248
+        ],
+        [
+          194485248,
+          194486272
+        ],
+        [
+          194486272,
+          194487296
+        ],
+        [
+          194487296,
+          194488320
+        ],
+        [
+          194488320,
+          194489344
+        ],
+        [
+          194489344,
+          194490368
+        ],
+        [
+          194490368,
+          194491392
+        ],
+        [
+          194491392,
+          194492416
+        ],
+        [
+          194493440,
+          194494464
+        ],
+        [
+          194494464,
+          194495488
+        ],
+        [
+          194495488,
+          194496512
+        ],
+        [
+          194496512,
+          194497536
+        ],
+        [
+          194497536,
+          194498560
+        ],
+        [
+          194498560,
+          194499584
+        ],
+        [
+          194499584,
+          194500608
+        ],
+        [
+          194500608,
+          194501632
+        ],
+        [
+          194501632,
+          194502656
+        ],
+        [
+          194502656,
+          194503680
+        ],
+        [
+          194503680,
+          194504704
+        ],
+        [
+          194504704,
+          194505728
+        ],
+        [
+          194505728,
+          194506752
+        ],
+        [
+          194506752,
+          194507776
+        ],
+        [
+          194507776,
+          194508800
+        ],
+        [
+          194508800,
+          194509824
+        ],
+        [
+          194509824,
+          194510848
+        ],
+        [
+          194510848,
+          194511872
+        ],
+        [
+          194511872,
+          194512896
+        ],
+        [
+          194512896,
+          194513920
+        ],
+        [
+          194513920,
+          194514944
+        ],
+        [
+          194514944,
+          194515968
+        ],
+        [
+          194515968,
+          194516992
+        ],
+        [
+          194516992,
+          194518016
+        ],
+        [
+          194518016,
+          194519040
+        ],
+        [
+          194519040,
+          194520064
+        ],
+        [
+          194520064,
+          194521088
+        ],
+        [
+          194521088,
+          194522112
+        ],
+        [
+          194522112,
+          194523136
+        ],
+        [
+          194523136,
+          194524160
+        ],
+        [
+          194524160,
+          194525184
+        ],
+        [
+          194525184,
+          194526208
+        ],
+        [
+          194526208,
+          194527232
+        ],
+        [
+          194527232,
+          194528256
+        ],
+        [
+          194528256,
+          194529280
+        ],
+        [
+          194529280,
+          194530304
+        ],
+        [
+          194530304,
+          194531328
+        ],
+        [
+          194531328,
+          194532352
+        ],
+        [
+          194532352,
+          194533376
+        ],
+        [
+          194533376,
+          194534400
+        ],
+        [
+          194534400,
+          194535424
+        ],
+        [
+          194535424,
+          194536448
+        ],
+        [
+          194536448,
+          194537472
+        ],
+        [
+          194537472,
+          194538496
+        ],
+        [
+          194538496,
+          194539520
+        ],
+        [
+          194539520,
+          194540544
+        ],
+        [
+          194540544,
+          194541568
+        ],
+        [
+          194541568,
+          194542592
+        ],
+        [
+          194542592,
+          194543616
+        ],
+        [
+          194543616,
+          194544640
+        ],
+        [
+          194544640,
+          194545664
+        ],
+        [
+          194545664,
+          194546688
+        ],
+        [
+          194546688,
+          194547712
+        ],
+        [
+          194547712,
+          194548736
+        ],
+        [
+          194548736,
+          194549760
+        ],
+        [
+          194549760,
+          194550784
+        ],
+        [
+          194550784,
+          194551808
+        ],
+        [
+          194551808,
+          194552832
+        ],
+        [
+          194552832,
+          194553856
+        ],
+        [
+          194553856,
+          194554880
+        ],
+        [
+          194554880,
+          194555904
+        ],
+        [
+          194555904,
+          194556928
+        ],
+        [
+          194556928,
+          194557952
+        ],
+        [
+          194557952,
+          194558976
+        ],
+        [
+          194558976,
+          194560000
+        ],
+        [
+          194560000,
+          194561024
+        ],
+        [
+          194561024,
+          194562048
+        ],
+        [
+          194562048,
+          194563072
+        ],
+        [
+          194563072,
+          194564096
+        ],
+        [
+          194564096,
+          194565120
+        ],
+        [
+          194565120,
+          194566144
+        ],
+        [
+          194566144,
+          194567168
+        ],
+        [
+          194567168,
+          194568192
+        ],
+        [
+          194568192,
+          194569216
+        ],
+        [
+          194569216,
+          194570240
+        ],
+        [
+          194570240,
+          194571264
+        ],
+        [
+          194571264,
+          194572288
+        ],
+        [
+          194572288,
+          194573312
+        ],
+        [
+          194573312,
+          194574336
+        ],
+        [
+          194574336,
+          194575360
+        ],
+        [
+          194575360,
+          194576384
+        ],
+        [
+          194576384,
+          194577408
+        ],
+        [
+          194577408,
+          194578432
+        ],
+        [
+          194578432,
+          194579456
+        ],
+        [
+          194579456,
+          194580480
+        ],
+        [
+          194580480,
+          194581504
+        ],
+        [
+          194581504,
+          194582528
+        ],
+        [
+          194582528,
+          194583552
+        ],
+        [
+          194583552,
+          194584576
+        ],
+        [
+          194584576,
+          194585600
+        ],
+        [
+          194585600,
+          194586624
+        ],
+        [
+          194586624,
+          194587648
+        ],
+        [
+          194587648,
+          194588672
+        ],
+        [
+          194588672,
+          194589696
+        ],
+        [
+          194589696,
+          194590720
+        ],
+        [
+          194590720,
+          194591744
+        ],
+        [
+          194591744,
+          194592768
+        ],
+        [
+          194592768,
+          194593792
+        ],
+        [
+          194593792,
+          194594816
+        ],
+        [
+          194594816,
+          194595840
+        ],
+        [
+          194595840,
+          194596864
+        ],
+        [
+          194596864,
+          194597888
+        ],
+        [
+          194597888,
+          194598912
+        ],
+        [
+          194598912,
+          194599936
+        ],
+        [
+          194599936,
+          194600960
+        ],
+        [
+          194600960,
+          194601984
+        ],
+        [
+          194601984,
+          194603008
+        ],
+        [
+          194603008,
+          194604032
+        ],
+        [
+          194604032,
+          194605056
+        ],
+        [
+          194605056,
+          194606080
+        ],
+        [
+          194606080,
+          194607104
+        ],
+        [
+          194607104,
+          194608128
+        ],
+        [
+          194608128,
+          194609152
+        ],
+        [
+          194609152,
+          194610176
+        ],
+        [
+          194610176,
+          194611200
+        ],
+        [
+          194611200,
+          194612224
+        ],
+        [
+          194612224,
+          194613248
+        ],
+        [
+          194613248,
+          194614272
+        ],
+        [
+          194614272,
+          194615296
+        ],
+        [
+          194615296,
+          194616320
+        ],
+        [
+          194616320,
+          194617344
+        ],
+        [
+          194617344,
+          194618368
+        ],
+        [
+          194618368,
+          194619392
+        ],
+        [
+          194619392,
+          194620416
+        ],
+        [
+          194620416,
+          194621440
+        ],
+        [
+          194621440,
+          194622464
+        ],
+        [
+          194622464,
+          194623488
+        ],
+        [
+          194623488,
+          194624512
+        ],
+        [
+          194624512,
+          194625536
+        ],
+        [
+          194625536,
+          194626560
+        ],
+        [
+          194626560,
+          194627584
+        ],
+        [
+          194627584,
+          194628608
+        ],
+        [
+          194628608,
+          194629632
+        ],
+        [
+          194629632,
+          194630656
+        ],
+        [
+          194630656,
+          194631680
+        ],
+        [
+          194631680,
+          194632704
+        ],
+        [
+          194632704,
+          194633728
+        ],
+        [
+          194633728,
+          194634752
+        ],
+        [
+          194634752,
+          194635776
+        ],
+        [
+          194635776,
+          194636800
+        ],
+        [
+          194636800,
+          194637824
+        ],
+        [
+          194637824,
+          194638848
+        ],
+        [
+          194638848,
+          194639872
+        ],
+        [
+          194639872,
+          194640896
+        ],
+        [
+          194640896,
+          194641920
+        ],
+        [
+          194641920,
+          194642944
+        ],
+        [
+          194642944,
+          194643968
+        ],
+        [
+          194643968,
+          194644992
+        ],
+        [
+          194644992,
+          194646016
+        ],
+        [
+          194646016,
+          194647040
+        ],
+        [
+          194647040,
+          194648064
+        ],
+        [
+          194648064,
+          194649088
+        ]
+      ]
+    }
+  ],
+  "files": {
+    "config_records.py": {
+      "bytes": 5739,
+      "sha256": "68983afc0667f54ca5f8ef4c0294bed6f7b1c821d32c71adbb8341975254ea49"
+    },
+    "guarded_config.py": {
+      "bytes": 9285,
+      "sha256": "2d673eb5416e73fe3ca544056de5d715588b53c9c62b22d4aebf76f718b59338"
+    },
+    "lut_backup.py": {
+      "bytes": 4015,
+      "sha256": "4c82b1eecf334f3b1c41bc8b321ecca100e16020e29afd8e2eb5fed8b4937f8b"
+    },
+    "partition_core.py": {
+      "bytes": 5709,
+      "sha256": "d5d3296d0f0fb3a68d60b70530e921b9d7149b013b7982e0da284804fe803a8a"
+    },
+    "r10.r12p.xz": {
+      "bytes": 449332,
+      "sha256": "eb4088cde882a8086b75a12160914e99324aa522b75db4060986866920ae5c45"
+    },
+    "r11.r12p.xz": {
+      "bytes": 449080,
+      "sha256": "2c66cd9e62879d068ee7963e98392aeb7c199d4c465a7d9c926d65b5dc3401cc"
+    },
+    "r12.r12p.xz": {
+      "bytes": 447984,
+      "sha256": "6dd172a2ee6d50b6bc8e49e8f5ed18791717e2d35a34e3a47aa9a10bd02c07ba"
+    },
+    "r8.r12p.xz": {
+      "bytes": 399384,
+      "sha256": "2dcc622077c0b18d871dc430c34ad931a4ea1757a89bdc72250c957c120887e7"
+    },
+    "r9.r12p.xz": {
+      "bytes": 450068,
+      "sha256": "f7d11446a81dc8975e10d9da1390c3195c41d13a576512b70d55e6b1595239b0"
+    },
+    "r9_1.r12p.xz": {
+      "bytes": 449964,
+      "sha256": "db85ae9b7d7ed1091a3c92cd73f280f5e4159e74e6bea201100bda909da720c3"
+    },
+    "readback_rules.py": {
+      "bytes": 1795,
+      "sha256": "bc1a3d3ad4fa61ece9d310e6309d834931272fca0a3c01454aab610dab1c1070"
+    },
+    "snapshot_fs.py": {
+      "bytes": 10796,
+      "sha256": "d4954445c22f1f22f677c06e28fae4d7821233919e5c6b680638ec9eedce5216"
+    },
+    "stock.r12p.xz": {
+      "bytes": 571984,
+      "sha256": "cb8ffc6ab520ce5eea0f70c3670c21aa97b24afc37530b4cea435ca00b00a34c"
+    }
+  },
+  "workflow": "backup -> identify -> local R12P patch -> one full FF01 write -> complete readback"
+}

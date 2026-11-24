@@ -108,11 +108,12 @@ class TestGui(unittest.TestCase):
 
     # -- electronic-shutter flash tab --------------------------------------
     def test_tabs_exist(self):
-        self.assertEqual(len(self.app.notebook.tabs()), 5)
+        self.assertEqual(len(self.app.notebook.tabs()), 6)
         self.assertEqual(self.app.notebook.tab(1, 'text'), '电子快门引闪')
-        self.assertEqual(self.app.notebook.tab(2, 'text'), '创意外观 LUT')
-        self.assertEqual(self.app.notebook.tab(3, 'text'), '解锁 5GHz WiFi')
-        self.assertEqual(self.app.notebook.tab(4, 'text'), '强制回退')
+        self.assertEqual(self.app.notebook.tab(2, 'text'), '创意外观 LUT · R15NH')
+        self.assertEqual(self.app.notebook.tab(3, 'text'), '悬浮菜单 · V8')
+        self.assertEqual(self.app.notebook.tab(4, 'text'), '解锁 5GHz WiFi')
+        self.assertEqual(self.app.notebook.tab(5, 'text'), '强制回退')
 
     def test_flash_buttons_disabled_before_reading(self):
         for button in (self.app.flash_menu_btn, self.app.flash_av_btn):
@@ -173,19 +174,14 @@ class TestGui(unittest.TestCase):
         self.assertEqual(self.app.flash_restore_btn.cget('text'), '恢复到初始备份')
 
     # -- menu deployment tab ----------------------------------------------
-    def test_menu_steps_gate_each_other(self):
-        """backup -> patch -> write, and rollback needs the backup."""
-        self.assertEqual(str(self.app.menu_backup_btn['state']), 'normal')
-        self.assertEqual(str(self.app.menu_patch_btn['state']), 'disabled')
-        self.assertEqual(str(self.app.menu_write_btn['state']), 'disabled')
-        self.assertEqual(str(self.app.menu_restore_btn['state']), 'disabled')
-        self.assertIn('尚未备份', self.app.menu_baseline_var.get())
-
-    def test_menu_tab_shows_the_r11_captures(self):
-        self.assertEqual(len(self.app.menu_preview), 3)
+    def test_menu_rollback_requires_a_saved_source(self):
+        self.assertEqual(str(self.app.native_buttons['r15.backup']['state']), 'normal')
+        self.assertEqual(str(self.app.native_buttons['r15.rollback']['state']), 'disabled')
+        self.app.native_source_vars['r15'].set(str(Path(self._tmp.name)/'original'))
+        self.assertEqual(str(self.app.native_buttons['r15.rollback']['state']), 'normal')
 
     def test_every_tab_scrolls_so_the_log_keeps_its_rows(self):
-        self.assertEqual(len(self.app._scroll_canvases), 5)
+        self.assertEqual(len(self.app._scroll_canvases), 6)
         self.assertGreaterEqual(int(self.app.log_box.cget('height')), 5)
 
     # -- force rollback tab -----------------------------------------------

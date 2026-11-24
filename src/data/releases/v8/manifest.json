@@ -1,0 +1,65 @@
+{
+  "schema": "a9-filecontrol-install-v71mt",
+  "model": "ILCE-9",
+  "firmware": "6.00",
+  "hardware_verified": false,
+  "device_hash_checks": true,
+  "owner_file_update": false,
+  "files": [
+    {
+      "name": "a9-autoexec-v71mt.so",
+      "file": "a9-autoexec-v71mt.so",
+      "path": "/etc/a9-autoexec-v71mt.so",
+      "bytes": 45428,
+      "sha256": "a98281a5886319f1cf04848fecbc21ba79cb08d2b3bdc06deb05755e7b48d926"
+    },
+    {
+      "name": "a9-v71mt.sh",
+      "file": "a9-v71mt.sh",
+      "path": "/tmp/a9-v71mt.sh",
+      "bytes": 3612,
+      "sha256": "cd12fe646e1fe0d209d2dfb5ba89c8f41fefd4763aa3cfb4df53359b5b3fc56e"
+    },
+    {
+      "name": "a9-film-boot-v71mt.tar",
+      "file": "a9-film-boot-v71mt.tar",
+      "path": "/tmp/a9-film-boot-v71mt.tar",
+      "bytes": 215040,
+      "sha256": "563d9c072ef85e0bf7020446a04eec7e8da8822f904a7c48707260f924ead8b2"
+    }
+  ],
+  "bundle_files": {
+    "a9-extra-menu.so": {
+      "bytes": 66308,
+      "sha256": "434dc319ca02da074c1ad533d7a50807c962e11ba6f3e40d025d34dcc931884f"
+    },
+    "a9-extra-menu-guard.elf": {
+      "bytes": 68352,
+      "sha256": "f8bd0b6c4fad51c6c4eb13be9d8f4390da4aeaf00280bc334bbbc87ff1d403f8"
+    },
+    "a9-check-persist.req": {
+      "bytes": 500,
+      "sha256": "b54b53915f4d55eb02561c78bd3efee4d0b1f21d8c2244258dc0a3758eeb5ceb"
+    },
+    "a9-install-persist.req": {
+      "bytes": 500,
+      "sha256": "cb84e0d54921b38fc9085c887b0500cdf3bcb09fd9c82c4c6fd2af3f947275f9"
+    },
+    "a9-remove-persist.req": {
+      "bytes": 500,
+      "sha256": "f2cb3f7bddf4fe8f2cb032a2e915bd4e151c200317a4c68d03b20cc79c920522"
+    },
+    "a9-wps-boot.elf": {
+      "bytes": 60804,
+      "sha256": "7cb5ea95bc0294bc6eddcaa755098ce391cb25069f8d49fdbaddb821e6f2ceba"
+    },
+    "prepare.sh": {
+      "bytes": 3366,
+      "sha256": "9cfbde8dc2878ed46184feeccef9fd31305a59238daea52e87681e6a54cfd140"
+    },
+    "runtime-start.sh": {
+      "bytes": 6915,
+      "sha256": "50ad0b9e88659fdf2cb29f99f425302ddd9c9922dd04fa1b534644716a8212bd"
+    }
+  }
+}

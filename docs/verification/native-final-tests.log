@@ -1,0 +1,479 @@
+test_already_at_target_writes_nothing (tests.test_aspect_params.TestApply.test_already_at_target_writes_nothing) ... ok
+test_mismatched_readback_stops_before_save (tests.test_aspect_params.TestApply.test_mismatched_readback_stops_before_save) ... ok
+test_records_the_preimage_before_writing (tests.test_aspect_params.TestApply.test_records_the_preimage_before_writing) ... ok
+test_restore_puts_the_recorded_values_back (tests.test_aspect_params.TestApply.test_restore_puts_the_recorded_values_back) ... ok
+test_restore_refuses_another_camera (tests.test_aspect_params.TestApply.test_restore_refuses_another_camera) ... ok
+test_writes_every_differing_property (tests.test_aspect_params.TestApply.test_writes_every_differing_property) ... ok
+test_allows_read_of_a_listed_property (tests.test_aspect_params.TestGuard.test_allows_read_of_a_listed_property) ... ok
+test_rejects_read_of_an_unlisted_property (tests.test_aspect_params.TestGuard.test_rejects_read_of_an_unlisted_property) ... ok
+test_rejects_save_before_any_write (tests.test_aspect_params.TestGuard.test_rejects_save_before_any_write) ... ok
+test_rejects_write_with_wrong_length (tests.test_aspect_params.TestGuard.test_rejects_write_with_wrong_length) ... ok
+test_connect_succeeds_and_identifies_the_camera (tests.test_connect.TestConnect.test_connect_succeeds_and_identifies_the_camera) ... ok
+test_connect_uses_the_requested_restricted_guard (tests.test_connect.TestConnect.test_connect_uses_the_requested_restricted_guard) ... ok
+test_connect_with_two_cameras_is_refused (tests.test_connect.TestConnect.test_connect_with_two_cameras_is_refused) ... ok
+test_connect_without_camera_says_not_found (tests.test_connect.TestConnect.test_connect_without_camera_says_not_found) ... ok
+test_second_connect_starts_from_mass_storage_again (tests.test_connect.TestConnect.test_second_connect_starts_from_mass_storage_again) ... ok
+test_service_device_never_appearing_reports_that_specific_failure (tests.test_connect.TestConnect.test_service_device_never_appearing_reports_that_specific_failure) ... ok
+test_successful_connect_leaves_no_reusable_receipt (tests.test_connect.TestConnect.test_successful_connect_leaves_no_reusable_receipt) ... ok
+test_already_enabled_writes_nothing (tests.test_core_override.TestEnableOverride.test_already_enabled_writes_nothing) ... ok
+test_failed_write_leaves_a_review_state (tests.test_core_override.TestEnableOverride.test_failed_write_leaves_a_review_state) ... ok
+test_never_touches_any_fn_slot (tests.test_core_override.TestEnableOverride.test_never_touches_any_fn_slot) ... ok
+test_preserves_other_bytes (tests.test_core_override.TestEnableOverride.test_preserves_other_bytes) ... ok
+test_refuses_mixed_state (tests.test_core_override.TestEnableOverride.test_refuses_mixed_state) ... ok
+test_writes_only_five_offsets (tests.test_core_override.TestEnableOverride.test_writes_only_five_offsets) ... ok
+test_baseline_is_written_once (tests.test_core_restore.TestRestore.test_baseline_is_written_once) ... ok
+test_restore_baseline_reverts_everything_tool_touched (tests.test_core_restore.TestRestore.test_restore_baseline_reverts_everything_tool_touched) ... ok
+test_restore_override_returns_original_bytes (tests.test_core_restore.TestRestore.test_restore_override_returns_original_bytes) ... ok
+test_restore_refuses_a_session_from_another_camera (tests.test_core_restore.TestRestore.test_restore_refuses_a_session_from_another_camera) ... ok
+test_restore_refuses_tampered_snapshot (tests.test_core_restore.TestRestore.test_restore_refuses_tampered_snapshot) ... ok
+test_restore_refuses_when_value_is_third_state (tests.test_core_restore.TestRestore.test_restore_refuses_when_value_is_third_state) ... ok
+test_restore_returns_slot_to_original (tests.test_core_restore.TestRestore.test_restore_returns_slot_to_original) ... ok
+test_restore_without_baseline_is_refused (tests.test_core_restore.TestRestore.test_restore_without_baseline_is_refused) ... ok
+test_journal_records_verification_note_for_pixel_shift (tests.test_core_slot.TestWriteSlot.test_journal_records_verification_note_for_pixel_shift) ... ok
+test_records_original_before_write (tests.test_core_slot.TestWriteSlot.test_records_original_before_write) ... ok
+test_refuses_out_of_range_value (tests.test_core_slot.TestWriteSlot.test_refuses_out_of_range_value) ... ok
+test_refuses_unknown_value (tests.test_core_slot.TestWriteSlot.test_refuses_unknown_value) ... ok
+test_refuses_when_override_is_mixed (tests.test_core_slot.TestWriteSlot.test_refuses_when_override_is_mixed) ... ok
+test_refuses_when_override_not_enabled (tests.test_core_slot.TestWriteSlot.test_refuses_when_override_not_enabled) ... ok
+test_second_write_records_written_by (tests.test_core_slot.TestWriteSlot.test_second_write_records_written_by) ... ok
+test_writes_one_byte_in_one_slot (tests.test_core_slot.TestWriteSlot.test_writes_one_byte_in_one_slot) ... ok
+test_all_one_is_disabled (tests.test_core_state.TestOverrideStatus.test_all_one_is_disabled) ... ok
+test_all_two_is_enabled (tests.test_core_state.TestOverrideStatus.test_all_two_is_enabled) ... ok
+test_factory_ff_is_disabled (tests.test_core_state.TestOverrideStatus.test_factory_ff_is_disabled) ... ok
+test_mixed_is_mixed_and_blocks_writes (tests.test_core_state.TestOverrideStatus.test_mixed_is_mixed_and_blocks_writes) ... ok
+test_guard_allows_whitelisted_read (tests.test_core_state.TestParameterGuard.test_guard_allows_whitelisted_read) ... ok
+test_guard_allows_whitelisted_write_then_one_save (tests.test_core_state.TestParameterGuard.test_guard_allows_whitelisted_write_then_one_save) ... ok
+test_guard_blocks_non_whitelisted_property (tests.test_core_state.TestParameterGuard.test_guard_blocks_non_whitelisted_property) ... ok
+test_guard_blocks_read_of_unknown_property (tests.test_core_state.TestParameterGuard.test_guard_blocks_read_of_unknown_property) ... ok
+test_guard_blocks_save_without_write (tests.test_core_state.TestParameterGuard.test_guard_blocks_save_without_write) ... ok
+test_guard_rejects_short_override_payload (tests.test_core_state.TestParameterGuard.test_guard_rejects_short_override_payload) ... ok
+test_guard_rejects_wrong_payload_length_for_a_slot (tests.test_core_state.TestParameterGuard.test_guard_rejects_wrong_payload_length_for_a_slot) ... ok
+test_reads_all_twelve_slots (tests.test_core_state.TestReadState.test_reads_all_twelve_slots) ... ok
+test_snapshot_is_the_whole_backup (tests.test_core_state.TestReadState.test_snapshot_is_the_whole_backup) ... ok
+test_bad_r15_records_are_not_reported_as_uninstalled_or_current (tests.test_deployment_status.DeploymentStatusTests.test_bad_r15_records_are_not_reported_as_uninstalled_or_current) ... ok
+test_inactive_v8_files_are_not_called_absent (tests.test_deployment_status.DeploymentStatusTests.test_inactive_v8_files_are_not_called_absent) ... ok
+test_incomplete_and_conflicting_v8_are_explicit (tests.test_deployment_status.DeploymentStatusTests.test_incomplete_and_conflicting_v8_are_explicit) ... ok
+test_older_menu_version_is_named (tests.test_deployment_status.DeploymentStatusTests.test_older_menu_version_is_named) ... ok
+test_r15_distinguishes_stock_legacy_and_installed (tests.test_deployment_status.DeploymentStatusTests.test_r15_distinguishes_stock_legacy_and_installed) ... ok
+test_v8_installed_and_dependency_are_explicit (tests.test_deployment_status.DeploymentStatusTests.test_v8_installed_and_dependency_are_explicit) ... ok
+test_a_read_timeout_says_it_stopped_and_did_not_retry (tests.test_errors.TestErrorMessages.test_a_read_timeout_says_it_stopped_and_did_not_retry) ... ok
+test_busy_identity_yields_power_cycle_hint (tests.test_errors.TestErrorMessages.test_busy_identity_yields_power_cycle_hint) ... ok
+test_libusb_not_supported_gets_driver_advice (tests.test_errors.TestErrorMessages.test_libusb_not_supported_gets_driver_advice)
+pyusb turns -12 into a bare NotImplementedError; say what it means. ... ok
+test_multiple_cameras_message_is_actionable (tests.test_errors.TestErrorMessages.test_multiple_cameras_message_is_actionable) ... ok
+test_no_camera_message_names_the_checks (tests.test_errors.TestErrorMessages.test_no_camera_message_names_the_checks) ... ok
+test_service_not_found_yields_resume_hint (tests.test_errors.TestErrorMessages.test_service_not_found_yields_resume_hint) ... ok
+test_unknown_error_still_gives_next_step (tests.test_errors.TestErrorMessages.test_unknown_error_still_gives_next_step) ... ok
+test_wrong_model_message_names_the_limit (tests.test_errors.TestErrorMessages.test_wrong_model_message_names_the_limit) ... ok
+test_a_known_hint_keeps_its_advice_and_gains_the_detail (tests.test_errors.TestRawDetailAlwaysReachesTheUser.test_a_known_hint_keeps_its_advice_and_gains_the_detail) ... ok
+test_an_error_that_was_never_raised_still_renders (tests.test_errors.TestRawDetailAlwaysReachesTheUser.test_an_error_that_was_never_raised_still_renders) ... ok
+test_an_unknown_failure_shows_its_type_and_message (tests.test_errors.TestRawDetailAlwaysReachesTheUser.test_an_unknown_failure_shows_its_type_and_message) ... ok
+test_the_fallback_asks_for_the_detail_lines (tests.test_errors.TestRawDetailAlwaysReachesTheUser.test_the_fallback_asks_for_the_detail_lines) ... ok
+test_the_fallback_points_at_what_the_detail_records (tests.test_errors.TestRawDetailAlwaysReachesTheUser.test_the_fallback_points_at_what_the_detail_records) ... ok
+test_the_innermost_location_is_named (tests.test_errors.TestRawDetailAlwaysReachesTheUser.test_the_innermost_location_is_named)
+One line placing the fault, instead of a stack trace at the user. ... ok
+test_the_transport_note_is_included (tests.test_errors.TestRawDetailAlwaysReachesTheUser.test_the_transport_note_is_included) ... ok
+test_a_wrong_length_is_not_guessed (tests.test_firmware_reset.TestEncoding.test_a_wrong_length_is_not_guessed) ... ok
+test_an_unknown_value_is_shown_as_its_hex (tests.test_firmware_reset.TestEncoding.test_an_unknown_value_is_shown_as_its_hex) ... ok
+test_the_two_versions_are_named (tests.test_firmware_reset.TestEncoding.test_the_two_versions_are_named) ... ok
+test_exactly_one_write_per_session (tests.test_firmware_reset.TestGuard.test_exactly_one_write_per_session) ... ok
+test_parameter_traffic_is_refused (tests.test_firmware_reset.TestGuard.test_parameter_traffic_is_refused) ... ok
+test_read_of_companion_is_allowed (tests.test_firmware_reset.TestGuard.test_read_of_companion_is_allowed) ... ok
+test_read_of_dat4_is_allowed (tests.test_firmware_reset.TestGuard.test_read_of_dat4_is_allowed) ... ok
+test_read_outside_the_allowlist_is_refused (tests.test_firmware_reset.TestGuard.test_read_outside_the_allowlist_is_refused) ... ok
+test_the_sink_travels_through (tests.test_firmware_reset.TestGuard.test_the_sink_travels_through) ... ok
+test_write_of_a_different_value_is_refused (tests.test_firmware_reset.TestGuard.test_write_of_a_different_value_is_refused) ... ok
+test_write_of_the_wrong_length_is_refused (tests.test_firmware_reset.TestGuard.test_write_of_the_wrong_length_is_refused) ... ok
+test_write_to_another_path_is_refused (tests.test_firmware_reset.TestGuard.test_write_to_another_path_is_refused) ... ok
+test_write_without_arming_is_refused (tests.test_firmware_reset.TestGuard.test_write_without_arming_is_refused) ... ok
+test_a_500_receipt_is_skipped_by_the_strict_path (tests.test_firmware_reset.TestReceiptAt500.test_a_500_receipt_is_skipped_by_the_strict_path) ... ok
+test_the_same_receipt_is_usable_by_the_rollback_tab (tests.test_firmware_reset.TestReceiptAt500.test_the_same_receipt_is_usable_by_the_rollback_tab) ... ok
+test_a_body_reporting_500_still_connects (tests.test_firmware_reset.TestRelaxedIdentity.test_a_body_reporting_500_still_connects) ... ok
+test_a_missing_fingerprint_is_still_refused (tests.test_firmware_reset.TestRelaxedIdentity.test_a_missing_fingerprint_is_still_refused) ... ok
+test_another_model_is_still_refused (tests.test_firmware_reset.TestRelaxedIdentity.test_another_model_is_still_refused) ... ok
+test_the_strict_gate_is_untouched (tests.test_firmware_reset.TestRelaxedIdentity.test_the_strict_gate_is_untouched) ... ok
+test_a_readback_that_disagrees_fails_the_transaction (tests.test_firmware_reset.TestTransactions.test_a_readback_that_disagrees_fails_the_transaction) ... ok
+test_a_value_that_moved_after_the_snapshot_stops_the_write (tests.test_firmware_reset.TestTransactions.test_a_value_that_moved_after_the_snapshot_stops_the_write) ... ok
+test_close_gate_writes_600 (tests.test_firmware_reset.TestTransactions.test_close_gate_writes_600) ... ok
+test_open_gate_is_a_no_op_when_already_open (tests.test_firmware_reset.TestTransactions.test_open_gate_is_a_no_op_when_already_open) ... ok
+test_open_gate_records_the_original_bytes_before_writing (tests.test_firmware_reset.TestTransactions.test_open_gate_records_the_original_bytes_before_writing) ... ok
+test_open_gate_refuses_an_unexpected_value (tests.test_firmware_reset.TestTransactions.test_open_gate_refuses_an_unexpected_value) ... ok
+test_open_gate_writes_500 (tests.test_firmware_reset.TestTransactions.test_open_gate_writes_500) ... ok
+test_status_reads_and_writes_nothing (tests.test_firmware_reset.TestTransactions.test_status_reads_and_writes_nothing) ... ok
+test_the_write_guard_must_be_the_dat4_one (tests.test_firmware_reset.TestTransactions.test_the_write_guard_must_be_the_dat4_one) ... ok
+test_default_command_is_read_only_and_closes_handle (tests.test_flash.TestFlashCli.test_default_command_is_read_only_and_closes_handle) ... ok
+test_help_does_not_connect (tests.test_flash.TestFlashCli.test_help_does_not_connect) ... ok
+test_backup_attribute_checksum_and_length_are_validated (tests.test_flash.TestFlashConfig.test_backup_attribute_checksum_and_length_are_validated) ... ok
+test_changes_only_the_located_value_and_preserves_padding (tests.test_flash.TestFlashConfig.test_changes_only_the_located_value_and_preserves_padding) ... ok
+test_rejects_invalid_schema_and_ambiguous_index (tests.test_flash.TestFlashConfig.test_rejects_invalid_schema_and_ambiguous_index) ... ok
+test_arming_requires_observed_original_and_exact_policy_change (tests.test_flash.TestFlashGuard.test_arming_requires_observed_original_and_exact_policy_change) ... ok
+test_blocks_unarmed_write_and_all_non_flash_writes (tests.test_flash.TestFlashGuard.test_blocks_unarmed_write_and_all_non_flash_writes) ... ok
+test_blocks_whole_backup_protection_ram_and_terminal (tests.test_flash.TestFlashGuard.test_blocks_whole_backup_protection_ram_and_terminal) ... ok
+test_only_exact_payload_once_and_verified_save_once (tests.test_flash.TestFlashGuard.test_only_exact_payload_once_and_verified_save_once) ... ok
+test_already_at_target_never_writes_or_saves (tests.test_flash.TestFlashTransactions.test_already_at_target_never_writes_or_saves) ... ok
+test_ambiguous_write_is_never_retried_or_saved (tests.test_flash.TestFlashTransactions.test_ambiguous_write_is_never_retried_or_saved) ... ok
+test_apply_persists_original_before_write_and_verifies_one_property (tests.test_flash.TestFlashTransactions.test_apply_persists_original_before_write_and_verifies_one_property) ... ok
+test_immediate_mismatch_never_saves (tests.test_flash.TestFlashTransactions.test_immediate_mismatch_never_saves) ... ok
+test_rechecks_baseline_immediately_before_write (tests.test_flash.TestFlashTransactions.test_rechecks_baseline_immediately_before_write) ... ok
+test_rejects_protected_or_snapshot_mismatched_property (tests.test_flash.TestFlashTransactions.test_rejects_protected_or_snapshot_mismatched_property) ... ok
+test_rejects_wrong_identity_before_any_service_request (tests.test_flash.TestFlashTransactions.test_rejects_wrong_identity_before_any_service_request) ... ok
+test_restore_checks_payload_against_hashed_original_snapshot (tests.test_flash.TestFlashTransactions.test_restore_checks_payload_against_hashed_original_snapshot) ... ok
+test_restore_refuses_another_body_before_device_access (tests.test_flash.TestFlashTransactions.test_restore_refuses_another_body_before_device_access) ... ok
+test_restore_refuses_changes_to_other_records (tests.test_flash.TestFlashTransactions.test_restore_refuses_changes_to_other_records) ... ok
+test_restore_returns_exact_original_using_a_new_guard (tests.test_flash.TestFlashTransactions.test_restore_returns_exact_original_using_a_new_guard) ... ok
+test_save_mismatch_leaves_failure_record (tests.test_flash.TestFlashTransactions.test_save_mismatch_leaves_failure_record) ... ok
+test_snapshot_persistence_failure_prevents_all_writes (tests.test_flash.TestFlashTransactions.test_snapshot_persistence_failure_prevents_all_writes) ... ok
+test_status_cannot_write_or_save (tests.test_flash.TestFlashTransactions.test_status_cannot_write_or_save) ... ok
+test_separate_experimental_entry_exists (tests.test_flash_av.TestAVEntryExists.test_separate_experimental_entry_exists) ... ok
+test_already_enabled_no_write_or_save (tests.test_flash_av.TestFlashAV.test_already_enabled_no_write_or_save) ... ok
+test_ambiguous_write_no_retry_no_save (tests.test_flash_av.TestFlashAV.test_ambiguous_write_no_retry_no_save) ... ok
+test_apply_only_changes_av_and_backups_exist_before_write (tests.test_flash_av.TestFlashAV.test_apply_only_changes_av_and_backups_exist_before_write) ... ok
+test_apply_refuses_closed_menu_without_writes (tests.test_flash_av.TestFlashAV.test_apply_refuses_closed_menu_without_writes) ... ok
+test_bad_identity_prevents_all_access (tests.test_flash_av.TestFlashAV.test_bad_identity_prevents_all_access) ... ok
+test_byte_change_round_trip_and_unknown_values_rejected (tests.test_flash_av.TestFlashAV.test_byte_change_round_trip_and_unknown_values_rejected) ... ok
+test_cli_default_readonly_and_closes (tests.test_flash_av.TestFlashAV.test_cli_default_readonly_and_closes) ... ok
+test_cli_help_and_invalid_restore_do_not_connect (tests.test_flash_av.TestFlashAV.test_cli_help_and_invalid_restore_do_not_connect) ... ok
+test_cli_write_requires_detachment_declaration_before_connection (tests.test_flash_av.TestFlashAV.test_cli_write_requires_detachment_declaration_before_connection) ... ok
+test_guard_exact_single_write_and_save_with_both_readbacks (tests.test_flash_av.TestFlashAV.test_guard_exact_single_write_and_save_with_both_readbacks) ... ok
+test_guard_rejects_menu_and_arbitrary_writes (tests.test_flash_av.TestFlashAV.test_guard_rejects_menu_and_arbitrary_writes) ... ok
+test_guard_rejects_unobserved_original_or_extra_byte (tests.test_flash_av.TestFlashAV.test_guard_rejects_unobserved_original_or_extra_byte) ... ok
+test_readback_mismatches_leave_failure_and_never_retry (tests.test_flash_av.TestFlashAV.test_readback_mismatches_leave_failure_and_never_retry) ... ok
+test_rechecks_both_properties_after_backup (tests.test_flash_av.TestFlashAV.test_rechecks_both_properties_after_backup) ... ok
+test_restore_conflict_does_not_overwrite (tests.test_flash_av.TestFlashAV.test_restore_conflict_does_not_overwrite) ... ok
+test_restore_exact_original_even_if_menu_was_restored_separately (tests.test_flash_av.TestFlashAV.test_restore_exact_original_even_if_menu_was_restored_separately) ... ok
+test_restore_rejects_modified_journal (tests.test_flash_av.TestFlashAV.test_restore_rejects_modified_journal) ... ok
+test_restore_rejects_other_body_before_access (tests.test_flash_av.TestFlashAV.test_restore_rejects_other_body_before_access) ... ok
+test_snapshot_disagreement_and_wrong_attr_stop (tests.test_flash_av.TestFlashAV.test_snapshot_disagreement_and_wrong_attr_stop) ... ok
+test_snapshot_failure_prevents_writes (tests.test_flash_av.TestFlashAV.test_snapshot_failure_prevents_writes) ... ok
+test_snapshot_metadata_and_checksum (tests.test_flash_av.TestFlashAV.test_snapshot_metadata_and_checksum) ... ok
+test_status_reads_both_but_never_writes (tests.test_flash_av.TestFlashAV.test_status_reads_both_but_never_writes) ... ok
+test_belongs_to_compares_the_serial_fingerprint (tests.test_flash_baseline.TestFlashBaseline.test_belongs_to_compares_the_serial_fingerprint) ... ok
+test_damaged_blob_returns_none (tests.test_flash_baseline.TestFlashBaseline.test_damaged_blob_returns_none) ... ok
+test_missing_baseline_returns_none (tests.test_flash_baseline.TestFlashBaseline.test_missing_baseline_returns_none) ... ok
+test_save_never_overwrites_the_first_read (tests.test_flash_baseline.TestFlashBaseline.test_save_never_overwrites_the_first_read) ... ok
+test_save_then_load_round_trips (tests.test_flash_baseline.TestFlashBaseline.test_save_then_load_round_trips) ... ok
+test_truncated_record_returns_none (tests.test_flash_baseline.TestFlashBaseline.test_truncated_record_returns_none) ... ok
+test_chinese_name_present_for_every_value (tests.test_fnmap.TestFnMap.test_chinese_name_present_for_every_value) ... ok
+test_pixel_shift_is_known_bad (tests.test_fnmap.TestFnMap.test_pixel_shift_is_known_bad) ... ok
+test_seventy_seven_distinct_values (tests.test_fnmap.TestFnMap.test_seventy_seven_distinct_values) ... ok
+test_slots_are_not_linear (tests.test_fnmap.TestFnMap.test_slots_are_not_linear) ... ok
+test_untested_default (tests.test_fnmap.TestFnMap.test_untested_default) ... ok
+test_verified_values (tests.test_fnmap.TestFnMap.test_verified_values) ... ok
+test_cards_disabled_until_override_enabled (tests.test_gui.TestGui.test_cards_disabled_until_override_enabled) ... ok
+test_cards_enabled_once_override_on (tests.test_gui.TestGui.test_cards_enabled_once_override_on) ... ok
+test_every_tab_scrolls_so_the_log_keeps_its_rows (tests.test_gui.TestGui.test_every_tab_scrolls_so_the_log_keeps_its_rows) ... ok
+test_flash_av_button_requires_menu_already_open (tests.test_gui.TestGui.test_flash_av_button_requires_menu_already_open) ... ok
+test_flash_buttons_disabled_before_reading (tests.test_gui.TestGui.test_flash_buttons_disabled_before_reading) ... ok
+test_flash_buttons_idle_when_both_gates_open (tests.test_gui.TestGui.test_flash_buttons_idle_when_both_gates_open) ... ok
+test_flash_menu_button_offers_the_first_step (tests.test_gui.TestGui.test_flash_menu_button_offers_the_first_step) ... ok
+test_flash_read_failure_leaves_values_unknown (tests.test_gui.TestGui.test_flash_read_failure_leaves_values_unknown) ... ok
+test_flash_restore_restores_the_baseline_without_a_file_picker (tests.test_gui.TestGui.test_flash_restore_restores_the_baseline_without_a_file_picker) ... ok
+test_flash_write_buttons_enable_once_the_baseline_exists (tests.test_gui.TestGui.test_flash_write_buttons_enable_once_the_baseline_exists) ... ok
+test_flash_write_buttons_stay_disabled_without_a_baseline (tests.test_gui.TestGui.test_flash_write_buttons_stay_disabled_without_a_baseline) ... ok
+test_known_bad_row_is_marked (tests.test_gui.TestGui.test_known_bad_row_is_marked) ... ok
+test_lock_after_write_disables_everything (tests.test_gui.TestGui.test_lock_after_write_disables_everything) ... ok
+test_menu_rollback_requires_a_saved_source (tests.test_gui.TestGui.test_menu_rollback_requires_a_saved_source) ... ok
+test_mixed_override_offers_no_write (tests.test_gui.TestGui.test_mixed_override_offers_no_write) ... ok
+test_reset_buttons_follow_the_reported_version (tests.test_gui.TestGui.test_reset_buttons_follow_the_reported_version) ... ok
+test_reset_tab_explains_the_version_page_check (tests.test_gui.TestGui.test_reset_tab_explains_the_version_page_check)
+The user is told to look at the camera's own version page. ... ok
+test_reset_tab_reminds_about_the_driver_before_the_updater (tests.test_gui.TestGui.test_reset_tab_reminds_about_the_driver_before_the_updater)
+libusb-win32 has to go before the official updater can see the body. ... ok
+test_starts_disconnected (tests.test_gui.TestGui.test_starts_disconnected) ... ok
+test_tabs_exist (tests.test_gui.TestGui.test_tabs_exist) ... ok
+test_the_window_says_where_sessions_live (tests.test_gui.TestGui.test_the_window_says_where_sessions_live)
+Users run the exe from Downloads or a second copy, then look in the ... ok
+test_verified_rows_are_marked (tests.test_gui.TestGui.test_verified_rows_are_marked) ... ok
+test_create_writes_snapshot_before_journal (tests.test_journal.TestJournal.test_create_writes_snapshot_before_journal) ... ok
+test_journal_marks_chained_original (tests.test_journal.TestJournal.test_journal_marks_chained_original) ... ok
+test_list_sessions_newest_first (tests.test_journal.TestJournal.test_list_sessions_newest_first) ... ok
+test_list_sessions_skips_a_corrupt_journal (tests.test_journal.TestJournal.test_list_sessions_skips_a_corrupt_journal) ... ok
+test_list_sessions_skips_a_directory_without_payload (tests.test_journal.TestJournal.test_list_sessions_skips_a_directory_without_payload) ... ok
+test_load_rejects_tampered_snapshot (tests.test_journal.TestJournal.test_load_rejects_tampered_snapshot) ... ok
+test_save_leaves_no_temporary_file (tests.test_journal.TestJournal.test_save_leaves_no_temporary_file) ... ok
+test_two_creates_get_distinct_directories (tests.test_journal.TestJournal.test_two_creates_get_distinct_directories) ... ok
+test_a_sink_that_received_nothing_is_reported_as_such (tests.test_menu_deploy.TestBackup.test_a_sink_that_received_nothing_is_reported_as_such)
+Zero bytes means the file channel never worked, not a short read. ... ok
+test_an_interrupted_read_records_how_far_it_got (tests.test_menu_deploy.TestBackup.test_an_interrupted_read_records_how_far_it_got)
+The failure report must say where the transfer stopped. ... ok
+test_backup_announces_where_its_session_lands (tests.test_menu_deploy.TestBackup.test_backup_announces_where_its_session_lands)
+So "sessions is empty" can be answered without guessing. ... ok
+test_backup_never_overwrites (tests.test_menu_deploy.TestBackup.test_backup_never_overwrites) ... ok
+test_backup_saves_the_partition_without_writing (tests.test_menu_deploy.TestBackup.test_backup_saves_the_partition_without_writing) ... ok
+test_incomplete_backup_leaves_no_baseline (tests.test_menu_deploy.TestBackup.test_incomplete_backup_leaves_no_baseline) ... ok
+test_the_report_names_this_packages_frame (tests.test_menu_deploy.TestBackup.test_the_report_names_this_packages_frame)
+The innermost frame is vendored pyusb, which places nothing. ... ok
+test_a_patch_that_misses_the_target_hash_is_refused (tests.test_menu_deploy.TestBuildCandidate.test_a_patch_that_misses_the_target_hash_is_refused) ... ok
+test_factory_partition_becomes_the_candidate (tests.test_menu_deploy.TestBuildCandidate.test_factory_partition_becomes_the_candidate) ... ok
+test_legacy_build_is_refused_with_a_way_forward (tests.test_menu_deploy.TestBuildCandidate.test_legacy_build_is_refused_with_a_way_forward) ... ok
+test_partition_already_at_target_is_refused (tests.test_menu_deploy.TestBuildCandidate.test_partition_already_at_target_is_refused) ... ok
+test_sanity_rejects_non_ext2 (tests.test_menu_deploy.TestBuildCandidate.test_sanity_rejects_non_ext2) ... ok
+test_unknown_partition_is_refused (tests.test_menu_deploy.TestBuildCandidate.test_unknown_partition_is_refused) ... ok
+test_unknown_target_is_refused (tests.test_menu_deploy.TestBuildCandidate.test_unknown_target_is_refused) ... ok
+test_rejects_non_file_control (tests.test_menu_deploy.TestGuard.test_rejects_non_file_control) ... ok
+test_rejects_other_path (tests.test_menu_deploy.TestGuard.test_rejects_other_path) ... ok
+test_rejects_write_when_not_armed (tests.test_menu_deploy.TestGuard.test_rejects_write_when_not_armed) ... ok
+test_rejects_wrong_size (tests.test_menu_deploy.TestGuard.test_rejects_wrong_size) ... ok
+test_backup_alone_does_not_claim_a_version (tests.test_menu_deploy.TestIdentify.test_backup_alone_does_not_claim_a_version) ... ok
+test_identify_needs_a_backup_first (tests.test_menu_deploy.TestIdentify.test_identify_needs_a_backup_first) ... ok
+test_identify_records_what_it_found (tests.test_menu_deploy.TestIdentify.test_identify_records_what_it_found) ... ok
+test_identify_still_answers_when_the_record_cannot_be_rewritten (tests.test_menu_deploy.TestIdentify.test_identify_still_answers_when_the_record_cannot_be_rewritten) ... ok
+test_identify_works_on_a_backup_taken_before_it_existed (tests.test_menu_deploy.TestIdentify.test_identify_works_on_a_backup_taken_before_it_existed) ... ok
+test_retaking_a_backup_needs_permission (tests.test_menu_deploy.TestIdentify.test_retaking_a_backup_needs_permission) ... ok
+test_the_partition_hash_is_not_recomputed_for_an_unchanged_file (tests.test_menu_deploy.TestIdentify.test_the_partition_hash_is_not_recomputed_for_an_unchanged_file) ... ok
+test_patch_from_baseline (tests.test_menu_deploy.TestPatch.test_patch_from_baseline) ... ok
+test_patch_requires_a_baseline (tests.test_menu_deploy.TestPatch.test_patch_requires_a_baseline) ... ok
+test_corrupt_baseline_is_refused (tests.test_menu_deploy.TestRestore.test_corrupt_baseline_is_refused) ... ok
+test_restore_without_baseline_is_refused (tests.test_menu_deploy.TestRestore.test_restore_without_baseline_is_refused) ... ok
+test_restore_writes_the_baseline_back (tests.test_menu_deploy.TestRestore.test_restore_writes_the_baseline_back) ... ok
+test_every_run_lands_inside_the_partition (tests.test_menu_deploy.TestShippedPatch.test_every_run_lands_inside_the_partition) ... ok
+test_the_bundled_patch_parses (tests.test_menu_deploy.TestShippedPatch.test_the_bundled_patch_parses) ... ok
+test_already_at_target_writes_nothing (tests.test_menu_deploy.TestWrite.test_already_at_target_writes_nothing) ... ok
+test_write_requires_a_patched_image (tests.test_menu_deploy.TestWrite.test_write_requires_a_patched_image) ... ok
+test_write_sends_the_patched_image (tests.test_menu_deploy.TestWrite.test_write_sends_the_patched_image) ... ok
+test_write_still_refuses_an_incomplete_live_read (tests.test_menu_deploy.TestWrite.test_write_still_refuses_an_incomplete_live_read) ... ok
+test_a_path_without_valid_evidence_never_enables_write (tests.test_native_deployment_ui.NativeDeploymentTests.test_a_path_without_valid_evidence_never_enables_write) ... invalid command name "1650101689152_drain"
+    while executing
+"1650101689152_drain"
+    ("after" script)
+invalid command name "1650092257600_drain"
+    while executing
+"1650092257600_drain"
+    ("after" script)
+invalid command name "1650101663232_drain"
+    while executing
+"1650101663232_drain"
+    ("after" script)
+invalid command name "1650101657088_drain"
+    while executing
+"1650101657088_drain"
+    ("after" script)
+invalid command name "1650106537472_drain"
+    while executing
+"1650106537472_drain"
+    ("after" script)
+invalid command name "1650106007040_drain"
+    while executing
+"1650106007040_drain"
+    ("after" script)
+invalid command name "1650092852928_drain"
+    while executing
+"1650092852928_drain"
+    ("after" script)
+invalid command name "1650092738240_drain"
+    while executing
+"1650092738240_drain"
+    ("after" script)
+invalid command name "1650102089600_drain"
+    while executing
+"1650102089600_drain"
+    ("after" script)
+invalid command name "1650105980672_drain"
+    while executing
+"1650105980672_drain"
+    ("after" script)
+invalid command name "1650102077056_drain"
+    while executing
+"1650102077056_drain"
+    ("after" script)
+invalid command name "1650105812096_drain"
+    while executing
+"1650105812096_drain"
+    ("after" script)
+invalid command name "1650107164864_drain"
+    while executing
+"1650107164864_drain"
+    ("after" script)
+invalid command name "1650107773696_drain"
+    while executing
+"1650107773696_drain"
+    ("after" script)
+invalid command name "1650107841856_drain"
+    while executing
+"1650107841856_drain"
+    ("after" script)
+invalid command name "1650164910208_drain"
+    while executing
+"1650164910208_drain"
+    ("after" script)
+invalid command name "1650164961920_drain"
+    while executing
+"1650164961920_drain"
+    ("after" script)
+invalid command name "1650165046272_drain"
+    while executing
+"1650165046272_drain"
+    ("after" script)
+invalid command name "1650165114368_drain"
+    while executing
+"1650165114368_drain"
+    ("after" script)
+invalid command name "1650165231680_drain"
+    while executing
+"1650165231680_drain"
+    ("after" script)
+invalid command name "1650165299456_drain"
+    while executing
+"1650165299456_drain"
+    ("after" script)
+invalid command name "1650165433344_drain"
+    while executing
+"1650165433344_drain"
+    ("after" script)
+ok
+test_busy_disables_old_and_new_controls_and_close_waits (tests.test_native_deployment_ui.NativeDeploymentTests.test_busy_disables_old_and_new_controls_and_close_waits) ... ok
+test_direct_r15_status_read_names_the_current_version_without_preparing (tests.test_native_deployment_ui.NativeDeploymentTests.test_direct_r15_status_read_names_the_current_version_without_preparing) ... ok
+test_embedded_help_works_without_connecting (tests.test_native_deployment_ui.NativeDeploymentTests.test_embedded_help_works_without_connecting) ... ok
+test_error_changes_rollback_source_only_when_complete_material_is_reported (tests.test_native_deployment_ui.NativeDeploymentTests.test_error_changes_rollback_source_only_when_complete_material_is_reported) ... ok
+test_failed_status_read_does_not_leave_a_previous_installed_message (tests.test_native_deployment_ui.NativeDeploymentTests.test_failed_status_read_does_not_leave_a_previous_installed_message) ... ok
+test_lut_requires_backup_identification_and_patch_before_write (tests.test_native_deployment_ui.NativeDeploymentTests.test_lut_requires_backup_identification_and_patch_before_write) ... ok
+test_native_action_closes_existing_handle_and_uses_local_sessions (tests.test_native_deployment_ui.NativeDeploymentTests.test_native_action_closes_existing_handle_and_uses_local_sessions) ... ok
+test_native_tabs_keep_original_four_features_and_add_v8 (tests.test_native_deployment_ui.NativeDeploymentTests.test_native_tabs_keep_original_four_features_and_add_v8) ... ok
+test_offline_check_preserves_an_open_fn_connection (tests.test_native_deployment_ui.NativeDeploymentTests.test_offline_check_preserves_an_open_fn_connection) ... ok
+test_offline_identify_and_patch_use_audited_backup_without_closing_fn (tests.test_native_deployment_ui.NativeDeploymentTests.test_offline_identify_and_patch_use_audited_backup_without_closing_fn) ... ok
+test_recovery_uses_its_own_original_source_and_explicit_flag (tests.test_native_deployment_ui.NativeDeploymentTests.test_recovery_uses_its_own_original_source_and_explicit_flag) ... ok
+test_reinstalling_current_r15_preserves_the_original_stock_source (tests.test_native_deployment_ui.NativeDeploymentTests.test_reinstalling_current_r15_preserves_the_original_stock_source) ... ok
+test_reinstalling_current_v8_preserves_the_first_install_source (tests.test_native_deployment_ui.NativeDeploymentTests.test_reinstalling_current_v8_preserves_the_first_install_source) ... ok
+test_status_after_install_does_not_replace_the_original_preimage (tests.test_native_deployment_ui.NativeDeploymentTests.test_status_after_install_does_not_replace_the_original_preimage) ... ok
+test_status_read_displays_installed_versions_and_keeps_workflow_source (tests.test_native_deployment_ui.NativeDeploymentTests.test_status_read_displays_installed_versions_and_keeps_workflow_source) ... ok
+test_successful_rollback_keeps_the_original_rollback_source (tests.test_native_deployment_ui.NativeDeploymentTests.test_successful_rollback_keeps_the_original_rollback_source) ... ok
+test_v8_install_is_direct_and_backend_checks_the_prerequisite (tests.test_native_deployment_ui.NativeDeploymentTests.test_v8_install_is_direct_and_backend_checks_the_prerequisite) ... ok
+test_entry_and_sources_use_native_gui (tests.test_native_packaging.NativePackagingTests.test_entry_and_sources_use_native_gui) ... ok
+test_native_usb_stack_matches_released_182 (tests.test_native_packaging.NativePackagingTests.test_native_usb_stack_matches_released_182) ... ok
+test_offline_deployment_checks_never_enumerate_devices (tests.test_native_packaging.NativePackagingTests.test_offline_deployment_checks_never_enumerate_devices) ... ok
+test_baseline_root_follows_the_same_rule (tests.test_paths.TestPaths.test_baseline_root_follows_the_same_rule) ... ok
+test_sessions_root_is_executable_dir (tests.test_paths.TestPaths.test_sessions_root_is_executable_dir) ... ok
+test_sessions_root_never_uses_meipass (tests.test_paths.TestPaths.test_sessions_root_never_uses_meipass) ... ok
+test_source_run_uses_project_root (tests.test_paths.TestPaths.test_source_run_uses_project_root) ... ok
+test_corrupt_config_and_live_table_rejected (tests.test_r15_files.R15Tests.test_corrupt_config_and_live_table_rejected) ... ok
+test_install_gate_is_not_user_supplied (tests.test_r15_files.R15Tests.test_install_gate_is_not_user_supplied) ... ok
+test_r14_schema8_refs_keep_raw_bytes_and_block_index (tests.test_r15_files.R15Tests.test_r14_schema8_refs_keep_raw_bytes_and_block_index) ... ok
+test_real_sources_preserve_all_eighty_blocks (tests.test_r15_files.R15Tests.test_real_sources_preserve_all_eighty_blocks) ... ok
+test_unknown_code_rejected (tests.test_r15_files.R15Tests.test_unknown_code_rejected) ... ok
+test_complete_install_uses_one_ff01_write_and_keeps_paired_rollback (tests.test_r15nh_deploy.R15NHTests.test_complete_install_uses_one_ff01_write_and_keeps_paired_rollback) ... ok
+test_external_package_and_manifest_mismatch_never_connect (tests.test_r15nh_deploy.R15NHTests.test_external_package_and_manifest_mismatch_never_connect) ... ok
+test_four_cfg_restore_preserves_native_bounded_transport (tests.test_r15nh_deploy.R15NHTests.test_four_cfg_restore_preserves_native_bounded_transport) ... ok
+test_guard_only_allows_one_complete_partition_write (tests.test_r15nh_deploy.R15NHTests.test_guard_only_allows_one_complete_partition_write) ... ok
+test_identify_and_patch_are_offline_and_existing_evidence_is_not_overwritten (tests.test_r15nh_deploy.R15NHTests.test_identify_and_patch_are_offline_and_existing_evidence_is_not_overwritten) ... ok
+test_inspect_session_is_local_and_invalid_material_never_unlocks (tests.test_r15nh_deploy.R15NHTests.test_inspect_session_is_local_and_invalid_material_never_unlocks) ... ok
+test_install_rejects_stale_live_backup_before_write (tests.test_r15nh_deploy.R15NHTests.test_install_rejects_stale_live_backup_before_write) ... ok
+test_install_without_identify_and_patch_never_connects (tests.test_r15nh_deploy.R15NHTests.test_install_without_identify_and_patch_never_connects) ... ok
+test_native_baseline_connect_signature_and_receipt_resume (tests.test_r15nh_deploy.R15NHTests.test_native_baseline_connect_signature_and_receipt_resume) ... ok
+test_offline_check_never_connects (tests.test_r15nh_deploy.R15NHTests.test_offline_check_never_connects) ... ok
+test_partition_changed_before_write_is_rejected (tests.test_r15nh_deploy.R15NHTests.test_partition_changed_before_write_is_rejected) ... ok
+test_preload_active_v8_blocks_rollback_and_comments_do_not (tests.test_r15nh_deploy.R15NHTests.test_preload_active_v8_blocks_rollback_and_comments_do_not) ... ok
+test_prepared_session_unlocks_only_with_matching_candidate_and_paired_evidence (tests.test_r15nh_deploy.R15NHTests.test_prepared_session_unlocks_only_with_matching_candidate_and_paired_evidence) ... ok
+test_r9_only_schema4_accepts_published_a7_tag (tests.test_r15nh_deploy.R15NHTests.test_r9_only_schema4_accepts_published_a7_tag) ... ok
+test_real_rollback_snapshot_and_wrong_body_rejected_before_write (tests.test_r15nh_deploy.R15NHTests.test_real_rollback_snapshot_and_wrong_body_rejected_before_write) ... ok
+test_real_target_accepts_only_named_metadata_differences (tests.test_r15nh_deploy.R15NHTests.test_real_target_accepts_only_named_metadata_differences) ... ok
+test_release_contains_only_small_r12p_deltas (tests.test_r15nh_deploy.R15NHTests.test_release_contains_only_small_r12p_deltas) ... ok
+test_rollback_requires_paired_identity_bound_material (tests.test_r15nh_deploy.R15NHTests.test_rollback_requires_paired_identity_bound_material) ... ok
+test_rollback_restores_exact_four_records_and_two_tables (tests.test_r15nh_deploy.R15NHTests.test_rollback_restores_exact_four_records_and_two_tables) ... ok
+test_v8_active_rejects_rollback_before_partition_write (tests.test_r15nh_deploy.R15NHTests.test_v8_active_rejects_rollback_before_partition_write) ... ok
+test_write_once_requires_full_readback (tests.test_r15nh_deploy.R15NHTests.test_write_once_requires_full_readback) ... ok
+test_write_timeout_never_retries_and_retains_original (tests.test_r15nh_deploy.R15NHTests.test_write_timeout_never_retries_and_retains_original) ... ok
+test_read_identify_patch_write_and_paired_rollback (tests.test_r15nh_workflow.R12WorkflowTests.test_read_identify_patch_write_and_paired_rollback) ... ok
+test_asset_path_traversal_rejected (tests.test_release_assets.ReleaseTests.test_asset_path_traversal_rejected) ... ok
+test_release_hashes_and_initial_inventory (tests.test_release_assets.ReleaseTests.test_release_hashes_and_initial_inventory) ... ok
+test_a_large_request_is_split_into_one_mib_packets (tests.test_service_transfer.TestChunkedRequest.test_a_large_request_is_split_into_one_mib_packets) ... ok
+test_a_small_request_still_leaves_as_one_packet (tests.test_service_transfer.TestChunkedRequest.test_a_small_request_still_leaves_as_one_packet) ... ok
+test_a_path_outside_the_allowlist_is_still_refused (tests.test_service_transfer.TestFileControlSink.test_a_path_outside_the_allowlist_is_still_refused) ... ok
+test_a_whole_partition_write_leaves_as_packets (tests.test_service_transfer.TestFileControlSink.test_a_whole_partition_write_leaves_as_packets)
+The same path the deploy step uses, at a size a test can afford. ... ok
+test_an_oversized_write_is_still_refused (tests.test_service_transfer.TestFileControlSink.test_an_oversized_write_is_still_refused) ... ok
+test_readfile_writes_into_the_stream_it_was_given (tests.test_service_transfer.TestFileControlSink.test_readfile_writes_into_the_stream_it_was_given) ... ok
+test_several_blocks (tests.test_service_transfer.TestPadded0336.test_several_blocks) ... ok
+test_value_that_does_not_end_on_a_boundary (tests.test_service_transfer.TestPadded0336.test_value_that_does_not_end_on_a_boundary) ... ok
+test_value_that_ends_on_a_block_boundary (tests.test_service_transfer.TestPadded0336.test_value_that_ends_on_a_block_boundary) ... ok
+test_multi_block_payload (tests.test_service_transfer.TestPaddedInterface.test_multi_block_payload) ... ok
+test_small_payload (tests.test_service_transfer.TestPaddedInterface.test_small_payload) ... ok
+test_a_partition_sized_reply_streams_to_the_sink (tests.test_service_transfer.TestStreamedReply.test_a_partition_sized_reply_streams_to_the_sink) ... ok
+test_the_same_reply_without_a_sink_is_still_capped (tests.test_service_transfer.TestStreamedReply.test_the_same_reply_without_a_sink_is_still_capped) ... ok
+test_payload_that_ends_on_a_block_boundary (tests.test_service_transfer.TestUnpaddedInterface.test_payload_that_ends_on_a_block_boundary) ... ok
+test_small_payload (tests.test_service_transfer.TestUnpaddedInterface.test_small_payload) ... ok
+test_snapshot_sized_payload (tests.test_service_transfer.TestUnpaddedInterface.test_snapshot_sized_payload) ... ok
+test_config_schema_1_4_5_6_7_8_9_are_decoded_strictly (tests.test_state_fingerprints.FingerprintsTests.test_config_schema_1_4_5_6_7_8_9_are_decoded_strictly) ... ok
+test_every_menu_profile_with_real_hook_and_external_preload_can_match (tests.test_state_fingerprints.FingerprintsTests.test_every_menu_profile_with_real_hook_and_external_preload_can_match) ... ok
+test_index_covers_every_requested_major_and_intermediate_version (tests.test_state_fingerprints.FingerprintsTests.test_index_covers_every_requested_major_and_intermediate_version) ... ok
+test_menu_hook_and_complete_inventory_required (tests.test_state_fingerprints.FingerprintsTests.test_menu_hook_and_complete_inventory_required) ... ok
+test_menu_stock_requires_all_probed_files_absent (tests.test_state_fingerprints.FingerprintsTests.test_menu_stock_requires_all_probed_files_absent) ... ok
+test_missing_read_is_not_absence (tests.test_state_fingerprints.FingerprintsTests.test_missing_read_is_not_absence) ... ok
+test_r9_known_identity_does_not_claim_r8_config_compatibility (tests.test_state_fingerprints.FingerprintsTests.test_r9_known_identity_does_not_claim_r8_config_compatibility) ... ok
+test_real_current_prefix_allows_user_object_changes_but_not_code (tests.test_state_fingerprints.FingerprintsTests.test_real_current_prefix_allows_user_object_changes_but_not_code) ... ok
+test_real_released_r14_r15_and_name_help_preserve_mutable_identity (tests.test_state_fingerprints.FingerprintsTests.test_real_released_r14_r15_and_name_help_preserve_mutable_identity) ... ok
+test_stock_and_mixed_lut_are_distinct (tests.test_state_fingerprints.FingerprintsTests.test_stock_and_mixed_lut_are_distinct) ... ok
+test_connect_rejects_multiple_cameras (tests.test_usbdev.TestDeviceSelection.test_connect_rejects_multiple_cameras) ... ok
+test_connect_rejects_no_camera (tests.test_usbdev.TestDeviceSelection.test_connect_rejects_no_camera) ... ok
+test_select_single_returns_the_device (tests.test_usbdev.TestDeviceSelection.test_select_single_returns_the_device) ... ok
+test_identity_gate_accepts_a9_600 (tests.test_usbdev.TestIdentityGate.test_identity_gate_accepts_a9_600) ... ok
+test_identity_gate_rejects_missing_fingerprint (tests.test_usbdev.TestIdentityGate.test_identity_gate_rejects_missing_fingerprint) ... ok
+test_identity_gate_rejects_wrong_firmware (tests.test_usbdev.TestIdentityGate.test_identity_gate_rejects_wrong_firmware) ... ok
+test_identity_gate_rejects_wrong_model (tests.test_usbdev.TestIdentityGate.test_identity_gate_rejects_wrong_model) ... ok
+test_expired_receipt_is_not_returned (tests.test_usbdev.TestReceipt.test_expired_receipt_is_not_returned) ... ok
+test_missing_receipt_returns_none (tests.test_usbdev.TestReceipt.test_missing_receipt_returns_none) ... ok
+test_receipt_from_another_camera_is_rejected (tests.test_usbdev.TestReceipt.test_receipt_from_another_camera_is_rejected) ... ok
+test_save_receipt_round_trips (tests.test_usbdev.TestReceipt.test_save_receipt_round_trips) ... ok
+test_active_v71_requires_all_three_released_hashes (tests.test_v8_deploy.V8Tests.test_active_v71_requires_all_three_released_hashes) ... ok
+test_bad_configs_or_live_lut_never_write (tests.test_v8_deploy.V8Tests.test_bad_configs_or_live_lut_never_write) ... ok
+test_changed_preload_requires_explicit_recover (tests.test_v8_deploy.V8Tests.test_changed_preload_requires_explicit_recover) ... ok
+test_external_package_is_validated_instead_of_ignored (tests.test_v8_deploy.V8Tests.test_external_package_is_validated_instead_of_ignored) ... ok
+test_install_then_original_preload_rollback (tests.test_v8_deploy.V8Tests.test_install_then_original_preload_rollback) ... ok
+test_logging_failure_does_not_mask_unknown_write (tests.test_v8_deploy.V8Tests.test_logging_failure_does_not_mask_unknown_write) ... ok
+test_menu_change_between_audit_and_final_snapshot_never_writes (tests.test_v8_deploy.V8Tests.test_menu_change_between_audit_and_final_snapshot_never_writes) ... ok
+test_non_r15_and_mixed_files_never_write (tests.test_v8_deploy.V8Tests.test_non_r15_and_mixed_files_never_write) ... ok
+test_nonboolean_recover_is_rejected_offline (tests.test_v8_deploy.V8Tests.test_nonboolean_recover_is_rejected_offline) ... ok
+test_old_or_duplicate_unknown_owner_never_writes (tests.test_v8_deploy.V8Tests.test_old_or_duplicate_unknown_owner_never_writes) ... ok
+test_pinned_package_matches_formal_v8 (tests.test_v8_deploy.V8Tests.test_pinned_package_matches_formal_v8) ... ok
+test_prerequisite_evidence_is_durable_before_first_write (tests.test_v8_deploy.V8Tests.test_prerequisite_evidence_is_durable_before_first_write) ... ok
+test_racing_prerequisite_is_rejected (tests.test_v8_deploy.V8Tests.test_racing_prerequisite_is_rejected) ... ok
+test_readonly_guard_denies_terminal_partition_and_all_writes (tests.test_v8_deploy.V8Tests.test_readonly_guard_denies_terminal_partition_and_all_writes) ... ok
+test_real_camera_streams_large_r15_dependencies_through_native_reply_limits (tests.test_v8_deploy.V8Tests.test_real_camera_streams_large_r15_dependencies_through_native_reply_limits) ... ok
+test_real_native_transport_retains_unstreamed_two_mib_limit (tests.test_v8_deploy.V8Tests.test_real_native_transport_retains_unstreamed_two_mib_limit) ... ok
+test_reinstall_reports_original_install_session_needed (tests.test_v8_deploy.V8Tests.test_reinstall_reports_original_install_session_needed) ... ok
+test_rollback_rejects_corrupt_local_backup_without_connection (tests.test_v8_deploy.V8Tests.test_rollback_rejects_corrupt_local_backup_without_connection) ... ok
+test_rollback_rejects_other_body_before_reads_or_writes (tests.test_v8_deploy.V8Tests.test_rollback_rejects_other_body_before_reads_or_writes) ... ok
+test_status_names_inactive_complete_files_and_partial_active_installation (tests.test_v8_deploy.V8Tests.test_status_names_inactive_complete_files_and_partial_active_installation) ... ok
+test_timeout_not_retried_and_actual_install_backup_remains_usable (tests.test_v8_deploy.V8Tests.test_timeout_not_retried_and_actual_install_backup_remains_usable) ... ok
+test_dependency_loader_returns_usable_objects (tests.test_vendor_isolation.TestVendorIsolation.test_dependency_loader_returns_usable_objects)
+connect() destructures exactly these eight values. A rename or a ... ok
+test_libusb_backend_loads_from_vendor (tests.test_vendor_isolation.TestVendorIsolation.test_libusb_backend_loads_from_vendor) ... ok
+test_pmca_sony_imports_without_site_packages (tests.test_vendor_isolation.TestVendorIsolation.test_pmca_sony_imports_without_site_packages) ... ok
+test_sha256_shim_matches_hashlib (tests.test_vendor_isolation.TestVendorIsolation.test_sha256_shim_matches_hashlib) ... ok
+test_a_non_ext2_blob_is_reported (tests.test_versions.TestIdentify.test_a_non_ext2_blob_is_reported) ... ok
+test_a_short_buffer_does_not_raise (tests.test_versions.TestIdentify.test_a_short_buffer_does_not_raise) ... ok
+test_zeroes_are_reported_as_unreadable (tests.test_versions.TestIdentify.test_zeroes_are_reported_as_unreadable) ... ok
+test_every_build_compares_the_same_files (tests.test_versions.TestTable.test_every_build_compares_the_same_files) ... ok
+test_every_known_build_is_present (tests.test_versions.TestTable.test_every_known_build_is_present) ... ok
+test_factory_has_no_creative_look_module (tests.test_versions.TestTable.test_factory_has_no_creative_look_module) ... ok
+test_no_two_builds_share_a_fingerprint (tests.test_versions.TestTable.test_no_two_builds_share_a_fingerprint) ... ok
+test_the_shipped_target_matches_one_build (tests.test_versions.TestTable.test_the_shipped_target_matches_one_build) ... ok
+test_a_failed_write_leaves_a_journal_behind (tests.test_wifi_5ghz.TestApply.test_a_failed_write_leaves_a_journal_behind) ... ok
+test_apply_is_a_no_op_when_already_at_03 (tests.test_wifi_5ghz.TestApply.test_apply_is_a_no_op_when_already_at_03) ... ok
+test_apply_leaves_the_other_five_properties_alone (tests.test_wifi_5ghz.TestApply.test_apply_leaves_the_other_five_properties_alone) ... ok
+test_apply_refuses_an_unexpected_c_index (tests.test_wifi_5ghz.TestApply.test_apply_refuses_an_unexpected_c_index) ... ok
+test_apply_refuses_when_a_companion_has_moved (tests.test_wifi_5ghz.TestApply.test_apply_refuses_when_a_companion_has_moved) ... ok
+test_apply_writes_one_byte_and_saves (tests.test_wifi_5ghz.TestApply.test_apply_writes_one_byte_and_saves) ... ok
+test_a_failed_write_never_unlocks_save (tests.test_wifi_5ghz.TestGuard.test_a_failed_write_never_unlocks_save) ... ok
+test_allows_reading_any_of_the_six (tests.test_wifi_5ghz.TestGuard.test_allows_reading_any_of_the_six) ... ok
+test_arming_needs_the_exact_preimage (tests.test_wifi_5ghz.TestGuard.test_arming_needs_the_exact_preimage) ... ok
+test_arming_refuses_a_value_that_is_not_09_or_03 (tests.test_wifi_5ghz.TestGuard.test_arming_refuses_a_value_that_is_not_09_or_03) ... ok
+test_refuses_a_write_before_it_is_armed (tests.test_wifi_5ghz.TestGuard.test_refuses_a_write_before_it_is_armed) ... ok
+test_rejects_a_non_backup_channel (tests.test_wifi_5ghz.TestGuard.test_rejects_a_non_backup_channel) ... ok
+test_rejects_a_property_outside_the_six (tests.test_wifi_5ghz.TestGuard.test_rejects_a_property_outside_the_six) ... ok
+test_rejects_the_pre_post_read (tests.test_wifi_5ghz.TestGuard.test_rejects_the_pre_post_read)
+command 5 with anything but 0x01 is how the camera ends a session. ... ok
+test_save_is_allowed_only_once (tests.test_wifi_5ghz.TestGuard.test_save_is_allowed_only_once) ... ok
+test_save_needs_a_verified_write (tests.test_wifi_5ghz.TestGuard.test_save_needs_a_verified_write) ... ok
+test_restore_leaves_other_properties_where_they_are (tests.test_wifi_5ghz.TestRestore.test_restore_leaves_other_properties_where_they_are) ... ok
+test_restore_puts_the_recorded_value_back (tests.test_wifi_5ghz.TestRestore.test_restore_puts_the_recorded_value_back) ... ok
+test_restore_refuses_a_journal_from_another_action (tests.test_wifi_5ghz.TestRestore.test_restore_refuses_a_journal_from_another_action) ... ok
+test_restore_refuses_a_third_value (tests.test_wifi_5ghz.TestRestore.test_restore_refuses_a_third_value) ... ok
+test_restore_refuses_another_camera (tests.test_wifi_5ghz.TestRestore.test_restore_refuses_another_camera) ... ok
+test_restore_when_already_original_does_not_save (tests.test_wifi_5ghz.TestRestore.test_restore_when_already_original_does_not_save) ... ok
+test_status_keeps_the_full_backup (tests.test_wifi_5ghz.TestStatus.test_status_keeps_the_full_backup) ... ok
+test_status_reads_and_never_writes (tests.test_wifi_5ghz.TestStatus.test_status_reads_and_never_writes) ... ok
+
+----------------------------------------------------------------------
+Ran 374 tests in 52.991s
+
+OK

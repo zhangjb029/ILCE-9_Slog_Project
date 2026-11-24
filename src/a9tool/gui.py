@@ -15,6 +15,7 @@ from tkinter import messagebox, ttk
 from . import __version__
 from . import (aspect_params, core, data, errors, firmware_reset, flash_av, flash_baseline,
                flash_service, fnmap, journal, menu_deploy, usbdev, wifi_5ghz)
+from .native_deployment_ui import NativeDeploymentMixin
 
 PICTURE_PROFILE = 0x3A
 SLOG_DISPLAY_ASSIST = 0x36
@@ -26,7 +27,7 @@ STATUS_MARKS = {
 }
 
 
-class App:
+class App(NativeDeploymentMixin):
     def __init__(self, root: tk.Tk):
         self.root = root
         self.root.title(f'ILCE-9 功能槽位工具  v{__version__}')
@@ -83,6 +84,9 @@ class App:
         self._refresh()
 
     def on_close(self) -> None:
+        if self.busy:
+            self.log('任务仍在进行，请等待结果后关闭；不会强杀当前机身操作。')
+            return
         if self.handle is not None:
             self.handle.close()
         self.root.destroy()
@@ -99,11 +103,13 @@ class App:
         self.tab_fn = ttk.Frame(self.notebook)
         self.tab_flash = ttk.Frame(self.notebook)
         self.tab_menu = ttk.Frame(self.notebook)
+        self.tab_v8 = ttk.Frame(self.notebook)
         self.tab_wifi = ttk.Frame(self.notebook)
         self.tab_reset = ttk.Frame(self.notebook)
         self.notebook.add(self.tab_fn, text='Fn 功能')
         self.notebook.add(self.tab_flash, text='电子快门引闪')
-        self.notebook.add(self.tab_menu, text='创意外观 LUT')
+        self.notebook.add(self.tab_menu, text='创意外观 LUT · R15NH')
+        self.notebook.add(self.tab_v8, text='悬浮菜单 · V8')
         self.notebook.add(self.tab_wifi, text='解锁 5GHz WiFi')
         self.notebook.add(self.tab_reset, text='强制回退')
 
@@ -112,6 +118,7 @@ class App:
         body_fn = self._scroll_body(self.tab_fn)
         body_flash = self._scroll_body(self.tab_flash)
         body_menu = self._scroll_body(self.tab_menu)
+        body_v8 = self._scroll_body(self.tab_v8)
         body_wifi = self._scroll_body(self.tab_wifi)
         body_reset = self._scroll_body(self.tab_reset)
 
@@ -185,7 +192,8 @@ class App:
         self.log_box.pack(fill='both', expand=True, padx=10, pady=8)
 
         self._build_flash_tab(body_flash)
-        self._build_menu_tab(body_menu)
+        self._build_native_lut_tab(body_menu)
+        self._build_native_v8_tab(body_v8)
         self._build_wifi_tab(body_wifi)
         self._build_reset_tab(body_reset)
         self.reload_sessions()
@@ -262,7 +270,7 @@ class App:
     def _refresh(self) -> None:
         connected = self.state is not None
         status = core.override_status(self.state) if connected else None
-        writable = connected and not self.locked
+        writable = connected and not self.locked and not self.busy
         cards_on = writable and status == core.STATUS_ENABLED
         normal = lambda ok: 'normal' if ok else 'disabled'
 
@@ -277,7 +285,7 @@ class App:
         self.baseline_btn.configure(state=normal(writable))
         self.refresh_btn.configure(state=normal(not self.busy))
         self._refresh_flash()
-        self._refresh_menu()
+        self._refresh_native_deployment()
         self._refresh_wifi()
         self._refresh_reset()
 
@@ -1066,6 +1074,13 @@ class App:
         self._background(work, self._menu_done)
 
     def _menu_done(self, result, error) -> None:
+        # The retained 4:3 parameter action uses its original native connection.
+        # Its new host page does not carry the retired R12 six-step widgets.
+        if hasattr(self, 'native_buttons'):
+            self._set_busy(False)
+            self.log(errors.user_message(error) if error is not None else
+                     '4:3 参数结果：' + str(result) + '；请正常关机重启后核对。')
+            return
         self._set_busy(False)
         if error is not None:
             self.log(errors.user_message(error))

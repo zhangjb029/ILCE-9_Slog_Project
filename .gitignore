@@ -3,6 +3,9 @@ __pycache__/
 dist/
 build/output/
 build/work/
+build/work-*/
+*_receipt.json
+runtime-config.json
 sessions/
 baseline/
 *.exe

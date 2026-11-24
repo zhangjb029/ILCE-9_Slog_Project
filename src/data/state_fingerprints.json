@@ -1,0 +1,479 @@
+{
+  "schema": "a9-state-fingerprints-v1",
+  "r15": [
+    {
+      "label": "stock",
+      "files": {
+        "/usr/lib/a9fl.so": null,
+        "/usr/lib/viewUnified2.so": "d34b52f03c61f839e16141b8857a3f06b2960aafe3a6ceeba0e6c4a101954223",
+        "/usr/lib/CautionConfig.so": "577a29088c971344f8191049a298480aa1b2221393ad05815bbef860d2c35ac7",
+        "/usr/share/app/string_simplifiedchinese.uxc": "8ba55a52276a84f427e0e92816765ea584b7c44a7e20cad59eed3370d7d7cf7b",
+        "/usr/share/app/string_english.uxc": "c23b39b0f6115f2720d3e9b25ac247190db01f1570b1a57617ae5954da7e6d64"
+      },
+      "source": "src/data/version_fingerprints.json",
+      "config_schema": null,
+      "object_layout": null
+    },
+    {
+      "label": "R8",
+      "files": {
+        "/usr/lib/a9fl.so": "a12358a5a3f75a1497e98fed946f7ee4f4252fc26dfe50aba49892be79005cf4",
+        "/usr/lib/viewUnified2.so": "b5d6a6d3c0e5fb93d016dea2e8ae11b450cfc3e2f30a3696b11a3ede2d658c01",
+        "/usr/lib/CautionConfig.so": "24747bfedee7dfcd9b66deae2a86629405394d7647e1736c303452495359f391",
+        "/usr/share/app/string_simplifiedchinese.uxc": "8a5e51f768630fa831d6372b20f37b3f08ed0c6c8e3aeec63986bcc1eed035af",
+        "/usr/share/app/string_english.uxc": "9cfb78c053098d7e447352951f6669c34636a89a69962d5b18d112df3ca2dc8d"
+      },
+      "source": "src/data/version_fingerprints.json",
+      "config_schema": 1,
+      "object_layout": null
+    },
+    {
+      "label": "R9.1",
+      "files": {
+        "/usr/lib/a9fl.so": "3e01f0d0c1e6659fb66d74a41afe3b6621cab9c2660602b719668e70b210dd3d",
+        "/usr/lib/viewUnified2.so": "b5d6a6d3c0e5fb93d016dea2e8ae11b450cfc3e2f30a3696b11a3ede2d658c01",
+        "/usr/lib/CautionConfig.so": "24747bfedee7dfcd9b66deae2a86629405394d7647e1736c303452495359f391",
+        "/usr/share/app/string_simplifiedchinese.uxc": "1eee0fbb7850f4e8b5eae8a5fd9ec1ebbaba00cbfac8f272c6307f7e50650728",
+        "/usr/share/app/string_english.uxc": "01bd3ee7918eb14621bf5a024f4ef23429778a78a9778ebb8f9aa00e43aaaaea"
+      },
+      "source": "src/data/version_fingerprints.json",
+      "config_schema": 4,
+      "object_layout": null
+    },
+    {
+      "label": "R10",
+      "files": {
+        "/usr/lib/a9fl.so": "39e575666c211e1d000d7838af175c4d6eb14c5aa560ab96141dcf416f77075c",
+        "/usr/lib/viewUnified2.so": "b5d6a6d3c0e5fb93d016dea2e8ae11b450cfc3e2f30a3696b11a3ede2d658c01",
+        "/usr/lib/CautionConfig.so": "24747bfedee7dfcd9b66deae2a86629405394d7647e1736c303452495359f391",
+        "/usr/share/app/string_simplifiedchinese.uxc": "7f2f7d5138478b6a68517da585498099f6f8720f20d4406f0714e319018ffbd6",
+        "/usr/share/app/string_english.uxc": "6396ce51851402e94aea218d5cc6c6f781e602069ed253dda03012cc0a7f227c"
+      },
+      "source": "src/data/version_fingerprints.json",
+      "config_schema": 5,
+      "object_layout": null
+    },
+    {
+      "label": "R11",
+      "files": {
+        "/usr/lib/a9fl.so": "17c3315e7a0b260962e76d927f649f2eb237fef2dfff044fbe08eec760efbc9b",
+        "/usr/lib/viewUnified2.so": "6c1885d86feb358cf11b7f742ff2391e2dac9302ca15d1f98e91b2cff79946ba",
+        "/usr/lib/CautionConfig.so": "24747bfedee7dfcd9b66deae2a86629405394d7647e1736c303452495359f391",
+        "/usr/share/app/string_simplifiedchinese.uxc": "7f2f7d5138478b6a68517da585498099f6f8720f20d4406f0714e319018ffbd6",
+        "/usr/share/app/string_english.uxc": "6396ce51851402e94aea218d5cc6c6f781e602069ed253dda03012cc0a7f227c"
+      },
+      "source": "src/data/version_fingerprints.json",
+      "config_schema": 5,
+      "object_layout": null
+    },
+    {
+      "label": "R12",
+      "files": {
+        "/usr/lib/a9fl.so": "706cd7b36bf0ec86b813db3ac69f251c3d495c7b3d7d74e1664dc134a64afcc2",
+        "/usr/lib/viewUnified2.so": "6c1885d86feb358cf11b7f742ff2391e2dac9302ca15d1f98e91b2cff79946ba",
+        "/usr/lib/CautionConfig.so": "24747bfedee7dfcd9b66deae2a86629405394d7647e1736c303452495359f391",
+        "/usr/share/app/string_simplifiedchinese.uxc": "ddf566457a0fa2a76370df018635f50752893829244b123c381c38b619844cb9",
+        "/usr/share/app/string_english.uxc": "908eba5f6685787d74115e0324da0396673f1310a88a8d1463c5d8f9fc90b9dd"
+      },
+      "source": "src/data/version_fingerprints.json",
+      "config_schema": 6,
+      "object_layout": null
+    },
+    {
+      "label": "R9",
+      "files": {
+        "/usr/lib/a9fl.so": "eedc65f33e07460e42da542063cbcab792eeb53e438072fd9e22ebfb5a9457ff",
+        "/usr/share/app/string_simplifiedchinese.uxc": "1eee0fbb7850f4e8b5eae8a5fd9ec1ebbaba00cbfac8f272c6307f7e50650728",
+        "/usr/share/app/string_english.uxc": "01bd3ee7918eb14621bf5a024f4ef23429778a78a9778ebb8f9aa00e43aaaaea",
+        "/usr/lib/viewUnified2.so": "b5d6a6d3c0e5fb93d016dea2e8ae11b450cfc3e2f30a3696b11a3ede2d658c01",
+        "/usr/lib/CautionConfig.so": "24747bfedee7dfcd9b66deae2a86629405394d7647e1736c303452495359f391"
+      },
+      "source": "analysis/a9_fl23_operator_20261114_R9/manifest.json",
+      "config_schema": 4,
+      "object_layout": null
+    },
+    {
+      "label": "R13",
+      "files": {
+        "/usr/lib/a9fl.so": "8cf7a43cb36c310b23f4b4bbc057d72ddd7ceba3f5eb0046756f955c8fac9dcd",
+        "/usr/share/app/string_simplifiedchinese.uxc": "56df506b958665bc65a6eb266bec5b537a29a0d056b3dd329ed2708f4872f5eb",
+        "/usr/share/app/string_english.uxc": "1b24cf29eebfb0d86979e94c3789c3a3cacfbd55ed58d5bcc03e798a05427ef5",
+        "/usr/lib/viewUnified2.so": "6c1885d86feb358cf11b7f742ff2391e2dac9302ca15d1f98e91b2cff79946ba",
+        "/usr/lib/CautionConfig.so": "24747bfedee7dfcd9b66deae2a86629405394d7647e1736c303452495359f391"
+      },
+      "source": "analysis/a9_fl27_r13_20261119/operator/manifest.json",
+      "config_schema": 7,
+      "object_layout": null
+    },
+    {
+      "label": "R14",
+      "files": {
+        "/usr/lib/a9fl.so": "b976012adcc5da4074d390af5b3626b960ff2b1889f480b5d5e5faab23ddd31a",
+        "/usr/share/app/string_simplifiedchinese.uxc": "ecbbb59ad3b649694cdd97525a506301a57c60217c5a54799c2e2e06555bafac",
+        "/usr/share/app/string_english.uxc": "17d1d15dde1c06b7caf35be399a0f6c10f9859b7a079fa771d64f38a131167a8",
+        "/usr/lib/viewUnified2.so": "6c1885d86feb358cf11b7f742ff2391e2dac9302ca15d1f98e91b2cff79946ba",
+        "/usr/lib/CautionConfig.so": "24747bfedee7dfcd9b66deae2a86629405394d7647e1736c303452495359f391"
+      },
+      "source": "analysis/a9_fl43_sd_r13_20261119/operator/manifest.json",
+      "config_schema": 8,
+      "object_layout": {
+        "original_length": 283632,
+        "object_offset": 290816,
+        "object_blocks": 80,
+        "object_block_length": 4096,
+        "load_file_ranges": [
+          [
+            0,
+            263676
+          ],
+          [
+            263676,
+            264480
+          ]
+        ],
+        "elf_sha256": "fbfcc9acbcd74a58a053a369d99fca132cd587325f8b168156d69ef48945f394",
+        "immutable_prefix_sha256": "978dc832106c502664dc7e78cfe909651c9fa5f5b785884cd15e65ed3060951a",
+        "initial_full_file_sha256": "b976012adcc5da4074d390af5b3626b960ff2b1889f480b5d5e5faab23ddd31a"
+      },
+      "aliases": [
+        "R13-SD"
+      ],
+      "source_name": "A9 FL43 SD R14 (workspace directory retains R13 name)"
+    },
+    {
+      "label": "R14 FIX1",
+      "files": {
+        "/usr/lib/a9fl.so": "75483e9eebf09987e027318ddb8c4f19c881c09824ab16bfcdd5d70116c40eed",
+        "/usr/share/app/string_simplifiedchinese.uxc": "ecbbb59ad3b649694cdd97525a506301a57c60217c5a54799c2e2e06555bafac",
+        "/usr/share/app/string_english.uxc": "17d1d15dde1c06b7caf35be399a0f6c10f9859b7a079fa771d64f38a131167a8",
+        "/usr/lib/viewUnified2.so": "6c1885d86feb358cf11b7f742ff2391e2dac9302ca15d1f98e91b2cff79946ba",
+        "/usr/lib/CautionConfig.so": "24747bfedee7dfcd9b66deae2a86629405394d7647e1736c303452495359f391"
+      },
+      "source": "analysis/a9_fl43_sd_r14_fix_20261120/operator/manifest.json",
+      "config_schema": 8,
+      "object_layout": {
+        "original_length": 283636,
+        "object_offset": 290816,
+        "object_blocks": 80,
+        "object_block_length": 4096,
+        "load_file_ranges": [
+          [
+            0,
+            263680
+          ],
+          [
+            263680,
+            264484
+          ]
+        ],
+        "elf_sha256": "46d96c5a817cb42074a09d4c53db4bfc9c16109554166d84a46a4bfbda298887",
+        "immutable_prefix_sha256": "6f1e284d882144d6462eed7eeaa615c193a2e03149bd3c5b68d937a911c82aa0",
+        "initial_full_file_sha256": "75483e9eebf09987e027318ddb8c4f19c881c09824ab16bfcdd5d70116c40eed",
+        "profile": "R14-SD",
+        "fixture": "R14-SD.so",
+        "source_image_sha256": "63292cf14b1571d0fa6da4b63732bf139e18b0c97d23e3a28c3e904ad1158cbe",
+        "source_proof": "reference/r14_image.json",
+        "aliases": [
+          "R14 FIX1"
+        ]
+      }
+    },
+    {
+      "label": "R15",
+      "files": {
+        "/usr/lib/a9fl.so": "ba469724e09def7bc68e8d9a89aaa712b4df784434aed7d658a4da2201030260",
+        "/usr/share/app/string_simplifiedchinese.uxc": "ecbbb59ad3b649694cdd97525a506301a57c60217c5a54799c2e2e06555bafac",
+        "/usr/share/app/string_english.uxc": "17d1d15dde1c06b7caf35be399a0f6c10f9859b7a079fa771d64f38a131167a8",
+        "/usr/lib/viewUnified2.so": "6c1885d86feb358cf11b7f742ff2391e2dac9302ca15d1f98e91b2cff79946ba",
+        "/usr/lib/CautionConfig.so": "24747bfedee7dfcd9b66deae2a86629405394d7647e1736c303452495359f391"
+      },
+      "source": "analysis/a9_fl43_signed7_r15_20261120/operator/manifest.json",
+      "config_schema": 9,
+      "object_layout": {
+        "original_length": 352944,
+        "object_offset": 360448,
+        "object_blocks": 80,
+        "object_block_length": 4096,
+        "load_file_ranges": [
+          [
+            0,
+            332864
+          ],
+          [
+            332864,
+            333668
+          ]
+        ],
+        "elf_sha256": "7e7f982a9741e04a6307efb97facda93e018b5511c6490a6781acfe050cfb8c1",
+        "immutable_prefix_sha256": "4e4a0b536856107fc06dac1184239fe0c02c49fd8c80e24b037af6baff333aa6",
+        "initial_full_file_sha256": "ba469724e09def7bc68e8d9a89aaa712b4df784434aed7d658a4da2201030260",
+        "profile": "R15-ORIGINAL",
+        "fixture": "R15-ORIGINAL.so",
+        "source_image_sha256": "070c0e141b3ae260dd8ddd065f2d25d0604c262ecddb096dbe53d6058d6f359f",
+        "source_proof": "reference/r15_original_image.json",
+        "aliases": [
+          "R15 FIX1",
+          "original R15"
+        ]
+      },
+      "aliases": [
+        "R15 FIX1"
+      ],
+      "note": "FIX1 changes installer preimage policy, not module file identity"
+    },
+    {
+      "label": "R15 NAME HELP",
+      "files": {
+        "/usr/lib/a9fl.so": "1dcb196ad8f181a6821d1987f730c350ad4c0bd90a60b6cade4e90a366a0228e",
+        "/usr/lib/viewUnified2.so": "6c1885d86feb358cf11b7f742ff2391e2dac9302ca15d1f98e91b2cff79946ba",
+        "/usr/lib/CautionConfig.so": "24747bfedee7dfcd9b66deae2a86629405394d7647e1736c303452495359f391",
+        "/usr/share/app/string_english.uxc": "17d1d15dde1c06b7caf35be399a0f6c10f9859b7a079fa771d64f38a131167a8",
+        "/usr/share/app/string_simplifiedchinese.uxc": "ecbbb59ad3b649694cdd97525a506301a57c60217c5a54799c2e2e06555bafac"
+      },
+      "source": "src/data/releases/r15/manifest.json",
+      "config_schema": 9,
+      "object_layout": {
+        "original_length": 356576,
+        "object_offset": 364544,
+        "object_blocks": 80,
+        "object_block_length": 4096,
+        "load_file_ranges": [
+          [
+            0,
+            335256
+          ],
+          [
+            335256,
+            336476
+          ]
+        ],
+        "elf_sha256": "5d3af544b1e23ddf7be07b42a9cabc611112c59ad254f169f9b4aed4e9fed551",
+        "immutable_prefix_sha256": "f9935b0e4a93e7797042173561c4b88ca3671ba7346b39d0bb3a6bf4bf402dae",
+        "initial_full_file_sha256": "1dcb196ad8f181a6821d1987f730c350ad4c0bd90a60b6cade4e90a366a0228e",
+        "profile": "R15-SD",
+        "fixture": "R15-SD.so",
+        "source_image_sha256": "704d9401fb8f63823ffde6a8812eda38ae27d81d6432bf8332cdad95e46233da",
+        "source_proof": "evidence/image.json",
+        "aliases": [
+          "NAME HELP"
+        ]
+      }
+    }
+  ],
+  "menus": [
+    {
+      "label": "V5.3",
+      "files": {
+        "/etc/a9-autoexec-v53.so": "8b14dea8e13accfd316816408bd322bac852d5b6ca7f7953cf6868df3e072a18",
+        "/tmp/a9-v53.sh": "e53dd43b02cd19ffe3c7d6df021858074e50b507124a8a31da63d29c425b8195",
+        "/tmp/a9-film-boot-v53.tar": "3f2ecc5a595deab0aa8e8808575740da8bb005e8fa0a7ec9319c7b6e2e69a5c0"
+      },
+      "bytes": {
+        "/etc/a9-autoexec-v53.so": 45428,
+        "/tmp/a9-v53.sh": 3610,
+        "/tmp/a9-film-boot-v53.tar": 122880
+      },
+      "hook": "/etc/a9-autoexec-v53.so",
+      "source": "analysis/a9_extra_menu_r15_compat_20261121/delivery/a9-extra-menu-audio-path-v5.3/install/manifest.json"
+    },
+    {
+      "label": "V3",
+      "files": {
+        "/tmp/A9BOOT/A9BOOT.SO": "2ed0d8cde5c68d80f4fdca0224450fdc48946d8ac91cd881b1c54a326b37011a",
+        "/tmp/A9BOOT/A9START.SH": "22bf018d5a322c5bb4cb3c98b05cc5813e9cf44d7f450f07f6ea9f318afb57ef",
+        "/tmp/A9BOOT/a9-extra-menu-guard.elf": "098e86996731a3c8605fcc125d345dc4385eaf1be3c9684164ba5045c59a2c62",
+        "/tmp/A9BOOT/a9-extra-menu.so": "776c17290873345df17535d4fe60ecb11038fd9a24b6611acb8f87033aaf6bc5",
+        "/tmp/A9BOOT/install.req": "1665d5ee645e93facffde6fc369d806f6c89bb40637169a6b20a8d8a8b757969",
+        "/tmp/A9BOOT/A9UPDATER": "734ec6a29958970d97419a9e9232d7d8b0e31da56d990f2867897e70bbf8f869"
+      },
+      "bytes": {
+        "/tmp/A9BOOT/A9BOOT.SO": 45428,
+        "/tmp/A9BOOT/A9START.SH": 4245,
+        "/tmp/A9BOOT/a9-extra-menu-guard.elf": 68256,
+        "/tmp/A9BOOT/a9-extra-menu.so": 13652,
+        "/tmp/A9BOOT/install.req": 456,
+        "/tmp/A9BOOT/A9UPDATER": 22636
+      },
+      "hook": "/etc/A9BOOT/A9BOOT.SO",
+      "source": "analysis/a9_extra_menu_r15_compat_20261121/delivery/a9-extra-menu-autostart-v3/install/manifest.json",
+      "aliases": [
+        "V3.1"
+      ],
+      "alias_sources": [
+        "analysis/a9_extra_menu_r15_compat_20261121/delivery/a9-extra-menu-python-v3.1/install/manifest.json"
+      ],
+      "note": "V3.1 changes PC installer only; all six camera payload fingerprints are identical to V3"
+    },
+    {
+      "label": "V6.1",
+      "files": {
+        "/etc/a9-autoexec-v61.so": "0b5a1a552d4a4ff11b9aad40118c7b4382d1bbbf379f4dc0446505e96b8b2771",
+        "/tmp/a9-v61.sh": "078845074fa839e28a019e50d9e22bd4db7aed8f1bc41312b029c8893dc60f56",
+        "/tmp/a9-film-boot-v61.tar": "f46e98c6ae1509c05071121fd20ed938d686135171e0112500f3bd7d8dbe3e4d"
+      },
+      "bytes": {
+        "/etc/a9-autoexec-v61.so": 45428,
+        "/tmp/a9-v61.sh": 3610,
+        "/tmp/a9-film-boot-v61.tar": 204800
+      },
+      "hook": "/etc/a9-autoexec-v61.so",
+      "source": "analysis/a9_extra_menu_r15_compat_20261121/delivery/a9-extra-menu-burst-audio-v6.1/install/manifest.json"
+    },
+    {
+      "label": "V5.1",
+      "files": {
+        "/etc/a9-autoexec-v51.so": "2cd638ccdab2545d796aa1939a15ecbaf401cd0248db098b71e164440cd366ed",
+        "/tmp/a9-v51.sh": "e10731f0195f80d2f3bf40f1af15e757d1e6f87dc5352e2b002ec64baaad4be4",
+        "/tmp/a9-film-boot-v51.tar": "377d2df0bb68cb449fe995335a469f997c3560cdfb33506cda62197d620cf8d4"
+      },
+      "bytes": {
+        "/etc/a9-autoexec-v51.so": 45428,
+        "/tmp/a9-v51.sh": 3610,
+        "/tmp/a9-film-boot-v51.tar": 122880
+      },
+      "hook": "/etc/a9-autoexec-v51.so",
+      "source": "analysis/a9_extra_menu_r15_compat_20261121/delivery/a9-extra-menu-clock-fix-v5.1/install/manifest.json"
+    },
+    {
+      "label": "V4",
+      "files": {
+        "/etc/A9B4.SO": "c09531ca10f6412192ed937a58b78cd533d8de5564cf7380c99b2a91fec219b8",
+        "/etc/A9S4.SH": "6336143a6077fac9ad3153b0a2cd5561510ca6ff9baa21f927411f025e39234f",
+        "/etc/A9G4.ELF": "098e86996731a3c8605fcc125d345dc4385eaf1be3c9684164ba5045c59a2c62",
+        "/etc/A9L4.SO": "776c17290873345df17535d4fe60ecb11038fd9a24b6611acb8f87033aaf6bc5",
+        "/etc/A9I4.REQ": "1665d5ee645e93facffde6fc369d806f6c89bb40637169a6b20a8d8a8b757969",
+        "/etc/A9U4": "734ec6a29958970d97419a9e9232d7d8b0e31da56d990f2867897e70bbf8f869"
+      },
+      "bytes": {
+        "/etc/A9B4.SO": 45428,
+        "/etc/A9S4.SH": 4308,
+        "/etc/A9G4.ELF": 68256,
+        "/etc/A9L4.SO": 13652,
+        "/etc/A9I4.REQ": 456,
+        "/etc/A9U4": 22636
+      },
+      "hook": "/etc/A9B4.SO",
+      "source": "analysis/a9_extra_menu_r15_compat_20261121/delivery/a9-extra-menu-filecontrol-v4/install/manifest.json"
+    },
+    {
+      "label": "V7.1",
+      "files": {
+        "/etc/a9-autoexec-v71.so": "1db57472d1d4fac1d4f44ac918fc11eea860a64246d5fa8648d752214e1c0e70",
+        "/tmp/a9-v71.sh": "06bfcafd9768cc5f62a6d334856f29ef5810545fdfada08035d66721588312e3",
+        "/tmp/a9-film-boot-v71.tar": "222f390ea7b013a2e24a59912f3b03a5ac73c350587b6e540285183470fe0545"
+      },
+      "bytes": {
+        "/etc/a9-autoexec-v71.so": 45428,
+        "/tmp/a9-v71.sh": 3610,
+        "/tmp/a9-film-boot-v71.tar": 215040
+      },
+      "hook": "/etc/a9-autoexec-v71.so",
+      "source": "analysis/a9_extra_menu_r15_compat_20261121/delivery/a9-extra-menu-filter-info-v7.1/install/manifest.json"
+    },
+    {
+      "label": "V6",
+      "files": {
+        "/etc/a9-autoexec-v6.so": "4c7a8c44bbb94c8985ab0f41bc2f2c22d0922cdcfceac3985584e6f23c6c4eb3",
+        "/tmp/a9-v6.sh": "9351359798172e46586187c8f34416b6d29fce1f51fa2d538285b381f165422e",
+        "/tmp/a9-film-boot-v6.tar": "b99e849188a2cfb9876986418cdac07b53fc9498ccf25024fba41f7bbf68190d"
+      },
+      "bytes": {
+        "/etc/a9-autoexec-v6.so": 45428,
+        "/tmp/a9-v6.sh": 3609,
+        "/tmp/a9-film-boot-v6.tar": 204800
+      },
+      "hook": "/etc/a9-autoexec-v6.so",
+      "source": "analysis/a9_extra_menu_r15_compat_20261121/delivery/a9-extra-menu-name-help-wps-v6/install/manifest.json"
+    },
+    {
+      "label": "V5",
+      "files": {
+        "/etc/a9-autoexec.so": "f3843160ed478be6f5f49f3f69c3ff415e70c7bd32ba9f0f80f67cfde99acbdd",
+        "/tmp/autoexec.sh": "e6b18b7ec15ac610d586abd1f83a0eb0b5d5ffb7ab499449eeb72ec5bef8d971",
+        "/tmp/a9-film-boot-v5.tar": "2f20dac1d37f4df48fd76e5fc28a882d5accb5be29051f5717b821a382d33a79"
+      },
+      "bytes": {
+        "/etc/a9-autoexec.so": 45428,
+        "/tmp/autoexec.sh": 3609,
+        "/tmp/a9-film-boot-v5.tar": 122880
+      },
+      "hook": "/etc/a9-autoexec.so",
+      "source": "analysis/a9_extra_menu_r15_compat_20261121/delivery/a9-extra-menu-original-flow-v5/install/manifest.json"
+    },
+    {
+      "label": "V5.2",
+      "files": {
+        "/etc/a9-autoexec-v52.so": "7b3680e018e8ae092f9355af9b7e0783264eb14374b87c04f615ca0e664bb377",
+        "/tmp/a9-v52.sh": "9647a71226cb13b32f3a1a449ebc822e69c716f0de69767142467721c7dadf59",
+        "/tmp/a9-film-boot-v52.tar": "c299ea656673625b5f5e8f7f19ca1a6c477c4f93eea669dc8e1129f677048639"
+      },
+      "bytes": {
+        "/etc/a9-autoexec-v52.so": 45428,
+        "/tmp/a9-v52.sh": 3610,
+        "/tmp/a9-film-boot-v52.tar": 122880
+      },
+      "hook": "/etc/a9-autoexec-v52.so",
+      "source": "analysis/a9_extra_menu_r15_compat_20261121/delivery/a9-extra-menu-resident-audio-v5.2/install/manifest.json"
+    },
+    {
+      "label": "V6.1.1",
+      "files": {
+        "/etc/a9-autoexec-v611.so": "80687639ed2037878c75f8d44ea8de07d830fc38f0bceb95c4147913532c9e0b",
+        "/tmp/a9-v611.sh": "cb1cc11265bd1d5c845de0e81b142cef6727c84904539dbfde750597d40ae027",
+        "/tmp/a9-film-boot-v611.tar": "cbff1ddb982640d0ecd3e85f2b003bbb12b8e92c5326189d221f768b496e1610"
+      },
+      "bytes": {
+        "/etc/a9-autoexec-v611.so": 45428,
+        "/tmp/a9-v611.sh": 3611,
+        "/tmp/a9-film-boot-v611.tar": 204800
+      },
+      "hook": "/etc/a9-autoexec-v611.so",
+      "source": "analysis/a9_extra_menu_r15_compat_20261121/delivery/a9-extra-menu-startup-gate-v6.1.1/install/manifest.json"
+    },
+    {
+      "label": "V5.4",
+      "files": {
+        "/etc/a9-autoexec-v54.so": "76f4eb825470579723128489b35879ce1c8c8fb3a8e18c9d238d6d2464082f23",
+        "/tmp/a9-v54.sh": "da0c51981e3d61ddbe47532c50e09e0ead33113bb2eadd054f42306caf1eac0f",
+        "/tmp/a9-film-boot-v54.tar": "4e4a2170e1dc0a8885c52673f233cf347f3e4c898849d9bed8ca4e6dd23f68e6"
+      },
+      "bytes": {
+        "/etc/a9-autoexec-v54.so": 45428,
+        "/tmp/a9-v54.sh": 3610,
+        "/tmp/a9-film-boot-v54.tar": 122880
+      },
+      "hook": "/etc/a9-autoexec-v54.so",
+      "source": "analysis/a9_extra_menu_r15_compat_20261121/delivery/a9-extra-menu-touch-fix-v5.4/install/manifest.json"
+    },
+    {
+      "label": "V7",
+      "files": {
+        "/etc/a9-autoexec-v7.so": "5f8fe58379f1109affe6deb49934f0359353ac036d915d2d2a2b61e03b08124a",
+        "/tmp/a9-v7.sh": "828d059ac63f1f424668cec2b8b140f2e30ae5f6da048788739b47ebc5eb7e26",
+        "/tmp/a9-film-boot-v7.tar": "acd5a6ceac2e5f821dd4f5f6738ffce2d4d1e968cc232155308ce7a4cb850ddc"
+      },
+      "bytes": {
+        "/etc/a9-autoexec-v7.so": 45428,
+        "/tmp/a9-v7.sh": 3609,
+        "/tmp/a9-film-boot-v7.tar": 204800
+      },
+      "hook": "/etc/a9-autoexec-v7.so",
+      "source": "analysis/a9_extra_menu_r15_compat_20261121/delivery/a9-extra-menu-two-page-v7/install/manifest.json"
+    },
+    {
+      "label": "V5.5",
+      "files": {
+        "/etc/a9-autoexec-v55.so": "9bc34590ba59658ebb047af7660700cda63372ea36d7e516494990c60682ef65",
+        "/tmp/a9-v55.sh": "a51c59750a6c3e0d4f56ffc8ab3cf748aa1018858038438e9f1fae060dd380a3",
+        "/tmp/a9-film-boot-v55.tar": "a33208b92581334c0fd62f903792e2219e294ade86da2bbcca359bff6f67c1de"
+      },
+      "bytes": {
+        "/etc/a9-autoexec-v55.so": 45428,
+        "/tmp/a9-v55.sh": 3610,
+        "/tmp/a9-film-boot-v55.tar": 133120
+      },
+      "hook": "/etc/a9-autoexec-v55.so",
+      "source": "analysis/a9_extra_menu_r15_compat_20261121/delivery/a9-extra-menu-upstream-audio-v5.5/install/manifest.json"
+    }
+  ]
+}
