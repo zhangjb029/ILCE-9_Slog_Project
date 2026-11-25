@@ -6,6 +6,10 @@ def r15_text(record, *, runtime_note=True):
     state, label = record.get('state'), record.get('label')
     if state == 'current' and label == 'R15 NAME HELP' and record.get('state_validated') is True:
         text = 'R15NH：已安装（文件与配置校验通过）'
+        if record.get('view_library_match') == 'known-extent-variant':
+            text += '；菜单库：已知段长度变体（兼容）'
+        elif record.get('view_library_match') == 'canonical':
+            text += '；菜单库：标准版'
         if runtime_note:
             text += '；运行生效未验证，请冷重启后实机核对。'
         return text

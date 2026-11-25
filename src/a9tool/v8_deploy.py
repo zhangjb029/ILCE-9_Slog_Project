@@ -21,6 +21,9 @@ TARGETS = ('/etc/a9-autoexec-v71mt.so', '/tmp/a9-v71mt.sh', '/tmp/a9-film-boot-v
 PRELOAD = '/etc/ld.so.preload'
 BACKUP = '/etc/a9-preload-v71mt.bak'
 V71_PATHS = ('/etc/a9-autoexec-v71.so', '/tmp/a9-v71.sh', '/tmp/a9-film-boot-v71.tar')
+VIEW_PATH = '/usr/lib/viewUnified2.so'
+VIEW_CANONICAL_SHA = '6c1885d86feb358cf11b7f742ff2391e2dac9302ca15d1f98e91b2cff79946ba'
+VIEW_EXTENT_VARIANT_SHA = '07ffd8df517022d9e661240082170ea013023fdeb76156b5510c702bc19fed9e'
 
 
 def read_paths():
@@ -159,6 +162,28 @@ class PrerequisiteGuard:
         return self.transport.sendSenserPacket(function, data, oData)
 
 
+def r15_prerequisite(content, tables):
+    """Accept one fully pinned menu variant for V8, retaining R15/CFG/LUT gates.
+
+    Only a local comparison copy is normalized. Real camera bytes and their
+    hashes remain in prerequisite evidence; no library is rewritten. This rule
+    does not change the full-partition R15NH patch/source allowlist.
+    """
+    raw=content.get(VIEW_PATH)
+    digest=releases.sha(raw) if isinstance(raw,bytes) else None
+    match='canonical' if digest==VIEW_CANONICAL_SHA else 'unrecognized'
+    checked=content
+    if (isinstance(raw,bytes) and len(raw)==10913344 and digest==VIEW_EXTENT_VARIANT_SHA
+            and struct.unpack_from('<II',raw,0x64)==(0x8c7dfc,0x8c7dfc)):
+        normalized=bytearray(raw)
+        struct.pack_into('<II',normalized,0x64,0x8c7e78,0x8c7e78)
+        if releases.sha(normalized)==VIEW_CANONICAL_SHA:
+            checked=dict(content);checked[VIEW_PATH]=bytes(normalized)
+            match='known-extent-variant'
+    result=fingerprints.classify_r15(checked,[content[path] for path in deploy.CONFIG_PATHS],tables)
+    return dict(result,view_library_match=match,view_library_sha256=digest)
+
+
 def _capture(camera):
     files = deploy.CameraFiles(camera)
     content = {path: files.read(path) for path in deploy.R15_PATHS + deploy.CONFIG_PATHS + read_paths()}
@@ -168,7 +193,7 @@ def _capture(camera):
             raise ValueError('Source changed during V8 prerequisite audit: ' + path)
     if [camera.readBackup(pid) for pid in r15_files.TABLE_IDS] != tables:
         raise ValueError('Live LUT tables changed during V8 prerequisite audit')
-    r15 = fingerprints.classify_r15(content, [content[path] for path in deploy.CONFIG_PATHS], tables)
+    r15 = r15_prerequisite(content, tables)
     return content, tables, r15, classify(content)
 
 
@@ -245,7 +270,7 @@ def execute(action, arguments, progress=None):
         module.capture = audited_capture
         module.install(handle.camera, identity, payloads, dest)
         result = json.loads((dest/'result.json').read_text(encoding='utf-8'))
-        return dict(result, session=str(dest), identity=identity, r15nh_current=True,
+        return dict(result, session=str(dest), identity=identity, r15nh_current=True,r15=r15,
                     requires_cold_restart=True, activation_verified=False)
     except BaseException as error:
         if dest is not None:

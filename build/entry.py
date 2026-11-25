@@ -69,6 +69,22 @@ def selfcheck() -> int:
             raise ValueError('A complete R15NH partition image must not be distributed')
         print('R15NH: read -> identify -> patch -> write; FF01 full partition')
         v8_deploy.execute('v8.check', {})
+        # Exercise the shipped compatibility rule without discovering USB.
+        import struct
+        from a9tool import file_deploy, r15_files
+        content={row['path']:release_assets.asset('r15/'+row['file'])
+                 for row in release_assets.r15()['initial_files']}
+        content.update(dict.fromkeys(file_deploy.CONFIG_PATHS))
+        for variant in (False,True):
+            if variant:
+                raw=bytearray(content[v8_deploy.VIEW_PATH])
+                struct.pack_into('<II',raw,0x64,0x8c7dfc,0x8c7dfc)
+                content[v8_deploy.VIEW_PATH]=bytes(raw)
+            state=v8_deploy.r15_prerequisite(content,r15_files.a9p.stock())
+            if (state['label']!='R15 NAME HELP' or not state['state_validated']
+                    or state['view_library_match']!=('known-extent-variant' if variant else 'canonical')):
+                raise ValueError('V8 R15NH prerequisite compatibility selfcheck failed')
+        print('V8: canonical and pinned RX extent variant; R15NH/CFG/LUT required')
     except Exception as error:
         print(f'RELEASE_FAIL: {type(error).__name__}: {error}')
         return 4

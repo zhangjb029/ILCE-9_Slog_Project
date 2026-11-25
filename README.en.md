@@ -1,4 +1,6 @@
-# v1.9.0: native Windows update based on released v1.8.2
+# v1.9.1: native Windows update based on released v1.8.2
+
+Fixes V8 installation being blocked by the pinned historical `07ffd8df…` menu-library extent variant. Both this exact variant and the canonical library are accepted for V8; the R15NH module/resources, four CFG records and two live LUTs still must pass validation. Status identifies the menu variant. Replace the EXE while retaining original sessions and rollback backups; this mismatch does not require reinstalling R15NH. [Download v1.9.1](https://github.com/zhangjb029/ILCE-9_Slog_Project/releases/tag/v1.9.1).
 
 R15NH uses the original read, identify, local R12P patch, and FF01 write workflow. No complete partition image is bundled. V8 has a separate deployment tab and requires R15NH. Both support original-session rollback. See [current instructions](README.md) and the in-app operating guide. The older documentation below is retained for the original features.
 

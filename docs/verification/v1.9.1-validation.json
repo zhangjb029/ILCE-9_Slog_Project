@@ -1,0 +1,42 @@
+{
+  "version": "1.9.1",
+  "date": "2026-11-25",
+  "tests": {
+    "passed": 381,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0,
+    "seconds": 48.281
+  },
+  "frozen_selfcheck": "PASS",
+  "native_tabs": 6,
+  "fn_functions": 77,
+  "pinned_assets": 38,
+  "camera_accessed": false,
+  "new_hardware_testing": false,
+  "view_canonical_sha256": "6c1885d86feb358cf11b7f742ff2391e2dac9302ca15d1f98e91b2cff79946ba",
+  "view_accepted_variant_sha256": "07ffd8df517022d9e661240082170ea013023fdeb76156b5510c702bc19fed9e",
+  "variant_bytes": 10913344,
+  "changed_byte_offsets": [
+    "0x64",
+    "0x65",
+    "0x68",
+    "0x69"
+  ],
+  "compatibility_scope": "V8 prerequisite only; exact full digest plus two-field reconstruction",
+  "cfg_lut_and_other_file_gates_retained": true,
+  "original_source_hashes_recorded": true,
+  "firmware_payloads_unchanged": true,
+  "r15nh_partition_workflow_unchanged": true,
+  "rollback_format_unchanged": true,
+  "usbdev_sha256": "107086bd70bcc752508088bffc5a224ae6bb1002b693a4b49b68c6eb327941e0",
+  "regression_cases": [
+    "known variant status",
+    "known variant install and rollback",
+    "additional code/header changes rejected",
+    "other files and legacy module rejected",
+    "invalid CFG and LUT rejected",
+    "canonical library retained",
+    "padded/unpadded native framing"
+  ]
+}
