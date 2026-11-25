@@ -4,6 +4,8 @@ Fixes V8 installation being blocked by the pinned historical `07ffd8df…` menu-
 
 R15NH uses the original read, identify, local R12P patch, and FF01 write workflow. No complete partition image is bundled. V8 has a separate deployment tab and requires R15NH. Both support original-session rollback. See [current instructions](README.md) and the in-app operating guide. The older documentation below is retained for the original features.
 
+Media authoring guides (Chinese): [LUT fitting and A9P](docs/authoring/R15_V8_LUT拟合与A9P制作详解.md), [shutter audio and A9W](docs/authoring/R15_V8_快门声A9W制作详解.md). Portable offline source, a frozen synthetic fitting baseline, a licensed CUBE example, and format checks are in [tools/media](tools/media/README.md). This documentation/source update creates no new software version or Release.
+
 ---
 
 # ILCE-9_Slog_Project

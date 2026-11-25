@@ -1,0 +1,95 @@
+{
+  "date": "2026-11-25",
+  "application_version_unchanged": "1.9.1",
+  "camera_access": false,
+  "media_unit_tests": 8,
+  "media_unit_tests_passed": true,
+  "lut": {
+    "recipe": "library",
+    "steps": 200,
+    "source": "examples/glassmeter-400d.cube",
+    "package_sha256": "d058e07bd3d6d54b77c86446678ba508b129dc97c1737415d28e34efc4a8fae9",
+    "published_id": "L58e987d32c",
+    "published_package_sha256": "d058e07bd3d6d54b77c86446678ba508b129dc97c1737415d28e34efc4a8fae9",
+    "byte_identical_to_published": true,
+    "samples": {
+      "train": 24064,
+      "refine": 6144,
+      "validation": 17467,
+      "held_out_test": 17343
+    },
+    "held_out": [
+      {
+        "samples": 17343,
+        "deltaE00_mean": 0.5456823288487231,
+        "deltaE00_median": 0.36843538054776254,
+        "deltaE00_p95": 1.6276967249310323,
+        "deltaE00_max": 5.100366141661095,
+        "RGB_RMSE_255": 2.851033188207613
+      },
+      {
+        "samples": 17343,
+        "deltaE00_mean": 0.5755361648492181,
+        "deltaE00_median": 0.4254197192116513,
+        "deltaE00_p95": 1.623614951328966,
+        "deltaE00_max": 4.092470988471754,
+        "RGB_RMSE_255": 2.002512431444406
+      }
+    ],
+    "baseline_sha256": "2c2b4a3890a87b58b25a8005cb469790bf5ab9d3b651ee127dd357bbf814fa94"
+  },
+  "audio": {
+    "input": "synthetic 1200Hz tone, 150ms, mono PCM16 24kHz",
+    "package_version": 2,
+    "bytes": 83520,
+    "mask": 15,
+    "package_sha256": "514502c7373ecdd7fbe626c23cdb968055cbd964c73d3b8ea4cb7f7a865cb195",
+    "slots": [
+      {
+        "slot": 1,
+        "app_id": "0x33",
+        "selected": true,
+        "bytes": 24768,
+        "frames": 774,
+        "samples": 23994,
+        "sha256": "53e22e8a3a08f8ab2eb3207276c4163d95ae31a6cefe087eeb0d6960f5843751"
+      },
+      {
+        "slot": 2,
+        "app_id": "0x34",
+        "selected": true,
+        "bytes": 29760,
+        "frames": 930,
+        "samples": 28830,
+        "sha256": "4976b2f2d486441682256bef95f5695ab1a65df1e49a4ee6fb8a88fbbff9538a"
+      },
+      {
+        "slot": 3,
+        "app_id": "0x35",
+        "selected": true,
+        "bytes": 18560,
+        "frames": 580,
+        "samples": 17980,
+        "sha256": "e3d0fd129a84458de6d755f8d62709d717e8df282465e8fc8004bca698494db4"
+      },
+      {
+        "slot": 4,
+        "app_id": "0x32",
+        "selected": true,
+        "bytes": 9920,
+        "frames": 310,
+        "samples": 9610,
+        "sha256": "d67ca386bc5de1422461fd294fd5467e2a5094920d93668bab8d00d420b4f799"
+      }
+    ],
+    "python_inspection": "PASS",
+    "c_parser": "PASS: A9W_C_OK version=2 slots=4 mask=15 bytes=83520",
+    "reference_source_syntax": "PASS: store, resident scheduler, AUTO; complete header closure"
+  },
+  "dependencies": {
+    "python": "3.14.3",
+    "numpy": "2.5.4",
+    "scipy": "1.18.1",
+    "torch": "2.14.1+cpu"
+  }
+}

@@ -10,3 +10,7 @@ filters/provenance/source_docs/** -text whitespace=-blank-at-eol,-blank-at-eof
 *.dll binary
 *.so binary
 *.elf binary
+# Frozen media algorithms and fixtures retain their recorded byte identity.
+tools/media/** -text whitespace=-blank-at-eol,-blank-at-eof
+*.npz binary
+tools/media/lut/examples/*.cube -text -diff

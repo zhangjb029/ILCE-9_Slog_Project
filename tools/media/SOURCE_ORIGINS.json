@@ -1,0 +1,172 @@
+[
+  {
+    "path": "tools/media/lut/a9_model.py",
+    "source": "R15 signed7 fit/a9_model.py",
+    "sha256": "f48123e5f1783f17ba346dd71df57007a91d952258477cac4770d08d8541530a",
+    "change": "byte-identical"
+  },
+  {
+    "path": "tools/media/lut/color_delta.py",
+    "source": "R15 signed7 fit/color_delta.py",
+    "sha256": "045560a325a15354cd1c5eed69d69920c2e9fce2b88c8ed2ff5c85c93c06feee",
+    "change": "byte-identical"
+  },
+  {
+    "path": "tools/media/lut/fit_metrics.py",
+    "source": "R15 signed7 fit/fit_metrics.py",
+    "sha256": "86dc50b24d2a12cac235ccc3f6de10401c3120a66e5138f95daf8be7c730d226",
+    "change": "byte-identical"
+  },
+  {
+    "path": "tools/media/lut/refine.py",
+    "source": "R15 signed7 fit/refine.py",
+    "sha256": "517ba6a918bcdd05ede9c3887e7305dbb28d5095d59b763b0722f9082ec145e0",
+    "change": "byte-identical"
+  },
+  {
+    "path": "tools/media/lut/lut.py",
+    "source": "227-library colour adapter/lut.py",
+    "sha256": "767ac222d7b60ab63938c67ae907bf2f51f8a68845699ed513d75b6ad1182f34",
+    "change": "byte-identical"
+  },
+  {
+    "path": "tools/media/lut/data/baseline.npz",
+    "source": "R15 frozen synthetic reference baseline",
+    "sha256": "2c2b4a3890a87b58b25a8005cb469790bf5ab9d3b651ee127dd357bbf814fa94",
+    "change": "byte-identical"
+  },
+  {
+    "path": "tools/media/lut/data/builtin_targets_manifest.json",
+    "source": "R15 frozen 27-look target provenance",
+    "sha256": "ee6f92a4a057a32d874311af3b1aaf6bc63d922f29e88aa7ed286163c86bbbe2",
+    "change": "byte-identical"
+  },
+  {
+    "path": "tools/media/lut/data/source_catalog.json",
+    "source": "227-library frozen source catalogue",
+    "sha256": "785596283c9a0acda580e6a05f1e6d0812ac29861679f89a3a753693556df116",
+    "change": "byte-identical"
+  },
+  {
+    "path": "tools/media/lut/examples/glassmeter-400d.cube",
+    "source": "GlassMeter by Glass Works, CC BY 4.0; frozen example",
+    "sha256": "fdeffcc07998673b44c2c4f215a189796149c2816792a52488586dfe7d67dca3",
+    "change": "byte-identical"
+  },
+  {
+    "path": "tools/media/a9w/pack_wps.py",
+    "source": "V8 frozen PC tools/pack_wps.py",
+    "sha256": "66fc279c0a4877c1f008610b830c9fc094736d0e319d55ba1760711303cf92c1",
+    "change": "byte-identical"
+  },
+  {
+    "path": "tools/media/a9w/make_burst_wps.py",
+    "source": "V8 frozen PC tools/make_burst_wps.py",
+    "sha256": "a20f471ca79684207f704458df3e82e4a7e5a118bc47313c5204a90284bb47f2",
+    "change": "byte-identical"
+  },
+  {
+    "path": "tools/media/a9w/make_four_slot_wps.py",
+    "source": "V8 frozen PC tools/make_four_slot_wps.py",
+    "sha256": "b4ef3e1fbfc363ce824cb9bdc6914c4b45d8d1b947f2f027b642b62b9670d265",
+    "change": "byte-identical"
+  },
+  {
+    "path": "tools/media/a9w/encode_sony_sds_adpcm.py",
+    "source": "PCIEARIA/A6400-Extra-Menu pinned SDS encoder, PolyForm Noncommercial 1.0.0",
+    "sha256": "d625b72751a58679f3baeff40a0d18d56b865242a3efb2db52f16450b9f97a2c",
+    "change": "byte-identical"
+  },
+  {
+    "path": "tools/media/a9w/reference/a9_wps_pack.c",
+    "source": "V8 frozen sound/a9_wps_pack.c",
+    "sha256": "b6ae64cccdefa3ece32c13fbac9d13c26355679108ea1a56a567544889139bfa",
+    "change": "byte-identical"
+  },
+  {
+    "path": "tools/media/a9w/reference/a9_wps_pack.h",
+    "source": "V8 frozen sound/a9_wps_pack.h",
+    "sha256": "53622966ec4d2cec1c6bfd30b4877114c211758395289cdbf815ee1cebab577c",
+    "change": "byte-identical"
+  },
+  {
+    "path": "tools/media/a9w/reference/a9_wps_store.c",
+    "source": "V8 frozen sound/a9_wps_store.c",
+    "sha256": "f023bc6990ec9774d18bf7d77a62ff9d16998bcd20dacef3b594e291088f5623",
+    "change": "byte-identical"
+  },
+  {
+    "path": "tools/media/a9w/reference/a9_wps_store.h",
+    "source": "V8 frozen sound/a9_wps_store.h",
+    "sha256": "a59a0955e6ea11c0d96f989508019874b0960eb1f2a1652eaadb242800d492a0",
+    "change": "byte-identical"
+  },
+  {
+    "path": "tools/media/a9w/reference/a9_sound_resident.c",
+    "source": "V8 frozen sound/a9_sound_resident.c",
+    "sha256": "d47d4d30829d277c8492676d6c9977d8b1bc46516c5af20dc35232a76c7d96cb",
+    "change": "byte-identical"
+  },
+  {
+    "path": "tools/media/a9w/reference/a9_sound_resident.h",
+    "source": "V8 frozen sound/a9_sound_resident.h",
+    "sha256": "976c77d1515517a2b97c602935b141cc503ddc63d2ad7cc74dc2c34b71a96f5a",
+    "change": "byte-identical"
+  },
+  {
+    "path": "tools/media/a9w/reference/a9_sound_state.h",
+    "source": "V8 frozen sound/a9_sound_state.h",
+    "sha256": "5d46bff2d83c04d564ff19120fb8cb5826a850a929df7657ce4e7db5deb309f0",
+    "change": "byte-identical"
+  },
+  {
+    "path": "tools/media/a9w/reference/a9_sound_auto.c",
+    "source": "V8 frozen sound/a9_sound_auto.c",
+    "sha256": "39842eb9f3ee34a432c81dafeb4375490091605202e50636b3315f6e1507928e",
+    "change": "byte-identical"
+  },
+  {
+    "path": "tools/media/a9w/reference/a9_sound_auto.h",
+    "source": "V8 frozen sound/a9_sound_auto.h",
+    "sha256": "de18f4431645a4ce48e55a063cff6d43bd5c7cc99f2ad8f07d6200b76f4634e1",
+    "change": "byte-identical"
+  },
+  {
+    "path": "tools/media/a9w/reference/a9_sd_sha256.c",
+    "source": "R15 shared SHA256 implementation",
+    "sha256": "fd2e2ac9b8ca97998b1b0409aac95b38c56095a0ffd71e230632153571258580",
+    "change": "include-only: firmware header replaced by stdint.h; function body unchanged",
+    "source_sha256": "969776caca655c1daa98b9b2f6e21e3218e52021230c38a63a6a26d129d8ad37"
+  },
+  {
+    "path": "tools/media/LICENSE-PolyForm-Noncommercial.txt",
+    "source": "pinned A6400 upstream license",
+    "sha256": "c0ea4a896d2c8c394b29f9427589996db826cd501c512279ff0ed3ef48fabbe5",
+    "change": "byte-identical"
+  },
+  {
+    "path": "tools/media/a9w/reference/platform/a9_drive_mode.h",
+    "source": "V8 frozen header closure/platform/a9_drive_mode.h",
+    "sha256": "2135718d8692103ff9987994d55155a5bb5849cfea4b059e7b5dcd21ee6cee60",
+    "change": "byte-identical"
+  },
+  {
+    "path": "tools/media/a9w/reference/input/a9_input_compat.h",
+    "source": "V8 frozen header closure/input/a9_input_compat.h",
+    "sha256": "3cdab339635d99ef4776411a69f44e12ebd64dda51a74524fb783d6823e09d17",
+    "change": "byte-identical"
+  },
+  {
+    "path": "tools/media/a9w/reference/sound/a9_sound_state.h",
+    "source": "V8 frozen header closure/sound/a9_sound_state.h",
+    "sha256": "5d46bff2d83c04d564ff19120fb8cb5826a850a929df7657ce4e7db5deb309f0",
+    "change": "byte-identical"
+  },
+  {
+    "path": "tools/media/lut/data/chroma_curves.json",
+    "source": "R15 a7-fl-module-data.h: a7_pkg_expand[129] and a7_pkg_compress[513]",
+    "source_sha256": "f9d3a06fed44291bb3e8b43b18952a75f4f78c053ab0300788be41cddcef95db",
+    "sha256": "8fc7f4272185f605efa06e3b8c5175693b88c819eba9bbe76465f9b8b476a4c8",
+    "change": "scalar arrays extracted to JSON without numerical changes"
+  }
+]

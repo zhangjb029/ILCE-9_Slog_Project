@@ -1,0 +1,438 @@
+[
+  {
+    "stable_id": 1,
+    "name": "FL1",
+    "path": "reference_outputs/01_FL1.npz",
+    "sha256": "ee2f6e17ac0da7edde21191034ccb4a11d03f47d5584ee6cfb4d218958f5bc9c",
+    "source": {
+      "kind": "continuous_reference_project_recipe_not_official_Sony_LUT",
+      "files": {
+        "a9_fl_upstream_after_r91_20261115\\upstream_snapshot\\recipes\\fl-inspired-v0.json": "a1d4ac96c8ab4bdadf34a32bebc3eb6f070c1ead28d2d6ddcbf4317a3cce10d1",
+        "a9_fl_upstream_after_r91_20261115\\upstream_snapshot\\research\\fl_look.py": "f4cf8f9e35f67bf4392923ae8cbc0036aa66e62828d7c06feb37f8d0c2dbd6d9"
+      }
+    }
+  },
+  {
+    "stable_id": 2,
+    "name": "FL2",
+    "path": "reference_outputs/02_FL2.npz",
+    "sha256": "ae0bfb8e603e1407ab917efdc907316fa6f962fae3203935c785b3690077159f",
+    "source": {
+      "kind": "continuous_reference_project_recipe_not_official_Sony_LUT",
+      "files": {
+        "a9_fl43_signed7_r15_20261120\\src\\a7-fl-fl2-model.inc": "71b3d5ee501c32fbb7452d405b8a0f876eb905a99df0718dda5f9a28142c3c4a"
+      }
+    }
+  },
+  {
+    "stable_id": 3,
+    "name": "FL3",
+    "path": "reference_outputs/03_FL3.npz",
+    "sha256": "ffa349d4a59f4261e2efa4f7269ee7ebc8da31dff8a8bddc9e4abbec80855a91",
+    "source": {
+      "kind": "continuous_reference_project_recipe_not_official_Sony_LUT",
+      "files": {
+        "a9_fl43_signed7_r15_20261120\\src\\a7-fl-leica-model.inc": "2b223747d24bc4ca7b318278a45f492bef475b2c93e97c065bc0a26fa0e53c4c"
+      }
+    }
+  },
+  {
+    "stable_id": 4,
+    "name": "ACROS",
+    "path": "reference_outputs/04_ACROS.npz",
+    "sha256": "924d54a2283cd7cd2463039bb03de898f6b98adc6041c1502c688b544d0fcb48",
+    "source": {
+      "kind": "Erlla Lut-v1.0.3",
+      "member": "Lut-v1.0.3/ACROS.json",
+      "archive_sha256": "04c514f91643779a3cb195d06a7324a09c4eda3677870f367adc4aba29b81d57",
+      "sha256": "0a1163fd2132777fd4640cd84a6adccda75629d1c9af44e916fdc1206c4f6861",
+      "full_payload_sha256": "8dce02a0e3dfa28fb649cf11ecba4a6949a81e21f65170fd6533defff0ec19c2"
+    }
+  },
+  {
+    "stable_id": 5,
+    "name": "ASTIA",
+    "path": "reference_outputs/05_ASTIA.npz",
+    "sha256": "0dae78194856811d9692d069bcb622a67229e06f6b7d33d25bd51b0df9000bd2",
+    "source": {
+      "kind": "Erlla Lut-v1.0.3",
+      "member": "Lut-v1.0.3/ASTIA.json",
+      "archive_sha256": "04c514f91643779a3cb195d06a7324a09c4eda3677870f367adc4aba29b81d57",
+      "sha256": "39b21a472c781825f7f50c94863800437108807686768a50852fd451df95df18",
+      "full_payload_sha256": "861e91c7bfb9a8e1d1cac54c8d10213636055c744dd6b86faef167e195be6490"
+    }
+  },
+  {
+    "stable_id": 6,
+    "name": "CLASSIC CHROME",
+    "path": "reference_outputs/06_CLASSIC CHROME.npz",
+    "sha256": "e30a82d3559ee65bc3a6564b7417e623d75322e68a4b59314136c51bb4e8b08b",
+    "source": {
+      "kind": "Erlla Lut-v1.0.3",
+      "member": "Lut-v1.0.3/CLASSIC CHROME.json",
+      "archive_sha256": "04c514f91643779a3cb195d06a7324a09c4eda3677870f367adc4aba29b81d57",
+      "sha256": "fba07e9e5adb68c77c569ea368d3f46fb61dad90cf0eed476246df185a767d81",
+      "full_payload_sha256": "7eb863389ed3664fee65830c17638ce36e8c6b474f97ec273ab475a431c99a6b"
+    }
+  },
+  {
+    "stable_id": 7,
+    "name": "CLASSIC Neg",
+    "path": "reference_outputs/07_CLASSIC Neg.npz",
+    "sha256": "a936c79b373fd839667b1d9ce725320085427df644b8bde9719320491c502fd6",
+    "source": {
+      "kind": "Erlla Lut-v1.0.3",
+      "member": "Lut-v1.0.3/CLASSIC Neg..json",
+      "archive_sha256": "04c514f91643779a3cb195d06a7324a09c4eda3677870f367adc4aba29b81d57",
+      "sha256": "7187ecb51b7d89bec1dd7c19208c0096a91774d34da8b8e64c633c99376d43db",
+      "full_payload_sha256": "dec84d9c40ca061ee3fefddf72bc373b85df6e32136a7107771287ab566f2d72"
+    }
+  },
+  {
+    "stable_id": 8,
+    "name": "ETERNA BLEACH BYPASS",
+    "path": "reference_outputs/08_ETERNA BLEACH BYPASS.npz",
+    "sha256": "c5cf9f29d3c4eafba86d8b3f2e3db9cec5783f4bfdcad7d6eda5a42d8dc9bca2",
+    "source": {
+      "kind": "Erlla Lut-v1.0.3",
+      "member": "Lut-v1.0.3/ETERNA BLEACH BYPASS.json",
+      "archive_sha256": "04c514f91643779a3cb195d06a7324a09c4eda3677870f367adc4aba29b81d57",
+      "sha256": "ed813a39626109e36482b97db57e862637caf90c85b6ba7d41be606ee32f8ed5",
+      "full_payload_sha256": "72de58aae5611021edbe1454a4e9362abd9e65dba8798d57e97fe2e27fd938c1"
+    }
+  },
+  {
+    "stable_id": 9,
+    "name": "ETERNA",
+    "path": "reference_outputs/09_ETERNA.npz",
+    "sha256": "1c37ad8f537db7c7bf28e166e3ee74836cc6962986e6b27a5ea39c44a315d7a7",
+    "source": {
+      "kind": "Erlla Lut-v1.0.3",
+      "member": "Lut-v1.0.3/ETERNA.json",
+      "archive_sha256": "04c514f91643779a3cb195d06a7324a09c4eda3677870f367adc4aba29b81d57",
+      "sha256": "7df0a432f6fb9fa657df8fcc0aecc6f5c4dd23eff4bac75cf91597c6c6740670",
+      "full_payload_sha256": "01b2142530dd34a9ff2a8e393677c87658621b4ae3c24f6cf6c8ca85c07df711"
+    }
+  },
+  {
+    "stable_id": 10,
+    "name": "Leica M10R Standard",
+    "path": "reference_outputs/10_Leica M10R Standard.npz",
+    "sha256": "96bc951585459dc6f6cab1b1cdceef9fb85dcdab5c6062a1ba89c7c8cdb6988a",
+    "source": {
+      "kind": "Erlla Lut-v1.0.3",
+      "member": "Lut-v1.0.3/Leica M10R Standard.json",
+      "archive_sha256": "04c514f91643779a3cb195d06a7324a09c4eda3677870f367adc4aba29b81d57",
+      "sha256": "7531d4e9db16193efaa74454d92dcbed7f240088891973ead79114c405bd0c1d",
+      "full_payload_sha256": "d0e56ff36963f1e29264f181420c81bb0a604642865c5e2f1d181f752b5cb108"
+    }
+  },
+  {
+    "stable_id": 11,
+    "name": "Leica M9 Embedded",
+    "path": "reference_outputs/11_Leica M9 Embedded.npz",
+    "sha256": "2a07e5aaba3424f9cb1ec20807250265eecd521678de5687a108559fdfd5380c",
+    "source": {
+      "kind": "Erlla Lut-v1.0.3",
+      "member": "Lut-v1.0.3/Leica M9 Embedded.json",
+      "archive_sha256": "04c514f91643779a3cb195d06a7324a09c4eda3677870f367adc4aba29b81d57",
+      "sha256": "3c721f9e685489ae7ca09349e233465226416984e75cc5dc9a1a6d5c3f9afcae",
+      "full_payload_sha256": "c376d198ece1bb44b47828bd8e8ae63fd66253a859d744f9d3ed64a10bb19e09"
+    }
+  },
+  {
+    "stable_id": 12,
+    "name": "Leica M9 Standard",
+    "path": "reference_outputs/12_Leica M9 Standard.npz",
+    "sha256": "a5ab4dd5398d4535652a9062c6b38258cc16989191b549a3deaae12bacec2d1f",
+    "source": {
+      "kind": "Erlla Lut-v1.0.3",
+      "member": "Lut-v1.0.3/Leica M9 Standard.json",
+      "archive_sha256": "04c514f91643779a3cb195d06a7324a09c4eda3677870f367adc4aba29b81d57",
+      "sha256": "59af054828f71913f90f99c397f21e64c3c882718d792257924bf30391a28e57",
+      "full_payload_sha256": "0b8138af8832a16b2b600bde9f84d0c3f6c5b0dbab24e962b3f7dda320a998dd"
+    }
+  },
+  {
+    "stable_id": 13,
+    "name": "NOSTALGIC Neg",
+    "path": "reference_outputs/13_NOSTALGIC Neg.npz",
+    "sha256": "7f6e1a5e445b5981b66b6b42ad4ac126170a076e4be186d52083e20ec0ed7e87",
+    "source": {
+      "kind": "Erlla Lut-v1.0.3",
+      "member": "Lut-v1.0.3/NOSTALGIC Neg..json",
+      "archive_sha256": "04c514f91643779a3cb195d06a7324a09c4eda3677870f367adc4aba29b81d57",
+      "sha256": "b787e4233098cec397f0465841bba29fb61c253579bd96c53162bc2515b5f2bf",
+      "full_payload_sha256": "e7b26807768deeed6a8bebd1367b10b6a2001b9c8f8e4a53c5b90774d50244d1"
+    }
+  },
+  {
+    "stable_id": 14,
+    "name": "PRO Neg. Hi",
+    "path": "reference_outputs/14_PRO Neg. Hi.npz",
+    "sha256": "0f67067d86405c6868bb74583e32d467c29286c6ba72efc7f8396d6a3ff5ad1a",
+    "source": {
+      "kind": "Erlla Lut-v1.0.3",
+      "member": "Lut-v1.0.3/PRO Neg. Hi.json",
+      "archive_sha256": "04c514f91643779a3cb195d06a7324a09c4eda3677870f367adc4aba29b81d57",
+      "sha256": "915dbb54a7f1a551c4abc69596b5a2c4472a9adc0d1222fac998b521d68da5a4",
+      "full_payload_sha256": "50d883e0595779830d2aab2c472adc56387c1543a44c5320a117f5031cfa40b0"
+    }
+  },
+  {
+    "stable_id": 15,
+    "name": "PRO Neg. Std",
+    "path": "reference_outputs/15_PRO Neg. Std.npz",
+    "sha256": "8fe4ac043fd3a290d910baa04e3c7047aa16c2065ce109d3650bc2f8c25dd52e",
+    "source": {
+      "kind": "Erlla Lut-v1.0.3",
+      "member": "Lut-v1.0.3/PRO Neg. Std.json",
+      "archive_sha256": "04c514f91643779a3cb195d06a7324a09c4eda3677870f367adc4aba29b81d57",
+      "sha256": "5d25562397bab0e9aaab10f2540b1d65f854d04f6bb89472fe3ecda5e3b09a7a",
+      "full_payload_sha256": "2f3d07c5c3ea50bb3540e25bd2ed0b57ca2d6ec5962d55340b2005cb018f5896"
+    }
+  },
+  {
+    "stable_id": 16,
+    "name": "PROVIA",
+    "path": "reference_outputs/16_PROVIA.npz",
+    "sha256": "0000cbb6588f60727a810c97986a038de259cb703285b6d247b844b40e7ad61b",
+    "source": {
+      "kind": "Erlla Lut-v1.0.3",
+      "member": "Lut-v1.0.3/PROVIA.json",
+      "archive_sha256": "04c514f91643779a3cb195d06a7324a09c4eda3677870f367adc4aba29b81d57",
+      "sha256": "01cda09c8ac495ca0d722bf139271921b61d2872c17259e3aad600f1c99b4d3e",
+      "full_payload_sha256": "3c79f2b9d76b3e5e2b740006874c2bf0fb5fcd4b4b059c448dfa7c3377d9f60b"
+    }
+  },
+  {
+    "stable_id": 17,
+    "name": "Portra 400 B",
+    "path": "reference_outputs/17_Portra 400 B.npz",
+    "sha256": "082e7aa8047ea261a0cd321453d2ebdfde63030c774ce6f3ce505ceda43e4969",
+    "source": {
+      "kind": "Erlla Lut-v1.0.3",
+      "member": "Lut-v1.0.3/Portra 400 B.json",
+      "archive_sha256": "04c514f91643779a3cb195d06a7324a09c4eda3677870f367adc4aba29b81d57",
+      "sha256": "08952c67b584d851142c333c2d10183f422ec4e361ddeeb5e2bbeee47767684a",
+      "full_payload_sha256": "65839f3365d51bc570c9a6d8d4f0c3031e6bb10fa86d8ca7f7ea0dff21bc51d5"
+    }
+  },
+  {
+    "stable_id": 18,
+    "name": "Portra 400 NB",
+    "path": "reference_outputs/18_Portra 400 NB.npz",
+    "sha256": "465b27ae841a880a547aa086e967d22bc8719c8249e150efb115d6cd50a8ee2f",
+    "source": {
+      "kind": "Erlla Lut-v1.0.3",
+      "member": "Lut-v1.0.3/Portra 400 NB.json",
+      "archive_sha256": "04c514f91643779a3cb195d06a7324a09c4eda3677870f367adc4aba29b81d57",
+      "sha256": "615c1fff51e65a5e420ed6ff0a477dac80652071267aa0196382c64bd078a92e",
+      "full_payload_sha256": "5c5416155fb78602f60aadbb1b0b4d3c66ca193ca790071c6b21f53a9f1a18fc"
+    }
+  },
+  {
+    "stable_id": 19,
+    "name": "FX2_FL2",
+    "path": "reference_outputs/19_FX2_FL2.npz",
+    "sha256": "3c6df3214616806ec981001a9720e109afefcdad3f34a41a33327c5f869fbeb4",
+    "source": {
+      "id": "FX2_FL2",
+      "name": "FX2 FL2",
+      "source": {
+        "kind": "FX2 donor in M4 fixed-A1 port proxy",
+        "path": "erlla_lut_fl23_resources_20261114\\resources\\FX2_1.01_FL23_donor\\FL2",
+        "sha256": "4820deffa0efb5208745822b86cdca4d9ec8b5ec2290975d2214a30ddd0c507a",
+        "donor_fx2_cp_sha256": "eba723db657117a36d9593dacf640840aca893c0d6ee5d728de9d1996b8c5e29",
+        "official_FX2_pixel_equivalence": false
+      },
+      "receipt": {
+        "photo": {
+          "matrix_mapping": "identical-endpoints",
+          "gamma_mapping": "photo context6, explicit knot axis and values",
+          "coefficients": "B/A1/A2 plus captured SR2 7848 weights, int16/Q10 selection",
+          "actual_weights": "0 1024 0 0",
+          "source_RAW_untouched": true
+        },
+        "live_proxy": {
+          "matrix_mapping": "identical-endpoints",
+          "gamma_mapping": "photo context6, explicit knot axis and values",
+          "coefficients": "B/A1/A2 plus captured SR2 7848 weights, int16/Q10 selection",
+          "actual_weights": "0 1024 0 0",
+          "source_RAW_untouched": true
+        },
+        "offline_SR2_adapter": "decoded int16 values repacked; upstream inline pointer bug corrected locally",
+        "live_proxy_qualified": false,
+        "formal_post_grid_size": [
+          129,
+          129,
+          129
+        ],
+        "gamma_fit_context": 6,
+        "spatial_operators_included": false,
+        "adobe_mapping": "sRGB -> D65 XYZ -> AdobeRGB1998, clipped; not a second empirical M4 model"
+      },
+      "output": {
+        "path": "reference_outputs\\FX2_FL2.npz",
+        "bytes": 3777244,
+        "sha256": "3c6df3214616806ec981001a9720e109afefcdad3f34a41a33327c5f869fbeb4"
+      },
+      "source_defaults": {
+        "contrast": 0,
+        "highlights": 0,
+        "shadows": 0,
+        "fade": 0,
+        "saturation": 0,
+        "sharpness": 4,
+        "sharpness_range": 3,
+        "clarity": 1
+      }
+    }
+  },
+  {
+    "stable_id": 20,
+    "name": "FX2_FL3",
+    "path": "reference_outputs/20_FX2_FL3.npz",
+    "sha256": "c137f08e545bf442aead6e3778a82d153cc6a24d0c05df0d9bb6d3076245a31e",
+    "source": {
+      "id": "FX2_FL3",
+      "name": "FX2 FL3",
+      "source": {
+        "kind": "FX2 donor in M4 fixed-A1 port proxy",
+        "path": "erlla_lut_fl23_resources_20261114\\resources\\FX2_1.01_FL23_donor\\FL3",
+        "sha256": "db237273901d769cf2819227d2122edc463af4030c60c7e3285058f1c7ccb809",
+        "donor_fx2_cp_sha256": "eba723db657117a36d9593dacf640840aca893c0d6ee5d728de9d1996b8c5e29",
+        "official_FX2_pixel_equivalence": false
+      },
+      "receipt": {
+        "photo": {
+          "matrix_mapping": "identical-endpoints",
+          "gamma_mapping": "photo context6, explicit knot axis and values",
+          "coefficients": "B/A1/A2 plus captured SR2 7848 weights, int16/Q10 selection",
+          "actual_weights": "0 1024 0 0",
+          "source_RAW_untouched": true
+        },
+        "live_proxy": {
+          "matrix_mapping": "identical-endpoints",
+          "gamma_mapping": "photo context6, explicit knot axis and values",
+          "coefficients": "B/A1/A2 plus captured SR2 7848 weights, int16/Q10 selection",
+          "actual_weights": "0 1024 0 0",
+          "source_RAW_untouched": true
+        },
+        "offline_SR2_adapter": "decoded int16 values repacked; upstream inline pointer bug corrected locally",
+        "live_proxy_qualified": false,
+        "formal_post_grid_size": [
+          129,
+          129,
+          129
+        ],
+        "gamma_fit_context": 6,
+        "spatial_operators_included": false,
+        "adobe_mapping": "sRGB -> D65 XYZ -> AdobeRGB1998, clipped; not a second empirical M4 model"
+      },
+      "output": {
+        "path": "reference_outputs\\FX2_FL3.npz",
+        "bytes": 3775648,
+        "sha256": "c137f08e545bf442aead6e3778a82d153cc6a24d0c05df0d9bb6d3076245a31e"
+      },
+      "source_defaults": {
+        "contrast": 0,
+        "highlights": 0,
+        "shadows": 0,
+        "fade": 0,
+        "saturation": 0,
+        "sharpness": 4,
+        "sharpness_range": 3,
+        "clarity": 1
+      }
+    }
+  },
+  {
+    "stable_id": 21,
+    "name": "FL4",
+    "path": "reference_outputs/21_FL4.npz",
+    "sha256": "60cb91bcac1f16289f2458f56a6cff3102c9160d84abfc95f7d0d94f469ade65",
+    "source": {
+      "kind": "continuous_reference_project_recipe_not_official_Sony_LUT",
+      "files": {
+        "a9_fl43_signed7_r15_20261120\\src\\a7-fl-classic-looks.h": "f2a6c7454ec4a7edf228c3ac54b3531a9078db8158d350e15ef27a03b2b6a381"
+      }
+    }
+  },
+  {
+    "stable_id": 22,
+    "name": "FL5",
+    "path": "reference_outputs/22_FL5.npz",
+    "sha256": "1fc861e769053f82d2e83438bca5d0bc8df1822b88b29810db290e9c57163e26",
+    "source": {
+      "kind": "continuous_reference_project_recipe_not_official_Sony_LUT",
+      "files": {
+        "a9_fl43_signed7_r15_20261120\\src\\a7-fl-classic-looks.h": "f2a6c7454ec4a7edf228c3ac54b3531a9078db8158d350e15ef27a03b2b6a381"
+      }
+    }
+  },
+  {
+    "stable_id": 23,
+    "name": "FL6",
+    "path": "reference_outputs/23_FL6.npz",
+    "sha256": "6d73e1312b4e67c51cc9e4f1290d55d93e2677506f4e1d757e0192f06e581d47",
+    "source": {
+      "kind": "continuous_reference_project_recipe_not_official_Sony_LUT",
+      "files": {
+        "a9_fl43_signed7_r15_20261120\\src\\a7-fl-classic-looks.h": "f2a6c7454ec4a7edf228c3ac54b3531a9078db8158d350e15ef27a03b2b6a381"
+      }
+    }
+  },
+  {
+    "stable_id": 24,
+    "name": "REALA ACE",
+    "path": "reference_outputs/24_REALA ACE.npz",
+    "sha256": "25d2c5eaef75cee304a1344ac419731769cb9057979f9719db5baf6359f20624",
+    "source": {
+      "kind": "Erlla Lut-v1.0.3",
+      "member": "Lut-v1.0.3/REALA ACE.json",
+      "archive_sha256": "04c514f91643779a3cb195d06a7324a09c4eda3677870f367adc4aba29b81d57",
+      "sha256": "649454c409d0da5be3bb9aa89f18e928ab90b43c4e8f7d63e3dc36fb393f1738",
+      "full_payload_sha256": "19d498bc121d6fdd334705c79af65782b366b9cefed75ee23ff624f684017328"
+    }
+  },
+  {
+    "stable_id": 25,
+    "name": "Velvia",
+    "path": "reference_outputs/25_Velvia.npz",
+    "sha256": "d552a9dd7dce3ea1d7d9521224d00d7984b8b4c48b60195ef8502784f4e3c85d",
+    "source": {
+      "kind": "Erlla Lut-v1.0.3",
+      "member": "Lut-v1.0.3/Velvia.json",
+      "archive_sha256": "04c514f91643779a3cb195d06a7324a09c4eda3677870f367adc4aba29b81d57",
+      "sha256": "3966bcf4ea495da433d68a1341c022486d8d75aaedcdc719b55ecf679a1f524d",
+      "full_payload_sha256": "92da22714b774be8685b4d91ed9ab67423fe8b767782a58a9b55134389d4555d"
+    }
+  },
+  {
+    "stable_id": 26,
+    "name": "理光正片",
+    "path": "reference_outputs/26_理光正片.npz",
+    "sha256": "1d89124c7cc1d19308b99ca549e0210607294f1a23ac84102526139bc5c29e21",
+    "source": {
+      "kind": "Erlla Lut-v1.0.3",
+      "member": "Lut-v1.0.3/理光正片.json",
+      "archive_sha256": "04c514f91643779a3cb195d06a7324a09c4eda3677870f367adc4aba29b81d57",
+      "sha256": "b8a161a5172d60c6e6968a8dd8bfc9cdbd9ed3995681049c4f0444315397e56b",
+      "full_payload_sha256": "deec4c8d565ca7144deaab336b534ab0f49c54f61d2f19a9cc2f61a648499c87"
+    }
+  },
+  {
+    "stable_id": 27,
+    "name": "理光负片",
+    "path": "reference_outputs/27_理光负片.npz",
+    "sha256": "7e064ca11a26fa24b8ab815abd533f303a9a27b820a0d649c80b3ea295073e21",
+    "source": {
+      "kind": "Erlla Lut-v1.0.3",
+      "member": "Lut-v1.0.3/理光负片.json",
+      "archive_sha256": "04c514f91643779a3cb195d06a7324a09c4eda3677870f367adc4aba29b81d57",
+      "sha256": "d7f501d7ef5869a284b74c8701fd5810fa72edd4953e5561481fc16ff5270f1c",
+      "full_payload_sha256": "669f6ffd330c99fbfbfa574a137bdb0e7fca79c4c0bcad1643eff4176a2b76bc"
+    }
+  }
+]

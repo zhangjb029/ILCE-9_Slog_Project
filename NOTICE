@@ -1,6 +1,7 @@
 Third-party components bundled in src/vendor/
 ==============================================
 
+
 pmca — Sony-PMCA-RE by ma1co
   https://github.com/ma1co/Sony-PMCA-RE
   License: MIT
@@ -65,3 +66,12 @@ robinshie/Sony_A7M3
   The menu-transplant technique (attaching the change to the real menu-creation
   call) originates here. No upstream binary or address table is redistributed;
   the addresses used by this project were re-derived from the ILCE-9 firmware.
+
+Offline media authoring sources
+===============================
+
+  See tools/media/NOTICE.md and SOURCE_ORIGINS.json for frozen R15/V8 sources,
+  the PCIEARIA/A6400-Extra-Menu SDS encoder (PolyForm Noncommercial 1.0.0),
+  and the GlassMeter by Glass Works CUBE example (CC BY 4.0).
+  Their respective terms and attributions are retained; root MIT does not
+  replace those terms. No private sound recording is included.

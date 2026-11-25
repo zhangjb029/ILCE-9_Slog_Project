@@ -12,6 +12,7 @@ baseline/
 .pytest_cache/
 .superpowers/
 .remember/
+/media-output/
 dist-debug/
 .venv-ci/
 dist-ci/

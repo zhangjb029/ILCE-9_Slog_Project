@@ -9,3 +9,5 @@
 135 个为常规近似，92 个为高误差实验项，指标见 [CATALOG.csv](CATALOG.csv)。Log 输入、ProPhoto 及 Pentax Natural 来源各有基底要求，拟合等级不能证明适合所有照片。名称帮助、保存及导入步骤见项目主手册。
 
 来源许可不统一。宾得社区及 abpy 资源保留 CC BY-NC-SA 4.0；GlassMeter 来源为 CC BY 4.0，署名“Film simulations from GlassMeter by Glass Works (glass-works.ai)”。官方及其他资源保留原厂或作者条款，详见 [source_docs](provenance/source_docs) 及完整包 README。本项目不覆盖来源许可。
+
+自己制作滤镜请看 [LUT 拟合与 A9P 详解](../docs/authoring/R15_V8_LUT拟合与A9P制作详解.md) 和 [离线代码](../tools/media/README.md)。教程附可复现示例、误差评估、双表导出及写卡路径，既有 227 个 A9P 原件不改动。

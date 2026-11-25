@@ -6,6 +6,13 @@
 
 完整新功能步骤见 [v1.9.0 使用与测试手册](docs/manuals/v1.9.0-使用与测试手册.md)，具体滤镜、A9P、自定义名称帮助、三页菜单与声音导入见 [相机操作补充](docs/manuals/v1.9.0-相机操作补充.md)；同样内容已加入 R15NH / V8 页的「完整操作说明（内置）」。旧 R15NH、V8 包及原 FF01 路径已有用户实机记录，**本版安装器集成流程待实机验收**；旧包结果与本版界面集成结果分别记录。
 
+## LUT 与快门声素材制作
+
+- [R15／V8 LUT 拟合与 A9P 制作详解](docs/authoring/R15_V8_LUT拟合与A9P制作详解.md)：颜色空间与 Log 适配、原厂残差锚定、两套拟合配方、signed7／单调约束、误差评估、A9P 二进制格式和导入。
+- [R15／V8 快门声 A9W 制作详解](docs/authoring/R15_V8_快门声A9W制作详解.md)：音频预处理、24 kHz Sony SDS 编码、四槽尺寸与循环配方、A9W V1／V2 校验、保存和启动绑定。
+
+必要的离线制作与检查代码、冻结基线、带许可的 CUBE 示例及验证记录见 [tools/media](tools/media/README.md)。LUT 示例可完整生成与已发布滤镜逐字节一致的 A9P；声音示例用合成音验证，不公开私人音频。此项仅更新仓库，不变更软件版本或新增 Release。
+
 ## 下载 v1.9.1 与 227 款滤镜
 
 [打开 v1.9.1 发布页](https://github.com/zhangjb029/ILCE-9_Slog_Project/releases/tag/v1.9.1)。下载 `A9Tool-1.9.1-Windows-native.zip`，解压后运行其中的 EXE；源码另附 `A9_Slog_Project-1.9.1-source.zip`。也可用新 EXE 替换原程序，保留原 `sessions` 目录及回滚备份。
