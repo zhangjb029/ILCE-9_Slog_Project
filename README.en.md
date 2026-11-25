@@ -4,7 +4,7 @@ Fixes V8 installation being blocked by the pinned historical `07ffd8df…` menu-
 
 R15NH uses the original read, identify, local R12P patch, and FF01 write workflow. No complete partition image is bundled. V8 has a separate deployment tab and requires R15NH. Both support original-session rollback. See [current instructions](README.md) and the in-app operating guide. The older documentation below is retained for the original features.
 
-Media authoring guides (Chinese): [LUT fitting and A9P](docs/authoring/R15_V8_LUT拟合与A9P制作详解.md), [shutter audio and A9W](docs/authoring/R15_V8_快门声A9W制作详解.md). Portable offline source, a frozen synthetic fitting baseline, a licensed CUBE example, and format checks are in [tools/media](tools/media/README.md). This documentation/source update creates no new software version or Release.
+Media authoring guides (Chinese): [LUT fitting and A9P](docs/authoring/R15_V8_LUT拟合与A9P制作详解.md), [shutter audio and A9W](docs/authoring/R15_V8_快门声A9W制作详解.md), and the full [References and Acknowledgements](docs/REFERENCES_AND_ACKNOWLEDGEMENTS.md) index (covering A7R3, A6400, A7M3, ZV-E10, Gen-5, and 227-filter provenance repositories). Portable offline source, a frozen synthetic fitting baseline, a licensed CUBE example, and format checks are in [tools/media](tools/media/README.md). This documentation/source update creates no new software version or Release.
 
 ---
 
@@ -559,6 +559,8 @@ The menu-transplant approach follows **[robinshie/Sony_A7M3](https://github.com/
 Its key insight is what made the transplant work here: attach the change to the **real menu-creation call**, not to `DT_INIT`. An earlier attempt that patched at init time wrote and read back correctly, yet the menu after a restart was unchanged. Everything else — function addresses, property record lengths, the layout of the new entry, the sector-level storage plan — was re-located and re-verified against this camera's own firmware rather than copied, because the A7 III reference differs on every one of those points.
 
 The electronic-shutter flash gates and the PP/Fn slot path come from the research in this repository's `analysis/` tree; their reports are cited in the delivery notes.
+
+For the full cross-model repository bibliography and filter provenance acknowledgements (covering A7R3 `kan-xx` / `Kevin`, A6400/A6100, A7M3, ZV-E10, Gen-5 models, 227 filter sources, and base PMCA/unpacking tools), see [References and Acknowledgements](docs/REFERENCES_AND_ACKNOWLEDGEMENTS.md).
 
 ## Licence
 
